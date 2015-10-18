@@ -79,12 +79,16 @@ class Propagation(db.Model):
             self.cutting = None
             if self.seed is None:
                 self.seed = PropSeed()
+
             self.seed.set_attributes(details)
+
         elif self.prop_type == 'UnrootedCutting':
             self.seed = None
             if self.cutting is None:
                 self.cutting = PropCutting()
+
             self.cutting.set_attributes(details)
+
         elif self.prop_type != 'Other':
             raise ValueError("Unknown propagation type: {}".format(self.prop_type))
 
@@ -119,7 +123,9 @@ class Propagation(db.Model):
                 s = _('Leaves: %s') % leaves_values[c.leaves]
                 if c.leaves == 'Removed' and c.leaves_reduced_pct:
                     s.append('(%s%%)' % c.leaves_reduced_pct)
+
                 values.append(s)
+
             if c.flower_buds:
                 values.append(_('Flower buds: %s') %
                               flower_buds_values[c.flower_buds])
@@ -144,7 +150,9 @@ class Propagation(db.Model):
 
             if c.rooted_pct:
                 values.append(_('Rooted: %s%%') % c.rooted_pct)
+
             s = ', '.join(values)
+
         elif self.prop_type == 'Seed':
             s = str(self)
             seed = self.seed
@@ -153,6 +161,7 @@ class Propagation(db.Model):
                 values.append(_('Pretreatment: %s') % seed.pretreatment)
             if seed.nseeds:
                 values.append(_('# of seeds: %s') % seed.nseeds)
+
             date_sown = get_date(seed.date_sown)
             if date_sown:
                 values.append(_('Date sown: %s') % date_sown)
@@ -164,6 +173,7 @@ class Propagation(db.Model):
                 values.append(_('Covered: %s') % seed.covered)
             if seed.location:
                 values.append(_('Location: %s') % seed.location)
+
             germ_date = get_date(seed.germ_date)
             if germ_date:
                 values.append(_('Germination date: %s') % germ_date)
@@ -171,10 +181,13 @@ class Propagation(db.Model):
                 values.append(_('# of seedlings: %s') % seed.nseedlings)
             if seed.germ_pct:
                 values.append(_('Germination rate: %s%%') % seed.germ_pct)
+
             date_planted = get_date(seed.date_planted)
             if date_planted:
                 values.append(_('Date planted: %s') % date_planted)
+
             s = ', '.join(values)
+
         elif self.notes:
             s = utils.utf8(self.notes)
 

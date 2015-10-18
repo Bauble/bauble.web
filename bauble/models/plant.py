@@ -350,6 +350,7 @@ class Plant(db.Model):
                             object_mapper(self).iterate_properties)
         for prop in properties:
             setattr(plant, prop.key, getattr(self, prop.key))
+
         plant.code = code
 
         # duplicate notes
@@ -357,6 +358,7 @@ class Plant(db.Model):
             new_note = PlantNote()
             for prop in object_mapper(note).iterate_properties:
                 setattr(new_note, prop.key, getattr(note, prop.key))
+
             new_note.id = None
             new_note.plant = plant
 
@@ -365,6 +367,7 @@ class Plant(db.Model):
             new_change = PlantChange()
             for prop in object_mapper(change).iterate_properties:
                 setattr(new_change, prop.key, getattr(change, prop.key))
+
             new_change.id = None
             new_change.plant = plant
 
@@ -374,6 +377,7 @@ class Plant(db.Model):
             for prop in object_mapper(propagation).iterate_properties:
                 setattr(new_propagation, prop.key,
                         getattr(propagation, prop.key))
+
             new_propagation.id = None
             new_propagation.plant = plant
         return plant

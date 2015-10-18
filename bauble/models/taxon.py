@@ -186,6 +186,7 @@ class Taxon(db.Model):
             return
         if vn not in self.vernacular_names:
             self.vernacular_names.append(vn)
+
         d = DefaultVernacularName()
         d.vernacular_name = vn
         self._default_vernacular_name = d
@@ -193,6 +194,7 @@ class Taxon(db.Model):
     def _del_default_vernacular_name(self):
         utils.delete_or_expunge(self._default_vernacular_name)
         del self._default_vernacular_name
+
     default_vernacular_name = property(_get_default_vernacular_name,
                                        _set_default_vernacular_name,
                                        _del_default_vernacular_name)
@@ -268,7 +270,8 @@ class Taxon(db.Model):
                 if taxon.cv_group and not group_added:
                     group_added = True
                     infrasp_parts.append(_("(%(group)s Group)") % \
-                                             dict(group=taxon.cv_group))
+                                         dict(group=taxon.cv_group))
+
                 infrasp_parts.append("'%s'" % escape(epithet))
             else:
                 if rank:
@@ -282,7 +285,7 @@ class Taxon(db.Model):
                 infrasp_parts.append(escape(iauthor))
         if taxon.cv_group and not group_added:
             infrasp_parts.append(_("%(group)s Group") % \
-                                     dict(group=taxon.cv_group))
+                                 dict(group=taxon.cv_group))
 
         # create the binomial part
         binomial = []

@@ -342,6 +342,7 @@ class Accession(db.Model):
         except KeyError:
             self.__cached_taxon_str[(markup, authors)] = None
             cached = None
+
         session = object_session(self.taxon)
         if session:
             # if not part of a session or if the taxon is dirty then
@@ -374,6 +375,7 @@ class Accession(db.Model):
         taxon.genus = self.taxon.genus#session.query(Genus).get(self.taxon.genus_id);
         for col in object_mapper(self.taxon).local_table.c:
             setattr(taxon, col.name, getattr(self.taxon, col.name))
+
         del taxon.id
 
         # generate the string
@@ -384,6 +386,7 @@ class Accession(db.Model):
                 setattr(taxon, self.id_qual_rank,
                         '%s %s' % (self.id_qual,
                                    getattr(taxon, self.id_qual_rank)))
+
             sp_str = Taxon.str(taxon, authors, markup)
         elif self.id_qual:
             sp_str = '%s(%s)' % (Taxon.str(taxon, authors, markup),
