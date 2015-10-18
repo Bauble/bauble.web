@@ -1,0 +1,28 @@
+<div ng-controller="PropagationEditorCtrl" class="propagation-editor">
+
+  <form class="form-horizontal">
+    <div class="form-group">
+
+      <label class="control-label col-md-2">Propagation Type</label>
+      <div class="col-md-2">
+        <select ng-model="propagation.prop_type" class="form-control">
+          <option value="Seed">Seed</option>
+          <option value="UnrootedCutting">Cutting</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      
+      
+      <label class="control-label col-md-2">Date</label>
+      <div class="col-md-2">
+        <input bs-datepicker ng-model="propagation.date" type="text"/>
+      </div>
+
+    </div> <!-- .form-group -->
+    
+
+    <div ng-include="propagation_views[propagation.prop_type]"></div>
+
+  </form>
+
+</div> <!-- .propagation-editor -->

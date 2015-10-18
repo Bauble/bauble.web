@@ -1,0 +1,34 @@
+<div id="login-page">
+
+  <div class="row">
+    <div class="col col-md-4 col-md-offset-4">
+
+      <form class="form-signin" autocorrect="off" autocapitalize="off">
+        <fieldset>
+          <legend>Sign In</legend>
+          <input type="email" placeholder="Email address" ng-model="email"
+                 class="form-control" autocorrect="off" autocapitalize="off"
+                 ng-disabled="working">
+          <input type="password" placeholder="Password" ng-model="password"
+                 class="form-control" ng-disabled="working">
+          <!-- <label class="checkbox"> -->
+          <!--   <input type="checkbox" value="remember-me"> Remember me -->
+          <!-- </label> -->
+          <button class="btn btn-large btn-primary" type="submit"
+                  ng-click="login()" ng-disabled="working">Sign In</button>
+          <span loading-spinner="working"></span>
+          <a style="padding-top: 2em" href="#/signup" class="pull-right">Or signup</a>
+        </fieldset>
+      </form>
+
+      <div class="forgot-password">
+      <a style="margin-top: 3em" href="#/forgot_password">Forget your password?</a>
+      </div>
+
+      <alert ng-show="message" type="'danger'">{{message}}</alert>
+
+    </div> <!-- .col -->
+
+  </div> <!-- .row -->
+
+</div> <!--.login-page -->

@@ -1,0 +1,6 @@
+-r requirements.txt
+flake8
+honcho
+livereload
+pytest>=2.7.2,<2.8a0
+requests-mock

@@ -1,0 +1,7 @@
+<div ng-controller="NotesCtrl">
+  <div ng-repeat="note in notes">
+    <span>By {{note.user}} on {{note.date}} ({{note.category}})
+    <div>{{note.note}}</div>
+    <br>
+  </div>
+</div>

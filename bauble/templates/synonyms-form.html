@@ -1,0 +1,37 @@
+<form role="form" name="synonyms">
+
+  <div class="form-group">
+    <label for="synonym-input">Synonyms</label>
+    <div class="input-group">
+      <input type="text" ng-model="data.newSynonym"
+             placeholder="{{placeholder}}" typeahead-editable="false"
+             typeahead="model as model.str for model in query({$viewValue: $viewValue})"
+             typeahead-loading="loadingSynonyms" class="form-control"
+             id="synonym-input">
+      <span class="input-group-btn">
+        <button class="btn btn-default" ng-disabled="!data.newSynonym"
+                ng-click="model.push(data.newSynonym); data.newSynonym=null;">Add</button>
+      </span>
+    </div>
+  </div>  <!-- .form-group -->
+
+
+  <p ng-hide="model && model.length > 0">
+    No synonyms.
+    <!-- This family doesn't have any synonyms. -->
+  </p>
+
+  <div class="synonyms-list">
+    <div ng-repeat="synonym in model" class="synonym-list-item"
+         ng-click="onClick($event, $index)">
+      <div class="first-cell">{{synonym.str}}</div>
+      <div class="second-cell">
+        <button ng-show="data.selectedSynonym===$index"
+                class="trash-btn slideShowRight"
+                ng-click="model.remove(synonym)">
+          <i class="fa fa-lg fa-trash-o"></i></button>
+      </div>
+    </div>
+  </div>
+
+</form>

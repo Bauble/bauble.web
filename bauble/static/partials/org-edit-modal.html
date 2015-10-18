@@ -1,0 +1,10 @@
+<div ng-init="orgEditModal=true">
+  <div class="modal-body">
+    <div ng-include="'views/org-edit.html'"></div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-primary" ng-click="save(org)">Save</button>
+    <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+  </div>
+</div>

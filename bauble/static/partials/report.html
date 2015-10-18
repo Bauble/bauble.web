@@ -1,0 +1,178 @@
+<div id="report-designer">
+
+  <div class="row" id="report-selector" ng-show="model.showReportSelector">
+    <div class="col-xs-5">
+      <select ng-model="model.report" class="form-control"
+              ng-options="report.name for report in model.reports">
+        <option value="">Select a report</option>
+      </select>
+    </div>
+
+  <div class="col-xs-2">
+      <button class="btn btn-primary" ng-click="newReport()">New report</button>
+    </div>
+  </div> <!-- #report-selector .row -->
+
+  <div class="row" ng-show="model.report">
+    <div class="col-md-6 col-md-offset-1">
+      <div class="report-header row" ng-switch="model.editReportName">
+        <div ng-switch-when="true">
+          <input type="text" class="form-control" ng-model="model.report.name"
+                 ng-blur="model.editReportName=false"></input>
+        </div>
+        <div ng-switch-default>
+          <h3 ng-bind="model.report.name"></h3>
+          <button class="btn btn-link" ng-click="model.editReportName=true">
+            <i class="fa fa-pencil"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row" ng-show="model.report">
+
+    <!-- action button list -->
+    <div class="col-md-1">
+      <ul class="action-icon-list">
+        <li class="dropdown">
+          <a class="dropdown-toggle" tooltip="Edit columns"><i class="fa fa-plus fa-2x"></i></a>
+          <ul class="dropdown-menu column-dropdown" role="menu" aria-labelledby="dLabel">
+            <li ng-repeat="column in model.tableColumns">
+              <a ng-click="column.visible=!column.visible">
+                <i ng-show="column.visible" class="fa fa-check-square-o"></i>
+                <i ng-show="!column.visible" class="fa fa-square-o"></i>
+                {{column.header}}
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- <li><i class="fa fa-cog fa-2x"></i></li> -->
+
+        <li tooltip="Edit query">
+          <a ng-click="model.showQueryBuilder=!model.showQueryBuilder">
+            <i class="fa fa-pencil fa-2x"></i>
+          </a></li>
+        <li tooltip="Refresh">
+          <a ng-click="refreshTable()"><i class="fa fa-refresh fa-2x"></i></a>
+        </li>
+        <li tooltip="Download">
+          <a ng-click="download()"><i class="fa fa-cloud-download fa-2x"></i></a>
+        </li>
+        <li tooltip="Save">
+          <a ng-click="saveReport()"><i class="fa fa-save fa-2x"></i></a>
+        </li>
+      </ul> <!-- .action-icon-list -->
+    </div> <!-- .col-md-1 -->
+
+
+    <div class="col-md-10">
+
+      <div id="report-query-builder" ng-show="model.showQueryBuilder">
+        <div class="panel domain-box">
+          <div class="panel-heading">Select a domain</div>
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-md-2">
+                <select ng-model="model.report.resource"
+                        ng-options="domain.resource as domain.label for domain in domains | orderBy:domain.sort"
+                        class="form-control"></select>
+              </div> <!-- .col -->
+            </div> <!-- .row -->
+          </div> <!-- .panel-body -->
+        </div><!-- .panel -->
+
+        <div class="panel filters-box">
+          <div class="panel-heading">Filters</div>
+          <div class="panel-body">
+            <div class="filters-row form-horizontal" ng-repeat="filter in model.report.filters">
+              <div class="form-group">
+
+                <div ng-show="$index>0" class="col-md-1">
+                  <select ng-model="model.report.filters[$index].boolOp" class="form-control">
+                    <option value="and">and</option>
+                    <option value="or">or</option>
+                  </select>
+                </div>
+
+                <div class="col-md-3">
+                  <div schema-menu on-schema-load='onSchemaMenuLoad()'
+                       selected='model.report.filters[$index].column'
+                       on-select="onFilterSchemaSelect($event, column, selected, $index)"
+                       class="filter-schema-menu" resource="model.report.resource"></div>
+                </div>
+
+                <div class="col-md-1">
+                  <select ng-model="model.report.filters[$index].operator" class="form-control"
+                          ng-options="key for (key, value) in operators"></select>
+                  <!-- <select ng-options="= +">Operator</select> -->
+                </div>
+                <div class="col-md-4">
+                  <input ng-model="model.report.filters[$index].value" type="text"
+                         class="form-control"/> <!-- type depending on field type -->
+                </div>
+
+                <div class="col-md-1 ">
+                  <button class="remove-button btn btn-link" ng-click="model.report.filters.splice($index)">
+                    <i class="fa fa-times"></i></a>
+                </div>
+              </div> <!-- .form-group -->
+            </div> <!-- .filters-row .form-horizontal -->
+            <button type="button" class="btn" ng-click="addFilterField()">Add</button>
+          </div><!-- .panel-body -->
+        </div> <!-- .panel .filters-box-->
+
+        <div class="panel order-box">
+          <div class="panel-heading">Order By</div>
+          <div class="panel-body">
+            <div class="order-row form-horizontal" ng-repeat="order in orders">
+
+              <div class="form-group">
+                <div class="col-md-3">
+                  <div schema-menu class="filter-schema-menu" resource="model.report.resource"></div>
+                </div>
+
+                <div class="col-md-1">
+                  <select ng-model="model.report.filters[$index].operator" class="form-control">
+                    <option>Ascending</option>
+                    <option>Descending</option>
+                  </select>
+                </div>
+              </div> <!-- .form-group -->
+            </div> <!-- .order-row .form-horizontal -->
+            <button type="button" class="btn" ng-click="addOrder()">Add</button>
+          </div> <!-- .panel-body -->
+        </div>   <!-- .panel .order-box -->
+
+        <button type="button" class="btn btn-primary"
+                ng-click="refreshTable();model.showQueryBuilder=false"
+                id="report-create-button" ng-disabled="validateQuery()" ng-bind='model.refreshButtonText'><!-- bind --></button>
+
+      </div>   <!-- #report-query-builder -->
+
+
+      <div class="message" ng-hide="model.tableData.length >= 0  && !model.message"
+           ng-bind="model.message"></div>
+
+      <!-- table data -->
+      <div ng-show="model.tableData != null">
+        <table class="report-table table">
+          <thead>
+            <th class="report-table-header" ng-repeat="column in model.tableColumns"
+                ng-show="column.visible" ng-mouseenter="showColButtons($event, $index)">
+              {{column.header}}
+            </th>
+          </thead>
+          <tbody>
+            <tr class="report-table-row" ng-repeat="row in model.tableData">
+              <td class="report-table-cell"  ng-show="column.visible"
+                  ng-repeat="column in model.tableColumns">{{row[column.name]}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div> <!-- .row -->
+
+</div> <!-- .report-designer -->

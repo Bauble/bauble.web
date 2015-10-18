@@ -1,0 +1,80 @@
+<div class="editor-section">
+
+  <h4>Sowing data</h4>
+
+  <div class="form-group">
+    <label class="control-label col-md-2">Pretreatment</label>
+    <div class="col-md-6">
+      <textarea ng-model="propagation._seed.pretreatment" class="form-control"></textarea>
+    </div>
+  </div> <!-- .form-group -->
+
+  <div class="form-group">
+    <label class="control-label col-md-2"># of Seeds</label>
+    <div class="col-md-1">
+      <input type="text" ng-model="propagation._seed.nseeds" class="form-control"/>
+    </div>
+  </div> <!-- .form-group -->
+
+  <div class="form-group">
+    <label class="control-label col-md-2">Date Sown</label>
+    <div class="col-md-2">
+      <input bs-datepicker type="text" ng-model="propagation._seed.date_sown"/>
+    </div>
+  </div> <!-- .form-group -->
+
+  <div class="form-group">
+    <label class="control-label col-md-2">Location</label>
+    <div class="col-md-4">
+      <input type="text" ng-model="propagation._seed.location" class="form-control"/>
+    </div>
+  </div> <!-- .form-group -->
+
+  <div class="form-group">
+    <label class="control-label col-md-2">Container</label>
+    <div class="col-md-2">
+      <input type="text" ng-model="propagation._seed.container" class="form-control"/>
+    </div>
+  </div> <!-- .form-group -->
+
+  <div class="form-group">
+    <label class="control-label col-md-2">Germination Media</label>
+    <div class="col-md-3">
+      <input type="text" ng-model="propagation._seed.media" class="form-control"/>
+    </div>
+  </div> <!-- .form-group -->
+</div> <!-- .editor-section -->
+
+<div class="editor-section">
+  <h4>Germination data</h4>
+  <div class="form-group">
+    <label class="control-label col-md-2">Date Germinated</label>
+    <div class="col-md-2">
+      <input bs-datepicker type="text" ng-model="propagation._seed.germ_date"/>
+    </div>
+  </div> <!-- .form-group -->
+
+  <div class="form-group">
+    <label class="control-label col-md-2"># Germinated</label>
+    <div class="col-md-1">
+      <input type="text" class="form-control" ng-model="propagation._seed.nseedlings"/>
+    </div>
+  </div> <!-- .form-group -->
+
+  <div class="form-group">
+    <label class="control-label col-md-2">% Germinated</label>
+    <div class="col-md-2">
+      <input type="text" class="form-control" ng-model="propagation._seed.germ_pct"/>
+    </div> <!-- .controls -->
+  </div> <!-- .form-group -->
+
+  <div class="form-group">
+    <label class="control-label col-md-2">Date Planted</label>
+    <div class="col-md-2">
+      <input bs-datepicker type="text" ng-model="propagation._seed.date_planted"/>
+    </div> <!-- .controls -->
+  </div> <!-- .form-group -->
+
+</div>  <!-- .editor-section -->
+
+</div>

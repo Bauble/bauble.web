@@ -1,0 +1,49 @@
+<!-- -*- engine: django -*- -->
+<!DOCTYPE html>
+<html>
+    <head>
+        {% include '_css.html' %}
+    </head>
+    <div id="signup-page" class="container">
+
+        <div class="row">
+            <form class="col-md-6 col-md-offset-2" role="form">
+
+                <legend>Signup</legend>
+
+                <div class="form-group">
+                    <label for="email">Email address</label>
+                    <input type="email" ng-model="user.email" id="email"
+                           class="form-control" autocapitalize="off" autocorrect="off"
+                           ng-disabled="working" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" ng-model="user.password" id="password"
+                           class="form-control" ng-disabled="working" required>
+                </div>
+
+                <!-- TODO: we need to add a CAPTCHA here -->
+
+                <button type="submit" class="btn btn-default" ng-click="save()"
+                        ng-disabled="working">
+                    Create your account
+                </button><span loading-spinner="working"></span>
+
+                <alert ng-show="message" type="'danger'" close="error=null"
+                       style="margin-top: 2em">{{message}}</alert>
+
+            </form>
+
+
+            <!-- <div class=" col-md-offset-1 welcome" ng-show="orgCreated"> -->
+            <!--   <h3>Welcome to Bauble!</h3> -->
+            <!--   <p> -->
+            <!--     Thank you for creating an account on Bauble.   -->
+            <!--   </p> -->
+            <!-- </div> -->
+
+        </div> <!-- .row -->
+    </div> <!-- #new-user-page -->
+</html>

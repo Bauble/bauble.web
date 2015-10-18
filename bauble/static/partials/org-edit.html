@@ -1,0 +1,54 @@
+<div class="row">
+  <div class="col-md-8 col-md-offset-2">
+    <h3 ng-if="!org._id">Create an organization</h3>
+    <form role="form">
+      <div class="form-group">
+        <label for="org-name-input">Full Name</label>
+        <input type="text" class="form-control" id="org-name-input"
+               placeholder="Royal Botanic Gardens" ng-model="org.name">
+      </div>
+
+      <div class="form-group">
+        <label for="org-shortname-input">Short Name</label>
+        <input type="text" class="form-control" id="org-shortname-input"
+               placeholder="RBG" ng-model="org.short_name">
+      </div>
+
+      <div class="form-group">
+        <label for="org-address-textarea">Address</label>
+        <textarea class="form-control" id="org-address-input" ng-model="org.address"
+                  placeholder="Royal Botanic Gardens"></textarea>
+      </div>
+
+      <div class="form-group">
+        <div class="row">
+
+          <div class="col-md-5">
+            <label for="org-city-input">City</label>
+            <input type="text" class="form-control" id="org-city-input"
+                   placeholder="Dallas" ng-model="org.city">
+          </div>
+
+          <div class="col-md-3">
+            <label for="org-state-input">State</label>
+            <input type="text" class="form-control" id="org-state-input"
+                   placeholder="Texas" ng-model="org.state">
+          </div>
+
+          <div class="col-md-4">
+            <label for="org-zip-input">Zip</label>
+            <input type="text" class="form-control" id="org-zip-input"
+                   placeholder="012333" ng-model="org.zip">
+          </div>
+
+        </div> <!-- .row -->
+      </div> <!-- .form-group -->
+
+
+      <div class="form-group" ng-if="!orgEditModal">
+       <button type="submit" class="btn btn-default" ng-click="save(org)">Save</button>
+      </div>
+    </form>
+
+  </div>  <!-- .col-md-8 -->
+</div> <!-- .row -->

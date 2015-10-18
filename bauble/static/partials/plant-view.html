@@ -1,0 +1,44 @@
+<div ng-controller="PlantViewCtrl">
+
+  <div class="row">
+    <div class="col-md-10">
+
+      <h3><a ng-href="{{'#/search?q=accession where id%3d' + plant.accession.id}}">{{accCode}}</a>{{plantCode}}</h3>
+      <h4><a ng-href="{{'#/search?q=taxon where id%3d' + plant.accession.taxon_id}}">{{plant.accession.taxon_str}}</a></h4>
+
+      <div>Location: <a ng-href="#/search?q=location where code%3d'{{plant.location.code}}'">{{plant.location.str}}</a></div>
+      <div>Type: {{plant.acc_type}}</div>
+      <div>Quantity: {{plant.quantity}}</div>
+      <div>Memorial: {{plant.memorial}}</div>
+
+      <!-- <h4>Changes</h4>
+      <ul>
+      <li ng-repeat="change for change in plant.changes">
+      </ul> -->
+
+      <h4>Propagations</h4>
+      <div ng-show="!plant.propagations || plant.propagations.length < 1" style="color: #aaa">
+        This plant has no propagation.
+      </div>
+      <ul>
+        <li ng-repeat="propagation in plant.propagations" loading-spinner="plant.propagations">
+          {{propagation.str}}
+        </li>
+      </ul>
+
+      <!-- <h4>Notes</h4> -->
+
+    </div>
+
+    <div class="col-md-2">
+      <div id="summary-buttons">
+        <a class="btn btn-default" location-push ng-href="#/plant/{{plant.id}}/edit">
+          <i class="fa fa-pencil"></i>Edit</a>
+        <a class="btn btn-default" ng-click="delete(plant.id)">
+          <i class="fa fa-trash-o"></i>Delete</a>
+      </div>
+    </div>
+
+  </div> <!-- .row -->
+
+</div>

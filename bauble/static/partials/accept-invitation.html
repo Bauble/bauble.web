@@ -1,0 +1,24 @@
+<div id="accept-invitation-page">
+  <i ng-show="loading" class="text-center" class="fa fa-spinner fa-spin fa-3x"></i>
+
+  <div ng-show="tokenFound" class="row">
+    <div class="col-md-4 col-md-offset-4">
+      <h2>Welcome to Bauble!</h2>
+
+
+      <form id="change-password-form" role="form">
+        <div class="form-group">
+          <label for="password1-input">Set your password</label>
+          <input type="password" class="form-control" id="password1-input"
+                 ng-model="model.password1" placeholder="Enter password">
+          <input type="password" class="form-control" id="password2-input"
+                 ng-model="model.password2" placeholder="Confirm password">
+        </div>
+
+        <button type="submit" class="change-pwd-btn btn btn-default"
+                ng-disabled="model.password1 && (model.password1 !== model.password2)"
+                ng-click="save(token, model.password1)">Accept Invitation</button>
+      </form>
+    </div> <!-- .col -->
+  </div> <!-- .row -->
+</div> <!-- #accept-invitation-page -->

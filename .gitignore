@@ -1,0 +1,6 @@
+.python-version
+*.pyc
+*~
+posse/static/css/menu.css
+posse/static/css/main.css
+posse/static/css/all.min.css

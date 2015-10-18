@@ -1,0 +1,18 @@
+<div>
+  <!-- <div class="modal-header">
+  <h3>Delete {{resourceName}}</h3>
+  </div> -->
+  <div class="modal-body">
+
+    <h3>Delete {{str}}?</h3>
+
+    <p>If you delete this resource it will be gone forever.</p>
+
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary" ng-click="delete()">Delete</button>
+    <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+  </div>
+
+  <div ng-show="selected">Selection from a modal: {{ selected }}</div>
+</div>

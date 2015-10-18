@@ -1,0 +1,22 @@
+<div id="dashboard-page">
+  <form autocapitalize="off" autocorrect="off">
+    <div class="row">
+      <div class="search-box col-md-12">
+        <div class="input-group">
+          <!-- <span class="input-group-btn">
+          <button class="btn btn-default" type="button"><i class="fa fa-cog"></i></button>
+          </span> -->
+          <input id="search-field" ng-model="q" type="text" autocomplete="off"
+                 autocorrect="off" autocapitalize="off" spellcheck="false"
+                 placeholder="Enter a search query" class="form-control"/>
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="submit" ng-click="search(q)" ng-disabled="!q">
+              Search</button>
+          </span>
+        </div> <!-- .input-group -->
+      </div> <!-- .search-box -->
+
+      <div class="col-md-12" style="text-align: center">Please enter a search query</div>
+    </div> <!-- .row -->
+  </form>
+</div>

@@ -1,0 +1,24 @@
+<div id="org-invite-modal">
+  <div class="modal-body">
+
+    <form role="form">
+      <div class="form-group">
+        <label class="sr-only" for="email-input">Email address</label>
+        <input type="email" class="form-control" id="email-input"
+               ng-model="model.email" placeholder="Enter email">
+        <div class="help-block">You can not send an invitation to an email
+          address that already has an account on Bauble.  If you need help
+          please <a href="mailto:support@bauble.io">contact us</a></div>
+      </div>
+
+      <span ng-if="changePasswordSuccess === true" class="success">Saved.</span>
+      <span ng-if="changePasswordSuccess === false" class="error">Error.</span>
+    </form>
+
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-primary" ng-click="send(model.email)">Send</button>
+    <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+  </div>
+</div>
