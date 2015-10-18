@@ -1,5 +1,5 @@
-from sqlalchemy import *
-from sqlalchemy.orm import *
+from sqlalchemy import Column, String, Text
+from sqlalchemy.orm import backref, relationship
 
 import bauble.db as db
 import bauble.search as search
@@ -35,7 +35,7 @@ class Location(db.Model):
     description = Column(Text)
 
     # relations
-    plants = relation('Plant', backref=backref('location', uselist=False))
+    plants = relationship('Plant', backref=backref('location', uselist=False))
 
     def __str__(self):
         if self.name:

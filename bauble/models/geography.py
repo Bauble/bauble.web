@@ -1,7 +1,7 @@
 from operator import itemgetter
 
-from sqlalchemy import *
-from sqlalchemy.orm import *
+from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy.orm import backref, object_session, relationship
 
 import bauble
 import bauble.db as db
@@ -71,12 +71,12 @@ class Geography(db.Model):
 
 
 # late bindings
-Geography.children = relation(Geography,
-                              primaryjoin=Geography.parent_id==Geography.id,
-                              cascade='all',
-                              backref=backref("parent",
-                                              remote_side=[Geography.__table__.c.id]),
-                              order_by=[Geography.name])
+Geography.children = relationship(Geography,
+                                  primaryjoin=Geography.parent_id==Geography.id,
+                                  cascade='all',
+                                  backref=backref("parent",
+                                                  remote_side=[Geography.__table__.c.id]),
+                                  order_by=[Geography.name])
 
 # setup search mapper
 mapper_search = search.get_strategy('MapperSearch')

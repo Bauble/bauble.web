@@ -2,7 +2,7 @@ import xml
 
 from sqlalchemy import (func, Column, Date, Enum, ForeignKey, Integer, String, Text,
                         UniqueConstraint)
-from sqlalchemy.orm import backref, relation
+from sqlalchemy.orm import backref, relationship
 from sqlalchemy.ext.associationproxy import association_proxy
 
 import bauble.db as db
@@ -79,14 +79,14 @@ class Genus(db.Model):
     qualifier = Column(Enum('s. lat.', 's. str', ''))
 
     family_id = Column(Integer, ForeignKey('family.id'), nullable=False)
-    family = relation('Family', backref=backref('genera', cascade='all,delete-orphan'))
+    family = relationship('Family', backref=backref('genera', cascade='all,delete-orphan'))
 
     # relations
     synonyms = association_proxy('_synonyms', 'synonym')
-    _synonyms = relation('GenusSynonym',
-                         primaryjoin='Genus.id==GenusSynonym.genus_id',
-                         cascade='all, delete-orphan', uselist=True,
-                         backref='genus')
+    _synonyms = relationship('GenusSynonym',
+                             primaryjoin='Genus.id==GenusSynonym.genus_id',
+                             cascade='all, delete-orphan', uselist=True,
+                             backref='genus')
 
     def __str__(self):
         return Genus.str(self)
@@ -117,8 +117,8 @@ class GenusNote(db.Model):
     category = Column(String(32))
     note = Column(Text, nullable=False)
     genus_id = Column(Integer, ForeignKey('genus.id'), nullable=False)
-    genus = relation('Genus', uselist=False,
-                     backref=backref('notes', cascade='all, delete-orphan'))
+    genus = relationship('Genus', uselist=False,
+                         backref=backref('notes', cascade='all, delete-orphan'))
 
 
 
@@ -135,8 +135,8 @@ class GenusSynonym(db.Model):
                         unique=True)
 
     # relations
-    synonym = relation('Genus', uselist=False,
-                       primaryjoin='GenusSynonym.synonym_id==Genus.id')
+    synonym = relationship('Genus', uselist=False,
+                           primaryjoin='GenusSynonym.synonym_id==Genus.id')
 
 
     def __init__(self, synonym=None, **kwargs):
@@ -153,8 +153,8 @@ class GenusSynonym(db.Model):
 
 # TODO: could probably incorporate this into the class since if we can
 # avoid using the Taxon class name in the order_by
-Genus.taxa = relation('Taxon', cascade='all, delete-orphan',
-                      backref=backref('genus', uselist=False))
+Genus.taxa = relationship('Taxon', cascade='all, delete-orphan',
+                          backref=backref('genus', uselist=False))
 
 
 #  setup the search matches

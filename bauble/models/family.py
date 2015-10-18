@@ -1,6 +1,6 @@
 from sqlalchemy import (func, Column, Date, Enum, ForeignKey, Integer, String, Text,
                         UniqueConstraint)
-from sqlalchemy.orm import relation, backref
+from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.associationproxy import association_proxy
 
 import bauble.db as db
@@ -58,10 +58,10 @@ class Family(db.Model):
 
     # relations
     synonyms = association_proxy('_synonyms', 'synonym')
-    _synonyms = relation('FamilySynonym',
-                         primaryjoin='Family.id==FamilySynonym.family_id',
-                         cascade='all, delete-orphan', uselist=True,
-                         backref='family')
+    _synonyms = relationship('FamilySynonym',
+                             primaryjoin='Family.id==FamilySynonym.family_id',
+                             cascade='all, delete-orphan', uselist=True,
+                             backref='family')
 
     def __str__(self):
         return Family.str(self)
@@ -84,8 +84,8 @@ class FamilyNote(db.Model):
     category = Column(String(32))
     note = Column(Text, nullable=False)
     family_id = Column(Integer, ForeignKey('family.id'), nullable=False)
-    family = relation('Family', uselist=False,
-                      backref=backref('notes', cascade='all, delete-orphan'))
+    family = relationship('Family', uselist=False,
+                          backref=backref('notes', cascade='all, delete-orphan'))
 
 
 class FamilySynonym(db.Model):
@@ -108,8 +108,8 @@ class FamilySynonym(db.Model):
                         unique=True)
 
     # relations
-    synonym = relation('Family', uselist=False,
-                       primaryjoin='FamilySynonym.synonym_id==Family.id')
+    synonym = relationship('Family', uselist=False,
+                           primaryjoin='FamilySynonym.synonym_id==Family.id')
 
     def __init__(self, synonym=None, **kwargs):
         # it is necessary that the first argument here be synonym for

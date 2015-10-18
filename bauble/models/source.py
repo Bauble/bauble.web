@@ -43,7 +43,7 @@ class Source(db.Model):
 
     # relation to a Propagation that already exists and is attached
     # to a Plant
-    plant_propagation_id = Column(Integer, ForeignKey('plant_prop.id'))
+    plant_propagation_id = Column(Integer, ForeignKey('plant_propagation.id'))
     plant_propagation = relationship("PlantPropagation", foreign_keys=plant_propagation_id,
                                      uselist=False)
 

@@ -1,7 +1,7 @@
 from flask.ext.babel import gettext as _
-from sqlalchemy import (func, Boolean, Column, Date, DateTime, Enum, ForeignKey, Integer,
-                        String, Text, UniqueConstraint)
-from sqlalchemy.orm import backref, object_mapper, relation
+from sqlalchemy import (and_, func, Boolean, Column, Date, DateTime, Enum, ForeignKey,
+                        Integer, String, Text, UniqueConstraint)
+from sqlalchemy.orm import backref, object_mapper, relationship
 from sqlalchemy.exc import DBAPIError
 
 import bauble.db as db
@@ -97,8 +97,8 @@ class PlantNote(db.Model):
     category = Column(String)
     note = Column(Text, nullable=False)
     plant_id = Column(Integer, ForeignKey('plant.id'), nullable=False)
-    plant = relation('Plant', uselist=False,
-                     backref=backref('notes', cascade='all, delete-orphan'))
+    plant = relationship('Plant', uselist=False,
+                         backref=backref('notes', cascade='all, delete-orphan'))
 
 
 
@@ -152,17 +152,17 @@ class PlantChange(db.Model):
     date = Column(DateTime(True), default=func.now())
 
     # relations
-    plant = relation('Plant', uselist=False,
-                     primaryjoin='PlantChange.plant_id == Plant.id',
-                     backref=backref('changes', cascade='all, delete-orphan'))
-    parent_plant = relation('Plant', uselist=False,
-                            primaryjoin='PlantChange.parent_plant_id == Plant.id',
-                            backref=backref('branches', cascade='all, delete-orphan'))
+    plant = relationship('Plant', uselist=False,
+                         primaryjoin='PlantChange.plant_id == Plant.id',
+                         backref=backref('changes', cascade='all, delete-orphan'))
+    parent_plant = relationship('Plant', uselist=False,
+                                primaryjoin='PlantChange.parent_plant_id == Plant.id',
+                                backref=backref('branches', cascade='all, delete-orphan'))
 
-    from_location = relation('Location',
-                             primaryjoin='PlantChange.from_location_id == Location.id')
-    to_location = relation('Location',
-                           primaryjoin='PlantChange.to_location_id == Location.id')
+    from_location = relationship('Location',
+                                 primaryjoin='PlantChange.from_location_id == Location.id')
+    to_location = relationship('Location',
+                               primaryjoin='PlantChange.to_location_id == Location.id')
 
 
 
@@ -296,10 +296,10 @@ class Plant(db.Model):
     accession_id = Column(Integer, ForeignKey('accession.id'), nullable=False)
     location_id = Column(Integer, ForeignKey('location.id'), nullable=False)
 
-    propagations = relation('Propagation', cascade='all, delete-orphan',
-                            single_parent=True,
-                            secondary=PlantPropagation.__table__,
-                            backref=backref('plant', uselist=False))
+    propagations = relationship('Propagation', cascade='all, delete-orphan',
+                                single_parent=True,
+                                secondary=PlantPropagation.__table__,
+                                backref=backref('plant', uselist=False))
 
     _delimiter = None
 

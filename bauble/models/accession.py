@@ -1,6 +1,6 @@
 from sqlalchemy import (func, Boolean, Column, Date, Enum, ForeignKey, Integer, String,
                         Text, UniqueConstraint)
-from sqlalchemy.orm import (backref, object_mapper, reconstructor, relation,
+from sqlalchemy.orm import (backref, object_mapper, reconstructor, relationship,
                             MapperExtension, EXT_CONTINUE)
 from sqlalchemy.orm.session import object_session
 
@@ -114,9 +114,8 @@ class Verification(db.Model):
     # what it was verified from
     prev_taxon_id = Column(Integer, ForeignKey('taxon.id'), nullable=False)
 
-    taxon = relation('Taxon', primaryjoin='Verification.taxon_id==Taxon.id')
-    prev_taxon = relation('Taxon',
-                          primaryjoin='Verification.prev_taxon_id==Taxon.id')
+    taxon = relationship('Taxon', primaryjoin='Verification.taxon_id==Taxon.id')
+    prev_taxon = relationship('Taxon', primaryjoin='Verification.prev_taxon_id==Taxon.id')
 
     notes = Column(Text)
 
@@ -150,7 +149,7 @@ class Voucher(db.Model):
     parent_material = Column(Boolean, default=False)
     accession_id = Column(Integer, ForeignKey('accession.id'), nullable=False)
 
-    # accession  = relation('Accession', uselist=False,
+    # accession  = relationship('Accession', uselist=False,
     #                       backref=backref('vouchers',
     #                                       cascade='all, delete-orphan'))
 
@@ -166,8 +165,8 @@ class AccessionNote(db.Model):
     category = Column(String(32))
     note = Column(Text, nullable=False)
     accession_id = Column(Integer, ForeignKey('accession.id'), nullable=False)
-    accession = relation('Accession', uselist=False,
-                         backref=backref('notes', cascade='all, delete-orphan'))
+    accession = relationship('Accession', uselist=False,
+                             backref=backref('notes', cascade='all, delete-orphan'))
 
 
 
@@ -283,26 +282,26 @@ class Accession(db.Model):
     intended2_location_id = Column(Integer, ForeignKey('location.id'))
 
     # the source of the accession
-    source = relation('Source', uselist=False, cascade='all, delete-orphan',
-                      backref=backref('accession', uselist=False))
+    source = relationship('Source', uselist=False, cascade='all, delete-orphan',
+                          backref=backref('accession', uselist=False))
 
     # relations
-    taxon = relation('Taxon', uselist=False,
-                     backref=backref('accessions', cascade='all, delete-orphan'))
+    taxon = relationship('Taxon', uselist=False,
+                         backref=backref('accessions', cascade='all, delete-orphan'))
 
     # use Plant.code for the order_by to avoid ambiguous column names
-    plants = relation('Plant', cascade='all, delete-orphan',
-                      #order_by='plant.code',
+    plants = relationship('Plant', cascade='all, delete-orphan',
+                          #order_by='plant.code',
                       backref=backref('accession', uselist=False))
-    verifications = relation('Verification',  # order_by='date',
-                             cascade='all, delete-orphan',
-                             backref=backref('accession', uselist=False))
-    vouchers = relation('Voucher', cascade='all, delete-orphan',
-                        backref=backref('accession', uselist=False))
-    intended_location = relation('Location',
-                                 primaryjoin='Accession.intended_location_id==Location.id')
-    intended2_location = relation('Location',
-                                  primaryjoin='Accession.intended2_location_id==Location.id')
+    verifications = relationship('Verification',  # order_by='date',
+                                 cascade='all, delete-orphan',
+                                 backref=backref('accession', uselist=False))
+    vouchers = relationship('Voucher', cascade='all, delete-orphan',
+                            backref=backref('accession', uselist=False))
+    intended_location = relationship('Location',
+                                     primaryjoin='Accession.intended_location_id==Location.id')
+    intended2_location = relationship('Location',
+                                      primaryjoin='Accession.intended2_location_id==Location.id')
 
     def __init__(self, *args, **kwargs):
         super(Accession, self).__init__(*args, **kwargs)

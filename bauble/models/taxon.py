@@ -3,7 +3,7 @@ from itertools import chain
 from flask.ext.babel import gettext as _, ngettext as _n
 from sqlalchemy import (func, Boolean, Column, Date, Enum, ForeignKey, Integer, String,
                         Text, UniqueConstraint)
-from sqlalchemy.orm import relation, backref
+from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.associationproxy import association_proxy
 
 import bauble.db as db
@@ -139,27 +139,27 @@ class Taxon(db.Model):
 
     # relations
     synonyms = association_proxy('_synonyms', 'synonym')
-    _synonyms = relation('TaxonSynonym',
-                         primaryjoin='Taxon.id==TaxonSynonym.taxon_id',
-                         cascade='all, delete-orphan', uselist=True,
-                         backref='taxon')
+    _synonyms = relationship('TaxonSynonym',
+                             primaryjoin='Taxon.id==TaxonSynonym.taxon_id',
+                             cascade='all, delete-orphan', uselist=True,
+                             backref='taxon')
 
 
-    vernacular_names = relation('VernacularName', cascade='all, delete-orphan',
-                                collection_class=VNList,
+    vernacular_names = relationship('VernacularName', cascade='all, delete-orphan',
+                                    collection_class=VNList,
+                                    backref=backref('taxon', uselist=False))
+    _default_vernacular_name = relationship('DefaultVernacularName', uselist=False,
+                                            cascade='all, delete-orphan',
+                                            backref=backref('taxon', uselist=False))
+    distribution = relationship('TaxonDistribution',
+                                cascade='all, delete-orphan',
                                 backref=backref('taxon', uselist=False))
-    _default_vernacular_name = relation('DefaultVernacularName', uselist=False,
-                                        cascade='all, delete-orphan',
-                                        backref=backref('taxon', uselist=False))
-    distribution = relation('TaxonDistribution',
-                            cascade='all, delete-orphan',
-                            backref=backref('taxon', uselist=False))
 
     habit_id = Column(Integer, ForeignKey('habit.id'), default=None)
-    habit = relation('Habit', uselist=False, backref='taxa')
+    habit = relationship('Habit', uselist=False, backref='taxa')
 
     flower_color_id = Column(Integer, ForeignKey('color.id'), default=None)
-    flower_color = relation('Color', uselist=False, backref='taxa')
+    flower_color = relationship('Color', uselist=False, backref='taxa')
 
     #hardiness_zone = Column(String(4))
 
@@ -348,8 +348,8 @@ class TaxonNote(db.Model):
     category = Column(String(32))
     note = Column(Text, nullable=False)
     taxon_id = Column(Integer, ForeignKey('taxon.id'), nullable=False)
-    taxon = relation('Taxon', uselist=False,
-                     backref=backref('notes', cascade='all, delete-orphan'))
+    taxon = relationship('Taxon', uselist=False,
+                         backref=backref('notes', cascade='all, delete-orphan'))
 
 
 
@@ -365,8 +365,8 @@ class TaxonSynonym(db.Model):
                         nullable=False, unique=True)
 
     # relations
-    synonym = relation('Taxon', uselist=False,
-                       primaryjoin='TaxonSynonym.synonym_id==Taxon.id')
+    synonym = relationship('Taxon', uselist=False,
+                           primaryjoin='TaxonSynonym.synonym_id==Taxon.id')
 
     def __init__(self, synonym=None, **kwargs):
         # it is necessary that the first argument here be synonym for
@@ -444,7 +444,7 @@ class DefaultVernacularName(db.Model):
                                 nullable=False)
 
     # relations
-    vernacular_name = relation(VernacularName, uselist=False)
+    vernacular_name = relationship(VernacularName, uselist=False)
 
     def __str__(self):
         return str(self.vernacular_name)
@@ -478,9 +478,9 @@ class TaxonDistribution(db.Model):
 
 
 # late bindings
-TaxonDistribution.geography = relation('Geography',
-                primaryjoin='TaxonDistribution.geography_id==Geography.id',
-                                         uselist=False)
+TaxonDistribution.geography = relationship('Geography',
+                                           primaryjoin='TaxonDistribution.geography_id==Geography.id',
+                                           uselist=False)
 
 class Habit(db.Model):
     name = Column(String(64))

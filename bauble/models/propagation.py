@@ -2,7 +2,7 @@ import datetime
 
 from flask.ext.babel import gettext as _
 from sqlalchemy import Column, Date, Enum, ForeignKey, Integer, String, Text
-from sqlalchemy.orm import backref, relation
+from sqlalchemy.orm import backref, relationship
 from sqlalchemy.exc import DBAPIError
 
 import bauble
@@ -25,8 +25,8 @@ class PlantPropagation(db.Model):
     propagation_id = Column(Integer, ForeignKey('propagation.id'),
                             nullable=False)
 
-    propagation = relation('Propagation', uselist=False)
-    plant = relation('Plant', uselist=False)
+    propagation = relationship('Propagation', uselist=False)
+    plant = relationship('Plant', uselist=False)
 
 
     def json(self, depth=1):
@@ -49,15 +49,15 @@ class Propagation(db.Model):
     notes = Column(Text)
     date = Column(Date)
 
-    cutting = relation('PropCutting',
-                       primaryjoin='Propagation.id==PropCutting.propagation_id',
-                       cascade='all,delete-orphan', uselist=False,
-                       backref=backref('propagation', uselist=False))
+    cutting = relationship('PropCutting',
+                           primaryjoin='Propagation.id==PropCutting.propagation_id',
+                           cascade='all,delete-orphan', uselist=False,
+                           backref=backref('propagation', uselist=False))
 
-    seed = relation('PropSeed',
-                    primaryjoin='Propagation.id==PropSeed.propagation_id',
-                    cascade='all,delete-orphan', uselist=False,
-                    backref=backref('propagation', uselist=False))
+    seed = relationship('PropSeed',
+                        primaryjoin='Propagation.id==PropSeed.propagation_id',
+                        cascade='all,delete-orphan', uselist=False,
+                        backref=backref('propagation', uselist=False))
 
 
     def _get_details(self):
@@ -347,8 +347,8 @@ class PropCutting(db.Model):
     propagation_id = Column(Integer, ForeignKey('propagation.id'),
                             nullable=False)
 
-    rooted = relation('PropRooted', cascade='all,delete-orphan',
-                        backref=backref('cutting', uselist=False))
+    rooted = relationship('PropRooted', cascade='all,delete-orphan',
+                          backref=backref('cutting', uselist=False))
 
 
 class PropSeed(db.Model):
