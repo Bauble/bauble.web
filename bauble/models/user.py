@@ -36,13 +36,12 @@ class User(db.Model, UserMixin):
         self.username = self.email if not self.username else self.username
 
 
-    __tablename__ = 'user'
-
     username = Column(String, nullable=False, unique=True)
     fullname = Column(String)
     title = Column(String)
     email = Column(String, nullable=False, unique=True)
-    _password = Column('password', String, nullable=False)  # hybrid property, see below
+
+    timezone = Column(String)
 
     # All requests after /login will use the access token for authentication
     # rather than the password.  An access token as an expiration date.
@@ -68,6 +67,7 @@ class User(db.Model, UserMixin):
     # organization object
     organization_id = Column(Integer, ForeignKey('organization.id'))
 
+    _password = Column('password', String, nullable=False)  # hybrid property, see below
 
     @hybrid_property
     def password(self):

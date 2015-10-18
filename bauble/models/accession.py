@@ -1,5 +1,5 @@
 from sqlalchemy import (func, Boolean, Column, Date, Enum, ForeignKey, Integer, String,
-                        Unicode, UnicodeText, UniqueConstraint)
+                        Text, UniqueConstraint)
 from sqlalchemy.orm import (backref, object_mapper, reconstructor, relation,
                             MapperExtension, EXT_CONTINUE)
 from sqlalchemy.orm.session import object_session
@@ -63,11 +63,11 @@ class Verification(db.Model):
     :Table name: verification
 
     :Columns:
-      verifier: :class:`sqlalchemy.types.Unicode`
+      verifier: :class:`sqlalchemy.types.String`
         The name of the person that made the verification.
       date: :class:`sqlalchemy.types.Date`
         The date of the verification
-      reference: :class:`sqlalchemy.types.UnicodeText`
+      reference: :class:`sqlalchemy.types.Text`
         The reference material used to make this verification
       level: :class:`sqlalchemy.types.Integer`
         Determines the level or authority of the verifier. If it is
@@ -86,7 +86,7 @@ class Verification(db.Model):
             - 4: The record is part of type gathering or propagated from
               type material by asexual methods
 
-      notes: :class:`sqlalchemy.types.UnicodeText`
+      notes: :class:`sqlalchemy.types.Text`
         Notes about this verification.
       accession_id: :class:`sqlalchemy.types.Integer`
         Foreign Key to the :class:`Accession` table.
@@ -100,9 +100,9 @@ class Verification(db.Model):
     __mapper_args__ = {'order_by': 'verification.date'}
 
     # columns
-    verifier = Column(Unicode(64), nullable=False)
+    verifier = Column(String(64), nullable=False)
     date = Column(Date, nullable=False)
-    reference = Column(UnicodeText)
+    reference = Column(Text)
     accession_id = Column(Integer, ForeignKey('accession.id'), nullable=False)
 
     # the level of assurance of this verification
@@ -118,7 +118,7 @@ class Verification(db.Model):
     prev_taxon = relation('Taxon',
                           primaryjoin='Verification.prev_taxon_id==Taxon.id')
 
-    notes = Column(UnicodeText)
+    notes = Column(Text)
 
 
 
@@ -132,9 +132,9 @@ class Voucher(db.Model):
     :Table name: voucher
 
     :Columns:
-      herbarium: :class:`sqlalchemy.types.Unicode`
+      herbarium: :class:`sqlalchemy.types.String`
         The name of the herbarium.
-      code: :class:`sqlalchemy.types.Unicode`
+      code: :class:`sqlalchemy.types.String`
         The herbarium code.
       parent_material: :class:`sqlalchemy.types.Boolean`
         Is this voucher the parent material of the accession.  E.g did
@@ -145,8 +145,8 @@ class Voucher(db.Model):
 
 
     """
-    herbarium = Column(Unicode, nullable=False)
-    code = Column(Unicode(32), nullable=False)
+    herbarium = Column(String, nullable=False)
+    code = Column(String(32), nullable=False)
     parent_material = Column(Boolean, default=False)
     accession_id = Column(Integer, ForeignKey('accession.id'), nullable=False)
 
@@ -159,13 +159,12 @@ class AccessionNote(db.Model):
     """
     Notes for the accession table
     """
-    __tablename__ = 'accession_note'
     __mapper_args__ = {'order_by': 'accession_note.date'}
 
     date = Column(Date, default=func.now())
-    user = Column(Unicode(64))
-    category = Column(Unicode(32))
-    note = Column(UnicodeText, nullable=False)
+    user = Column(String(64))
+    category = Column(String(32))
+    note = Column(Text, nullable=False)
     accession_id = Column(Integer, ForeignKey('accession.id'), nullable=False)
     accession = relation('Accession', uselist=False,
                          backref=backref('notes', cascade='all, delete-orphan'))
@@ -186,7 +185,7 @@ class Accession(db.Model):
     :Table name: accession
 
     :Columns:
-        *code*: :class:`sqlalchemy.types.Unicode`
+        *code*: :class:`sqlalchemy.types.String`
             the accession code
 
         *prov_type*: :class:`bauble.types.Enum`
@@ -226,7 +225,7 @@ class Accession(db.Model):
                 * ? - questionable
                 * incorrect
 
-        *id_qual_rank*: :class:`sqlalchemy.types.Unicode`
+        *id_qual_rank*: :class:`sqlalchemy.types.String`
             The rank of the taxon that the id_qaul refers to.
 
         *private*: :class:`sqlalchemy.types.Boolean`
@@ -252,13 +251,12 @@ class Accession(db.Model):
     :Constraints:
 
     """
-    __tablename__ = 'accession'
     __mapper_args__ = {'order_by': 'accession.code',
                        'extension': AccessionMapperExtension()}
 
     # columns
     #: the accession code
-    code = Column(Unicode(20), nullable=False, unique=True)
+    code = Column(String(20), nullable=False, unique=True)
 
     prov_type = Column(Enum(*prov_type_values.keys()))
 
@@ -274,7 +272,7 @@ class Accession(db.Model):
 
     # new in 0.9, this column should contain the name of the column in
     # the taxon table that the id_qual refers to, e.g. genus, sp, etc.
-    id_qual_rank = Column(Unicode(10))
+    id_qual_rank = Column(String(10))
 
     # "private" new in 0.8b2
     private = Column(Boolean, default=False)

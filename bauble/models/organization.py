@@ -6,8 +6,6 @@ from sqlalchemy.orm import relationship, backref, object_mapper
 import bauble.db as db
 
 class Organization(db.Model):
-    __tablename__ = 'organization'
-
     name = Column(String)
     short_name = Column(String)
 

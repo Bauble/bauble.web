@@ -1,7 +1,7 @@
 import xml
 
-from sqlalchemy import (func, Column, Date, Enum, ForeignKey, Integer, String, Unicode,
-                        UnicodeText, UniqueConstraint)
+from sqlalchemy import (func, Column, Date, Enum, ForeignKey, Integer, String, Text,
+                        UniqueConstraint)
 from sqlalchemy.orm import backref, relation
 from sqlalchemy.ext.associationproxy import association_proxy
 
@@ -65,7 +65,7 @@ class Genus(db.Model):
         The combination of genus, author, qualifier
         and family_id must be unique.
     """
-    __tablename__ = 'genus'
+
     __table_args__ = (UniqueConstraint('genus', 'author',
                                        'qualifier', 'family_id'),
                       {})
@@ -75,7 +75,7 @@ class Genus(db.Model):
     genus = Column(String(64), nullable=False, index=True)
 
     # use '' instead of None so that the constraints will work propertly
-    author = Column(Unicode(255), default='')
+    author = Column(String(255), default='')
     qualifier = Column(Enum('s. lat.', 's. str', ''))
 
     family_id = Column(Integer, ForeignKey('family.id'), nullable=False)
@@ -110,13 +110,12 @@ class GenusNote(db.Model):
     """
     Notes for the genus table
     """
-    __tablename__ = 'genus_note'
     __mapper_args__ = {'order_by': 'genus_note.date'}
 
     date = Column(Date, default=func.now())
-    user = Column(Unicode(64))
-    category = Column(Unicode(32))
-    note = Column(UnicodeText, nullable=False)
+    user = Column(String(64))
+    category = Column(String(32))
+    note = Column(Text, nullable=False)
     genus_id = Column(Integer, ForeignKey('genus.id'), nullable=False)
     genus = relation('Genus', uselist=False,
                      backref=backref('notes', cascade='all, delete-orphan'))
@@ -127,7 +126,6 @@ class GenusSynonym(db.Model):
     """
     :Table name: genus_synonym
     """
-    __tablename__ = 'genus_synonym'
 
     # columns
     genus_id = Column(Integer, ForeignKey('genus.id'), nullable=False)

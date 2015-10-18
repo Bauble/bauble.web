@@ -59,10 +59,8 @@ class Geography(db.Model):
 
     :Constraints:
     """
-    __tablename__ = 'geography'
 
-    # columns
-    name = Column(Unicode(255), nullable=False)
+    name = Column(String(255), nullable=False)
     tdwg_code = Column(String(6))
     iso_code = Column(String(7))
     parent_id = Column(Integer, ForeignKey('geography.id'))
@@ -77,7 +75,7 @@ Geography.children = relation(Geography,
                               primaryjoin=Geography.parent_id==Geography.id,
                               cascade='all',
                               backref=backref("parent",
-                                    remote_side=[Geography.__table__.c.id]),
+                                              remote_side=[Geography.__table__.c.id]),
                               order_by=[Geography.name])
 
 # setup search mapper

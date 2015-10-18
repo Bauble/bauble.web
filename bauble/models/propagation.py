@@ -21,7 +21,6 @@ class PlantPropagation(db.Model):
     PlantPropagation provides an intermediate relation from
     Plant->Propagation
     """
-    __tablename__ = 'plant_prop'
     plant_id = Column(Integer, ForeignKey('plant.id'), nullable=False)
     propagation_id = Column(Integer, ForeignKey('propagation.id'),
                             nullable=False)
@@ -43,7 +42,6 @@ class Propagation(db.Model):
     """
     Propagation
     """
-    __tablename__ = 'propagation'
     #recvd_as = Column(String(10)) # seed, urcu, other
 
     prop_type = Column(Enum(*prop_type_values.keys()), nullable=False)
@@ -253,7 +251,6 @@ class PropRooted(db.Model):
     """
     Rooting dates for cutting
     """
-    __tablename__ = 'prop_cutting_rooted'
     __mapper_args__ = {'order_by': 'date'}
 
     date = Column(Date)
@@ -315,7 +312,6 @@ class PropCutting(db.Model):
     """
     A cutting
     """
-    __tablename__ = 'prop_cutting'
     cutting_type = Column(Enum(*cutting_type_values.keys()), default='Other')
     tip = Column(Enum(*tip_values.keys()))
     leaves = Column(Enum(*leaves_values.keys()))
@@ -358,7 +354,6 @@ class PropCutting(db.Model):
 class PropSeed(db.Model):
     """
     """
-    __tablename__ = 'prop_seed'
     pretreatment = Column(Text)
     nseeds = Column(Integer, nullable=False, autoincrement=False)
     date_sown = Column(Date, nullable=False)

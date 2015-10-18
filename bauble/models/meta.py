@@ -66,5 +66,5 @@ def get_default(name, default=None, session=None):
 
 #     """
 #     __tablename__ = 'bauble'
-#     name = Column(Unicode(64), unique=True)
-#     value = Column(UnicodeText)
+#     name = Column(String(64), unique=True)
+#     value = Column(Text)

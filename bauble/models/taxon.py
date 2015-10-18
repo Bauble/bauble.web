@@ -2,7 +2,7 @@ from itertools import chain
 
 from flask.ext.babel import gettext as _, ngettext as _n
 from sqlalchemy import (func, Boolean, Column, Date, Enum, ForeignKey, Integer, String,
-                        Unicode, UnicodeText, UniqueConstraint)
+                        Text, UniqueConstraint)
 from sqlalchemy.orm import relation, backref
 from sqlalchemy.ext.associationproxy import association_proxy
 
@@ -87,7 +87,7 @@ class Taxon(db.Model):
                 *s. str.*: segregate taxon (sensu stricto)
 
         *label_distribution*:
-            UnicodeText
+            Text
             This field is optional and can be used for the label in case
             str(self.distribution) is too long to fit on the label.
 
@@ -106,37 +106,36 @@ class Taxon(db.Model):
         The combination of sp, sp_author, hybrid, sp_qual,
         cv_group, trade_name, genus_id
     """
-    __tablename__ = 'taxon'
     __mapper_args__ = {'order_by': ['sp', 'sp_author']}
 
     # columns
-    sp = Column(Unicode(64), index=True)
-    sp2 = Column(Unicode(64), index=True)  # in case hybrid=True
-    sp_author = Column(Unicode(128))
+    sp = Column(String(64), index=True)
+    sp2 = Column(String(64), index=True)  # in case hybrid=True
+    sp_author = Column(String(128))
     hybrid = Column(Boolean, default=False)
     sp_qual = Column(Enum('agg.', 's. lat.', 's. str.'))
-    cv_group = Column(Unicode(50))
-    trade_name = Column(Unicode(64))
+    cv_group = Column(String(50))
+    trade_name = Column(String(64))
 
-    infrasp1 = Column(Unicode(64))
+    infrasp1 = Column(String(64))
     infrasp1_rank = Column(Enum(*infrasp_rank_values.keys()))
-    infrasp1_author = Column(Unicode(64))
+    infrasp1_author = Column(String(64))
 
-    infrasp2 = Column(Unicode(64))
+    infrasp2 = Column(String(64))
     infrasp2_rank = Column(Enum(*infrasp_rank_values.keys()))
-    infrasp2_author = Column(Unicode(64))
+    infrasp2_author = Column(String(64))
 
-    infrasp3 = Column(Unicode(64))
+    infrasp3 = Column(String(64))
     infrasp3_rank = Column(Enum(*infrasp_rank_values.keys()))
-    infrasp3_author = Column(Unicode(64))
+    infrasp3_author = Column(String(64))
 
-    infrasp4 = Column(Unicode(64))
+    infrasp4 = Column(String(64))
     infrasp4_rank = Column(Enum(*infrasp_rank_values.keys()))
-    infrasp4_author = Column(Unicode(64))
+    infrasp4_author = Column(String(64))
 
     genus_id = Column(Integer, ForeignKey('genus.id'), nullable=False)
 
-    label_distribution = Column(UnicodeText)
+    label_distribution = Column(Text)
 
     # relations
     synonyms = association_proxy('_synonyms', 'synonym')
@@ -162,9 +161,9 @@ class Taxon(db.Model):
     flower_color_id = Column(Integer, ForeignKey('color.id'), default=None)
     flower_color = relation('Color', uselist=False, backref='taxa')
 
-    #hardiness_zone = Column(Unicode(4))
+    #hardiness_zone = Column(String(4))
 
-    awards = Column(UnicodeText)
+    awards = Column(Text)
 
     def __init__(self, *args, **kwargs):
         super(Taxon, self).__init__(*args, **kwargs)
@@ -342,13 +341,12 @@ class TaxonNote(db.Model):
     """
     Notes for the taxon table
     """
-    __tablename__ = 'taxon_note'
     __mapper_args__ = {'order_by': 'taxon_note.date'}
 
     date = Column(Date, default=func.now())
-    user = Column(Unicode(64))
-    category = Column(Unicode(32))
-    note = Column(UnicodeText, nullable=False)
+    user = Column(String(64))
+    category = Column(String(32))
+    note = Column(Text, nullable=False)
     taxon_id = Column(Integer, ForeignKey('taxon.id'), nullable=False)
     taxon = relation('Taxon', uselist=False,
                      backref=backref('notes', cascade='all, delete-orphan'))
@@ -359,7 +357,6 @@ class TaxonSynonym(db.Model):
     """
     :Table name: taxon_synonym
     """
-    __tablename__ = 'taxon_synonym'
 
     # columns
     taxon_id = Column(Integer, ForeignKey('taxon.id'),
@@ -402,9 +399,8 @@ class VernacularName(db.Model):
 
     :Constraints:
     """
-    __tablename__ = 'vernacular_name'
-    name = Column(Unicode(128), nullable=False)
-    language = Column(Unicode(128))
+    name = Column(String(128), nullable=False)
+    language = Column(String(128))
     taxon_id = Column(Integer, ForeignKey('taxon.id'), nullable=False)
     __table_args__ = (UniqueConstraint('name', 'language',
                                        'taxon_id', name='vn_index'), {})
@@ -439,7 +435,6 @@ class DefaultVernacularName(db.Model):
 
     :Constraints:
     """
-    __tablename__ = 'default_vernacular_name'
     __table_args__ = (UniqueConstraint('taxon_id', 'vernacular_name_id',
                                        name='default_vn_index'), {})
 
@@ -466,7 +461,6 @@ class TaxonDistribution(db.Model):
 
     :Constraints:
     """
-    __tablename__ = 'taxon_distribution'
 
     # columns
     geography_id = Column(Integer, ForeignKey('geography.id'), nullable=False)
@@ -489,10 +483,8 @@ TaxonDistribution.geography = relation('Geography',
                                          uselist=False)
 
 class Habit(db.Model):
-    __tablename__ = 'habit'
-
-    name = Column(Unicode(64))
-    code = Column(Unicode(8), unique=True)
+    name = Column(String(64))
+    code = Column(String(8), unique=True)
 
     def __str__(self):
         if self.name:
@@ -502,10 +494,8 @@ class Habit(db.Model):
 
 
 class Color(db.Model):
-    __tablename__ = 'color'
-
-    name = Column(Unicode(32))
-    code = Column(Unicode(8), unique=True)
+    name = Column(String(32))
+    code = Column(String(8), unique=True)
 
     def __str__(self):
         if self.name:

@@ -90,7 +90,6 @@ def is_code_unique(plant, code):
 # PlantNote.plant_id were out of sink....how could we avoid these sort
 # of cycles
 class PlantNote(db.Model):
-    __tablename__ = 'plant_note'
     __mapper_args__ = {'order_by': 'plant_note.date'}
 
     date = Column(Date, default=func.now())
@@ -130,7 +129,6 @@ change_reasons = {
 class PlantChange(db.Model):
     """
     """
-    __tablename__ = 'plant_change'
     __mapper_args__ = {'order_by': 'plant_change.date'}
 
     plant_id = Column(Integer, ForeignKey('plant.id'), nullable=False)
@@ -200,10 +198,9 @@ sex_values = {
 }
 
 # class Container(db.Model):
-#     __tablename__ = 'container'
 #     __mapper_args__ = {'order_by': 'name'}
-#     code = Column(Unicode)
-#     name = Column(Unicode)
+#     code = Column(String)
+#     name = Column(String)
 
 #
 # TODO: PlantStatus was never used integrated into Bauble 1.x....???
@@ -216,7 +213,6 @@ class PlantStatus(db.Model):
     comment: comments on check up
     checked_by: person who did the check
     """
-    __tablename__ = 'plant_status'
     date = Column(Date, default=func.now())
     condition = Column(Enum(*condition_values.keys()))
     comment = Column(Text)
@@ -252,7 +248,7 @@ class Plant(db.Model):
     :Table name: plant
 
     :Columns:
-        *code*: :class:`sqlalchemy.types.Unicode`
+        *code*: :class:`sqlalchemy.types.String`
             The plant code
 
         *acc_type*: :class:`bauble.types.Enum`
@@ -288,7 +284,6 @@ class Plant(db.Model):
     :Constraints:
         The combination of code and accession_id must be unique.
     """
-    __tablename__ = 'plant'
     __table_args__ = (UniqueConstraint('code', 'accession_id'), {})
     __mapper_args__ = {'order_by': ['plant.accession_id', 'plant.code']}
 

@@ -1,5 +1,5 @@
-from sqlalchemy import (func, Column, Date, Enum, ForeignKey, Integer, String, Unicode,
-                        UnicodeText, UniqueConstraint)
+from sqlalchemy import (func, Column, Date, Enum, ForeignKey, Integer, String, Text,
+                        UniqueConstraint)
 from sqlalchemy.orm import relation, backref
 from sqlalchemy.ext.associationproxy import association_proxy
 
@@ -46,7 +46,6 @@ class Family(db.Model):
     :Constraints:
         The family table has a unique constraint on family/qualifier.
     """
-    __tablename__ = 'family'
     __table_args__ = (UniqueConstraint('family', 'qualifier'),)
     __mapper_args__ = {'order_by': ['Family.family', 'Family.qualifier']}
 
@@ -80,12 +79,10 @@ class FamilyNote(db.Model):
     """
     Notes for the family table
     """
-    __tablename__ = 'family_note'
-
     date = Column(Date, default=func.now())
-    user = Column(Unicode(64))
-    category = Column(Unicode(32))
-    note = Column(UnicodeText, nullable=False)
+    user = Column(String(64))
+    category = Column(String(32))
+    note = Column(Text, nullable=False)
     family_id = Column(Integer, ForeignKey('family.id'), nullable=False)
     family = relation('Family', uselist=False,
                       backref=backref('notes', cascade='all, delete-orphan'))
@@ -105,8 +102,6 @@ class FamilySynonym(db.Model):
 
         *family*:
     """
-    __tablename__ = 'family_synonym'
-
     # columns
     family_id = Column(Integer, ForeignKey('family.id'), nullable=False)
     synonym_id = Column(Integer, ForeignKey('family.id'), nullable=False,

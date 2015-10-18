@@ -2,7 +2,6 @@ from sqlalchemy import *
 from sqlalchemy.orm import *
 
 import bauble.db as db
-from bauble.models import Model
 import bauble.search as search
 
 
@@ -27,14 +26,13 @@ class Location(db.Model):
         *plants*:
 
     """
-    __tablename__ = 'location'
     __mapper_args__ = {'order_by': 'name'}
 
     # columns
     # refers to beds by unique codes
-    code = Column(Unicode(10), unique=True, nullable=False)
-    name = Column(Unicode(64))
-    description = Column(UnicodeText)
+    code = Column(String(10), unique=True, nullable=False)
+    name = Column(String(64))
+    description = Column(Text)
 
     # relations
     plants = relation('Plant', backref=backref('location', uselist=False))

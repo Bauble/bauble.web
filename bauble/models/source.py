@@ -75,7 +75,6 @@ source_type_values = {
 
 
 class SourceDetail(db.Model):
-    __tablename__ = 'source_detail'
     __mapper_args__ = {'order_by': 'name'}
 
     name = Column(String(75), unique=True)
@@ -134,7 +133,6 @@ class Collection(db.Model):
 
     :Constraints:
     """
-    __tablename__ = 'collection'
 
     # columns
     collector = Column(String)
