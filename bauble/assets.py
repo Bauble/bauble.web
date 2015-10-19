@@ -1,33 +1,41 @@
+import os
+
 from flask_assets import Bundle
 from flask.ext.assets import Environment
 from webassets.filter import register_filter
-from webassets_libsass import LibSass
 
+from webassets_babel import BabelFilter
+from webassets_browserify import Browserify
+from webassets_libsass import LibSass
+from webassets_ng_annotate import NgAnnotateFilter
+
+path, _ = os.path.split(__file__)
+
+register_filter(NgAnnotateFilter)
+register_filter(BabelFilter)
+register_filter(Browserify)
 register_filter(LibSass)
 
-#: application css bundle
-css_app = Bundle("sass/main.scss", filters="libsass", output="css/main.css",
-                 debug=False)
-
-css_menu = Bundle("sass/menu.scss", filters="libsass", output="css/menu.css",
-                  debug=False)
-
-#: consolidated css bundle
-css_all = Bundle(# "css/bootstrap.min.css",
-                 css_app,
-                 # "css/bootstrap-responsive.min.css",
+# not sure why but the debug false is required here
+sass_app = Bundle("sass/main.scss", filters="libsass", output="css/main.css", debug=False)
+css_vendor = Bundle("vendor/node_modules/toastr/build/toastr.css")
+css_all = Bundle(sass_app, css_vendor,
                  filters="cssmin", output="css/all.min.css")
 
-#: vendor js bundletouc
-# js_vendor = Bundle("js/vendor/jquery-1.10.1.min.js",
-#                    "js/vendor/bootstrap-2.3.3.min.js",
-#                    "js/vendor/underscore-1.4.4.min.js",
-#                    "js/vendor/backbone-1.0.0.min.js",
-#                    filters="rjsmin", output="js/vendor.min.js")
+js_bundle = Bundle("js/*.js",
+                   "js/controllers/*.js",
+                   "js/services/*.js",
+                   "js/directives/*.js",
+                   filters=[
+                       "babel",
+                       "browserify",
+                       "ng-annotate"
+                   ],
+                   output='bundle.js')
 
-#: application js bundle
-js_main = Bundle("js/*.js", filters="rjsmin", output="js/main.js")
-
+# ** not sure why minifying and the bundling in the same step
+# ** doesn't cause the code to be minified
+js_all = Bundle(js_bundle, filters="rjsmin", output="bundle.min.js")
 
 webassets = Environment()
 
@@ -35,8 +43,13 @@ def init_app(app):
     webassets.app = app
     webassets.init_app(app)
     webassets.register('css_all', css_all)
-    webassets.register('css_menu', css_menu)
-    webassets.register('js_main', js_main)
-    webassets.manifest = 'cache' if not app.debug else False
-    webassets.cache = not app.debug
+    webassets.register('js_all', js_all)
+
+    # ** always cache to speed up dev build time
+    # webassets.manifest = 'cache' if not app.debug else False
+    # webassets.cache = not app.debug
+    webassets.cache = True
     webassets.debug = app.debug
+    webassets.config['BROWSERIFY_EXTRA_ARGS'] = ['--extension=.es6']
+    webassets.config['BROWSERIFY_TRANSFORMS'] = ['babelify', 'resolvify']
+    webassets.config['LIBSASS_INCLUDES'] = [os.path.join(path, 'static/vendor/node_modules/bootstrap-sass/assets/stylesheets')]
