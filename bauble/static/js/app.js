@@ -1,130 +1,116 @@
-'use strict';
+import angular from 'angular'
+import angularUIBootstrap from 'angular-ui-bootstrap'
+import angularUIRouter from 'angular-ui-router'
+import angularAnimate from 'angular-animate'
+import _ from 'lodash'
 
-angular.module('BaubleApp', [
+const app = angular.module('bauble-app', [
     'ui.bootstrap',
     'ui.router',
     'ngAnimate'
 ])
 
-  .config(['$stateProvider', '$urlRouterProvider',
-    function ($stateProvider, $urlRouterProvider) {
+app.config(function($locationProvider) {
+    $locationProvider.html5Mode(true);
+})
 
-        $stateProvider
-            .state('main', {
-                abstract: true,
-                templateUrl: 'views/main.html',
-                controller: 'MainCtrl'
-            })
-            .state('main.dashboard', {
-                url: '/dashboard',
-                templateUrl: 'views/dashboard.html',
-                controller: 'DashboardCtrl'
-            })
-            .state('main.search', {
-                url: '/search?q',
-                templateUrl: 'views/search.html',
-                controller: 'SearchCtrl',
-            })
+app.config(function ($stateProvider, $urlRouterProvider) {
+    $stateProvider
+        .state('dashboard', {
+            url: '/',
+            templateUrl: '/static/partials/dashboard.html',
+            controller: 'DashboardCtrl'
+        })
+        .state('search', {
+            url: '/search',
+            templateUrl: '/static/partials/search.html',
+            controller: 'SearchCtrl',
+        })
 
-            .state('main.settings', {
-                url: '/settings',
-                templateUrl: 'views/settings.html',
-                controller: 'SettingsCtrl',
-            })
-
-            .state('login', {
-                url: '/login',
-                templateUrl: 'views/login.html',
-                controller: 'LoginCtrl'
-            })
-
-            .state('logout', {
-                url: '/logout',
-                templateUrl: 'views/logout.html',
-                controller: 'LogoutCtrl'
-            })
-
-            .state('main.resource-edit', {
-                url: '/:resource/:id/edit',
-                templateUrl: function($stateParams) {
-                    return 'views/' + $stateParams.resource.toLowerCase() + "-edit.html";
-                },
-                controllerProvider: ['$stateParams', function($stateParams) {
-                    var resource = $stateParams.resource;
-                    resource = resource.slice(0,1).toUpperCase() + resource.slice(1, resource.length);
-                    return resource + "EditCtrl";
-                }]
-
-            })
-
-            .state('main.resource-add', {
-                url: '/:resource/add',
-                templateUrl: function($stateParams) {
-                    return 'views/' + $stateParams.resource.toLowerCase()+ "-edit.html";
-                },
-                controllerProvider: ['$stateParams', function($stateParams) {
-                    var resource = $stateParams.resource;
-                    resource = resource.slice(0,1).toUpperCase() + resource.slice(1, resource.length);
-                    return resource + "EditCtrl";
-                }]
-            })
-
-            .state('signup', {
-                url: '/signup',
-                templateUrl: 'views/signup.html',
-                controller: 'SignupCtrl'
-            })
-
-            .state('main.reset-password', {
-                url: '/reset-password/:token',
-                templateUrl: 'views/reset-password.html',
-                controller: 'ResetPasswordCtrl'
-            })
-
-            .state('main.forgot-password', {
-                url: '/forgot_password',
-                templateUrl: 'views/forgot-password.html',
-                controller: 'ForgotPasswordCtrl'
-            })
-
-            .state('main.accept-invitation', {
-                url: '/accept-invitation/:token',
-                templateUrl: 'views/accept-invitation.html',
-                controller: 'AcceptInvitationCtrl'
-            })
-
-            .state('main.organization-new', {
-                url: '/organization/new',
-                templateUrl: 'views/org-edit.html',
-                controller: 'OrgEditCtrl'
-            })
-
-            .state('main.report-new', {
-                url: '/report',
-                templateUrl: 'views/report.html',
-                controller: 'ReportCtrl'
-            })
-
-            .state('main.report-edit', {
-                url: '/report/:id',
-                templateUrl: 'views/report.html',
-                controller: 'ReportCtrl'
-            });
-
-
-
-        // .when('/admin', {
-        //     templateUrl: 'views/admin.html',
-        //     controller: 'AdminCtrl'
+        // .state('settings', {
+        //     url: '/settings',
+        //     templateUrl: '/static/partials/settings.html',
+        //     controller: 'SettingsCtrl',
         // })
 
-
-
-        // .when('/docs', {
-        //     templateUrl: 'views/docs.html'
+        // .state('login', {
+        //     url: '/login',
+        //     templateUrl: '/static/partials/login.html',
+        //     controller: 'LoginCtrl'
         // })
 
+        // .state('logout', {
+        //     url: '/logout',
+        //     templateUrl: '/static/partials/logout.html',
+        //     controller: 'LogoutCtrl'
+        // })
 
+        // .state('main.resource-edit', {
+        //     url: '/:resource/:id/edit',
+        //     templateUrl: function($stateParams) {
+        //         return '/static/partials/' + $stateParams.resource.toLowerCase() + "-edit.html";
+        //     },
+        //     controllerProvider: ['$stateParams', function($stateParams) {
+        //         var resource = $stateParams.resource;
+        //         resource = resource.slice(0,1).toUpperCase() + resource.slice(1, resource.length);
+        //         return resource + "EditCtrl";
+        //     }]
 
-        $urlRouterProvider.otherwise('/dashboard');
-    }]);
+        // })
+
+        // .state('main.resource-add', {
+        //     url: '/:resource/add',
+        //     templateUrl: function($stateParams) {
+        //         return '/static/partials/' + $stateParams.resource.toLowerCase()+ "-edit.html";
+        //     },
+        //     controllerProvider: ['$stateParams', function($stateParams) {
+        //         var resource = $stateParams.resource;
+        //         resource = resource.slice(0,1).toUpperCase() + resource.slice(1, resource.length);
+        //         return resource + "EditCtrl";
+        //     }]
+        // })
+
+        // .state('signup', {
+        //     url: '/signup',
+        //     templateUrl: '/static/partials/signup.html',
+        //     controller: 'SignupCtrl'
+        // })
+
+        // .state('main.reset-password', {
+        //     url: '/reset-password/:token',
+        //     templateUrl: '/static/partials/reset-password.html',
+        //     controller: 'ResetPasswordCtrl'
+        // })
+
+        // .state('main.forgot-password', {
+        //     url: '/forgot_password',
+        //     templateUrl: '/static/partials/forgot-password.html',
+        //     controller: 'ForgotPasswordCtrl'
+        // })
+
+        // .state('main.accept-invitation', {
+        //     url: '/accept-invitation/:token',
+        //     templateUrl: '/static/partials/accept-invitation.html',
+        //     controller: 'AcceptInvitationCtrl'
+        // })
+
+        // .state('main.organization-new', {
+        //     url: '/organization/new',
+        //     templateUrl: '/static/partials/org-edit.html',
+        //     controller: 'OrgEditCtrl'
+        // })
+
+        // .state('main.report-new', {
+        //     url: '/report',
+        //     templateUrl: '/static/partials/report.html',
+        //     controller: 'ReportCtrl'
+        // })
+
+        // .state('main.report-edit', {
+        //     url: '/report/:id',
+        //     templateUrl: '/static/partials/report.html',
+        //     controller: 'ReportCtrl'
+        // });
+
+    $urlRouterProvider.otherwise('/');
+});
