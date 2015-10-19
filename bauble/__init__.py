@@ -14,6 +14,17 @@ from flask.ext.migrate import Migrate
 from flask.ext.login import LoginManager
 from flask.ext.sslify import SSLify
 
+class JSONEncoder(flask.json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return int(obj.replace(tzinfo=timezone.utc).timestamp() * 1000)
+        if isinstance(obj, date):
+            return str(obj.isoformat())
+        if isinstance(obj, Decimal):
+            return float(obj)
+        else:
+            return super().default(obj)
+
 def create_app(config_filename=None):
     app = Flask(__name__)
     if config_filename is None:
@@ -64,18 +75,6 @@ def create_app(config_filename=None):
 
     from bauble.error import init_errorhandlers
     init_errorhandlers(app)
-
-
-    class JSONEncoder(flask.json.JSONEncoder):
-        def default(self, obj):
-            if isinstance(obj, datetime):
-                return int(obj.replace(tzinfo=timezone.utc).timestamp() * 1000)
-            if isinstance(obj, date):
-                return str(obj.isoformat())
-            if isinstance(obj, Decimal):
-                return float(obj)
-            else:
-                return super().default(obj)
 
     app.json_encoder = JSONEncoder
 
