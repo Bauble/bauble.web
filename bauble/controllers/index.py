@@ -10,7 +10,9 @@ root_path, _ = os.path.split(__file__)
 
 blueprint = bp = Blueprint('index', __name__)
 
-@bp.route('/')
+
+# @bp.route('/', defaults={'path': ''})
+@bp.route('/<path:path>')
 @login_required
-def index():
+def index(path):
     return render_template('index.html')
