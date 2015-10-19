@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('BaubleApp')
+angular.module('bauble-app')
     .directive('locationPush', function ($location, locationStack) {
         return {
             restrict: 'A',

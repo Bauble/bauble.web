@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('BaubleApp')
+angular.module('bauble-app')
     .controller('TaxonViewCtrl', function ($scope, $location, Alert, Taxon, DeleteModal) {
 
         $scope.taxon = null;

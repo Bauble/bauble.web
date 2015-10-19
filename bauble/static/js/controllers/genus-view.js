@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('BaubleApp')
+angular.module('bauble-app')
   .controller('GenusViewCtrl', ['$scope', '$location', 'Alert', 'Genus', 'DeleteModal',
     function ($scope, $location, Alert, Genus, DeleteModal) {
 

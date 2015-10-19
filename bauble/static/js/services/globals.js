@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('BaubleApp')
+angular.module('bauble-app')
     .factory('globals', function () {
 
         return {

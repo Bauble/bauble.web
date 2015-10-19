@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('BaubleApp')
+angular.module('bauble-app')
     .controller('PlantViewCtrl', function ($scope, $location, Alert, Plant, DeleteModal) {
 
         $scope.plant = null;

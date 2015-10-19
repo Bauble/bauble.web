@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('BaubleApp')
+angular.module('bauble-app')
     .factory('DeleteModal', ['$modal', function DeleteModal($modal) {
 
         return function(resource, resourceData, str) {
@@ -8,7 +8,7 @@ angular.module('BaubleApp')
             str = str || resourceData.str;
 
             var modalInstance = $modal.open({
-                templateUrl: 'views/delete-modal.html',
+                templateUrl: '/static/partials/delete-modal.html',
                 controller: function($scope, $modalInstance) {
 
                     $scope.str = str;

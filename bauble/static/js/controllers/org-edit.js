@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('BaubleApp')
+angular.module('bauble-app')
   .controller('OrgEditCtrl', ['$scope', '$location', 'Alert', 'User', 'Organization',
     function ($scope, $location, Alert, User, Organization) {
 

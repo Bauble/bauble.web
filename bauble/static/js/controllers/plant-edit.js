@@ -9,7 +9,7 @@ var acc_type_values ={
     None: ''
 };
 
-angular.module('BaubleApp')
+angular.module('bauble-app')
   .controller('PlantEditCtrl', ['$scope', '$location', '$stateParams', 'locationStack', 'Alert', 'Accession', 'Plant', 'Location', 'overlay',
     function ($scope, $location, $stateParams, locationStack, Alert, Accession, Plant, Location, overlay) {
         $scope.model = {

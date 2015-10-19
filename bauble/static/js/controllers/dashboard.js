@@ -1,9 +1,7 @@
-'use strict';
+const app = angular.module('bauble-app')
 
-angular.module('BaubleApp')
-  .controller('DashboardCtrl', ['$scope', '$location',
-    function ($scope, $location) {
-        $scope.search = function(value){
-            $location.path('/search').search('q', value);
-        };
-    }]);
+app.controller('DashboardCtrl', function ($scope, $location) {
+    $scope.search = function(value){
+        $location.path('/search').search('q', value);
+    };
+});

@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('BaubleApp')
+angular.module('bauble-app')
   .controller('LocationEditCtrl', ['$scope', '$window', '$stateParams', 'Plant', 'Location', 'Alert', 'overlay',
     function ($scope, $window, $stateParams, Plant, Location, Alert, overlay) {
         // isNew is inherited from the NewCtrl if this is a /new editor

@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('BaubleApp')
+angular.module('bauble-app')
   .controller('FamilyEditCtrl', ['$scope', '$q', '$location', '$stateParams', 'locationStack', 'Alert', 'Family', 'overlay',
     function ($scope, $q, $location, $stateParams, locationStack, Alert, Family, overlay) {
 

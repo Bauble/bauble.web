@@ -16,7 +16,7 @@ var source_type_values = {
     null: ''
 };
 
-angular.module('BaubleApp')
+angular.module('bauble-app')
   .controller('SourceDetailEditCtrl', ['$scope', '$modalInstance', 'Alert', 'Source', 'sourceDetail',
     function ($scope, $modalInstance, Alert, Source, sourceDetail) {
 

@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('BaubleApp')
+angular.module('bauble-app')
   .controller('FamilyViewCtrl', ['$scope', '$stateParams', '$state', '$location', 'Alert', 'Family', 'DeleteModal',
     function ($scope, $stateParams, $state, $location, Alert, Family, DeleteModal) {
 

@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('BaubleApp')
+angular.module('bauble-app')
   .controller('GenusEditCtrl', ['$scope', '$q', '$location', '$stateParams', 'locationStack', 'Alert', 'Family', 'Genus', 'overlay',
     function($scope, $q, $location, $stateParams, locationStack, Alert, Family, Genus, overlay) {
 

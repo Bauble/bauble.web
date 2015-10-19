@@ -1,9 +1,9 @@
 'use strict';
 
-angular.module('BaubleApp')
+angular.module('bauble-app')
     .directive('synonymsForm', function () {
         return {
-            templateUrl: 'views/synonyms-form.html',
+            templateUrl: '/static/partials/synonyms-form.html',
             restrict: 'E',
             scope: {
                 model: '=model',

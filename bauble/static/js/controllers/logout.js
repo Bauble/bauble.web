@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('BaubleApp')
+angular.module('bauble-app')
     .controller('LogoutCtrl', function ($scope, User) {
         User.local(null);
         $scope.$emit('logout');

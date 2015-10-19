@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('BaubleApp')
+angular.module('bauble-app')
     .controller('SignupCtrl', ['$scope', '$location', 'User',
         function ($scope, $location, User) {
             $scope.message = null;

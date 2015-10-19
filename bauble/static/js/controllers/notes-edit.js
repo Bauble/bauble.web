@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('BaubleApp')
+angular.module('bauble-app')
   .controller('NotesEditorCtrl', ['$scope', 'User',
     function ($scope, User) {
         $scope.notes = [];

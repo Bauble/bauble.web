@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('BaubleApp')
+angular.module('bauble-app')
     .directive('geographyMenu', function ($http, $compile, $location, Alert) {
         return {
             template: '<span class="geo-menu dropdown">' +

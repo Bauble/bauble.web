@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('BaubleApp')
+angular.module('bauble-app')
   .controller('ForgotPasswordCtrl', ['$scope', '$stateParams', 'User',
     function ($scope, $stateParams, User) {
 

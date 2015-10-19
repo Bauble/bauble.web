@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('BaubleApp')
+angular.module('bauble-app')
     .service('Alert', [function () {
         // AngularJS will instantiate a singleton by calling "new" on this function
         return {

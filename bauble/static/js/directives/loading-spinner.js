@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('BaubleApp')
+angular.module('bauble-app')
     .directive('loadingSpinner', function () {
         return {
             template: '<i class="loading-spinner fa fa-spin fa-spinner" ng-show="show"></i><span ng-transclude></span>',

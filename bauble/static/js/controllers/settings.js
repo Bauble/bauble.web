@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('BaubleApp')
+angular.module('bauble-app')
   .controller('SettingsCtrl', ['$scope', '$modal', 'User', 'Organization', 'Alert',
     function ($scope, $modal, User, Organization, Alert) {
         $scope.user = User.local();
@@ -40,7 +40,7 @@ angular.module('BaubleApp')
 
         $scope.editOrg = function() {
             var modalInstance = $modal.open({
-                templateUrl: 'views/org-edit-modal.html',
+                templateUrl: '/static/partials/org-edit-modal.html',
                 controller: function($scope, $modalInstance, organization){
 
                     $scope.org = organization;
@@ -79,7 +79,7 @@ angular.module('BaubleApp')
 
         $scope.invite = function() {
             var modalInstance = $modal.open({
-                templateUrl: 'views/org-invite-modal.html',
+                templateUrl: '/static/partials/org-invite-modal.html',
                 controller: 'OrgInviteModalCtrl',
                 resolve: {
                     organization: function() {

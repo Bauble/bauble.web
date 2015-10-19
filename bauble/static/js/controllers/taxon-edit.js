@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('BaubleApp')
+angular.module('bauble-app')
   .controller('TaxonEditCtrl',
    ['$scope', '$location', '$q', '$http', '$timeout', '$stateParams', 'locationStack', 'Alert', 'Genus', 'Taxon', 'overlay',
     function ($scope, $location, $q, $http, $timeout, $stateParams, locationStack, Alert, Genus, Taxon, overlay) {

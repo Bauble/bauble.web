@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('BaubleApp')
+angular.module('bauble-app')
   .controller('LocationViewCtrl', ['$scope', '$location', 'Alert', 'Location', 'DeleteModal',
     function ($scope, $location, Alert, Location, DeleteModal) {
 

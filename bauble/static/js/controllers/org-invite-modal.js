@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('BaubleApp')
+angular.module('bauble-app')
   .controller('OrgInviteModalCtrl', ['$scope', '$modalInstance', 'Organization', 'Alert', 'organization',
     function ($scope, $modalInstance, Organization, Alert, organization) {
 
