@@ -1,6 +1,10 @@
 .python-version
 *.pyc
+__pycache__/
 *~
-posse/static/css/menu.css
-posse/static/css/main.css
-posse/static/css/all.min.css
+bauble/static/bundle*.js
+bauble/static/css/main.css
+bauble/static/css/all.min.css
+bauble/static/vendor
+bauble/static/.webassets-cache
+node_modules
