@@ -1,6 +1,9 @@
 -r requirements.txt
+fake-factory
 flake8
 honcho
 livereload
 pytest>=2.7.2,<2.8a0
+pytest-flask
+pytest-mock
 requests-mock

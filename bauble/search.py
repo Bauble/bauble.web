@@ -176,8 +176,9 @@ class MapperSearch(SearchStrategy):
             elif cond == 'is not':
                 cond = '!='
             elif cond in ('ilike', 'icontains', 'ihas'):
-                cond = lambda col: \
-                    lambda val: utils.ilike(col, '%s' % val)
+                return col.op.ilike(val)
+                # cond = lambda col: \
+                #     lambda val: utils.ilike(col, '%s' % val)
 
 
             if len(idents) == 1:
@@ -289,8 +290,10 @@ class MapperSearch(SearchStrategy):
 
         # make searches case-insensitive, in postgres use ilike,
         # in other use upper()
+        # like = lambda table, col, val: \
+        #     utils.ilike(table.c[col], ('%%%s%%' % val))
         like = lambda table, col, val: \
-            utils.ilike(table.c[col], ('%%%s%%' % val))
+            table.c[col].ilike('%{}%'.format(val))
 
         for cls, columns in self._properties.items():
             q = self._session.query(cls)

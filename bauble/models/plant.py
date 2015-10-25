@@ -90,7 +90,7 @@ def is_code_unique(plant, code):
 # PlantNote.plant_id were out of sink....how could we avoid these sort
 # of cycles
 class PlantNote(db.Model):
-    __mapper_args__ = {'order_by': 'plant_note.date'}
+    __mapper_args__ = {'order_by': 'date'}
 
     date = Column(Date, default=func.now())
     user = Column(String)
@@ -129,7 +129,7 @@ change_reasons = {
 class PlantChange(db.Model):
     """
     """
-    __mapper_args__ = {'order_by': 'plant_change.date'}
+    __mapper_args__ = {'order_by': 'date'}
 
     plant_id = Column(Integer, ForeignKey('plant.id'), nullable=False)
     parent_plant_id = Column(Integer, ForeignKey('plant.id'))
@@ -285,7 +285,7 @@ class Plant(db.Model):
         The combination of code and accession_id must be unique.
     """
     __table_args__ = (UniqueConstraint('code', 'accession_id'), {})
-    __mapper_args__ = {'order_by': ['plant.accession_id', 'plant.code']}
+    __mapper_args__ = {'order_by': ['accession_id', 'code']}
 
     # columns
     code = Column(String(6), nullable=False)

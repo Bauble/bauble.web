@@ -18,14 +18,12 @@ register_filter(LibSass)
 
 # not sure why but the debug false is required here
 sass_app = Bundle("sass/main.scss", filters="libsass", output="css/main.css", debug=False)
-css_vendor = Bundle("vendor/node_modules/toastr/build/toastr.css")
-css_all = Bundle(sass_app, css_vendor,
+# css_vendor = Bundle("vendor/node_modules/toastr/build/toastr.css")
+css_all = Bundle(sass_app,
+                 # css_vendor,
                  filters="cssmin", output="css/all.min.css")
 
-js_bundle = Bundle("js/*.js",
-                   "js/controllers/*.js",
-                   "js/services/*.js",
-                   "js/directives/*.js",
+js_bundle = Bundle("app.js",
                    filters=[
                        "babel",
                        "browserify",

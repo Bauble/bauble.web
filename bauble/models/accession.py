@@ -1,5 +1,5 @@
-from sqlalchemy import (func, Boolean, Column, Date, Enum, ForeignKey, Integer, String,
-                        Text, UniqueConstraint)
+from sqlalchemy import (event, func, Boolean, Column, Date, Enum, ForeignKey, Integer,
+                        String, Text, UniqueConstraint)
 from sqlalchemy.orm import (backref, object_mapper, reconstructor, relationship,
                             MapperExtension, EXT_CONTINUE)
 from sqlalchemy.orm.session import object_session
@@ -97,7 +97,7 @@ class Verification(db.Model):
         table. What it was verified from.
 
     """
-    __mapper_args__ = {'order_by': 'verification.date'}
+    __mapper_args__ = {'order_by': 'date'}
 
     # columns
     verifier = Column(String(64), nullable=False)
@@ -172,11 +172,11 @@ class AccessionNote(db.Model):
 
 
 # invalidate an accessions string cache after it has been updated
-class AccessionMapperExtension(MapperExtension):
+# class AccessionMapperExtension(MapperExtension):
 
-    def after_update(self, mapper, conn, instance):
-        instance.invalidate_str_cache()
-        return EXT_CONTINUE
+#     def after_update(self, mapper, conn, instance):
+#         instance.invalidate_str_cache()
+#         return EXT_CONTINUE
 
 
 class Accession(db.Model):
@@ -250,8 +250,7 @@ class Accession(db.Model):
     :Constraints:
 
     """
-    __mapper_args__ = {'order_by': 'accession.code',
-                       'extension': AccessionMapperExtension()}
+    __mapper_args__ = {'order_by': 'code'}
 
     # columns
     #: the accession code
@@ -411,6 +410,12 @@ class Accession(db.Model):
         data['source'] = self.source.json() if self.source is not None else {}
         data['taxon_str'] = self.taxon_str()
         return data
+
+
+
+@event.listens_for(Accession, 'after_update')
+def accession_after_upload(mapper, connection, target):
+    target.invalidate_str_cache()
 
 
 # setup the search matcher

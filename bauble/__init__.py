@@ -1,6 +1,6 @@
 from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
-from importlib import __import__, import_module
+from importlib import import_module
 import logging
 import os
 
@@ -70,8 +70,10 @@ def create_app(config_filename=None):
 
     for controller in ['auth', 'index']:
         module = import_module('bauble.controllers.{}'.format(controller))
-        blueprint = module.blueprint
-        app.register_blueprint(blueprint)
+        app.register_blueprint(module.blueprint)
+
+    from bauble.controllers.api import api
+    app.register_blueprint(api)
 
     from bauble.error import init_errorhandlers
     init_errorhandlers(app)

@@ -47,7 +47,8 @@ class Family(db.Model):
         The family table has a unique constraint on family/qualifier.
     """
     __table_args__ = (UniqueConstraint('family', 'qualifier'),)
-    __mapper_args__ = {'order_by': ['Family.family', 'Family.qualifier']}
+    # __mapper_args__ = {'order_by': ['Family.family', 'Family.qualifier']}
+    __mapper_args__ = {'order_by': ['family', 'qualifier']}
 
     # columns
     family = Column(String(45), nullable=False, index=True)

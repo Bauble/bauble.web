@@ -2,6 +2,7 @@ from functools import wraps
 import traceback
 
 from flask import current_app as app, render_template
+import sass
 import webassets
 from werkzeug.exceptions import HTTPException
 
@@ -64,7 +65,6 @@ class CheckConditionError(BaubleError):
     pass
 
 
-
 def check(condition, msg=None):
     """
     Check that condition is true.  If not then raise
@@ -72,7 +72,6 @@ def check(condition, msg=None):
     """
     if not condition:
         raise CheckConditionError(msg)
-
 
 
 _error_handlers = {}
@@ -118,6 +117,7 @@ def error_handler_exc(error):
 
 @errorhandler(webassets.exceptions.FilterError)
 @errorhandler(webassets.exceptions.BuildError)
+@errorhandler(sass.CompileError)
 def webassets_filter_error(error):
     e = str(error).replace('\\n', '\n')
     return '<pre>{}</pre>'.format(e), 500

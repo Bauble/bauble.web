@@ -1,30 +1,44 @@
-from datetime import datetime
 import re
 import sys
 
 from attrdict import AttrDict
-import bcrypt
 from flask.ext.sqlalchemy import (SQLAlchemy, Model as ExtModel, _BoundDeclarativeMeta,
                                   _QueryProperty)
 from flask.ext.migrate import Migrate
 from flask_marshmallow import Marshmallow
 from sqlalchemy import func, Column, DateTime, Integer, MetaData
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
-from sqlalchemy.ext.hybrid import Comparator
 
+from bauble.utils import combomethod
 
 ma = Marshmallow()
 
-class Schema(ma.Schema):
+
+class SerializationError(Exception):
+
+    def __init__(self, errors):
+        self.errors = errors
+        super().__init__()
+
+
+class _BaseSchema(ma.Schema):
+
+    def dump(self, *args, **kwargs):
+        data, err = super().dump(*args, **kwargs)
+        if len(err) > 0:
+            raise SerializationError(err)
+        return data
 
     def make_object(self, data):
         return AttrDict(**data)
 
 
-class _Model(ExtModel):
+class _JSONSchema(_BaseSchema, ma.ModelSchema):
+    pass
 
-    """
-    The default Model base class.
+
+class _Model(ExtModel):
+    """The default Model base class.
     """
 
     @declared_attr
@@ -37,20 +51,38 @@ class _Model(ExtModel):
     updated_at = Column(DateTime(True), server_default=func.now(),
                         onupdate=func.now())
 
+    def __new__(cls, *args, **kwargs):
+        if not hasattr(cls, 'JSONSchema'):
+            class JSONSchema(_JSONSchema):
+                class Meta:
+                    model = cls
+                    # fields = cls.json_default
+            cls.JSONSchema = JSONSchema
+
+        return super().__new__(cls)
+
+    @combomethod
+    def jsonify(param, *args, **kwargs):
+        if isinstance(param, _Model):
+            # called as instance method
+            return param.JSONSchema().dump(param, *args, **kwargs)
+        # called as class method
+        return param.JSONSchema().dump(*args, **kwargs)
+
 
 class DBPlugin(SQLAlchemy):
 
     metadata = MetaData()
 
     def init_app(self, app):
-        super().init_app(app)
-        # TODO: we're not using a db uet
+        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         app.config['SQLALCHEMY_DATABASE_URI'] = app.config.get('DATABASE_URL')
+        super().init_app(app)
         ma.init_app(app)
         Migrate(app, self)
 
 
-    def make_declarative_base(self):
+    def make_declarative_base(self, *args):
         """Creates the declarative base."""
         base = declarative_base(cls=_Model, name='Model', metadata=self.metadata,
                                 metaclass=_BoundDeclarativeMeta)
@@ -60,5 +92,5 @@ class DBPlugin(SQLAlchemy):
 
 plugin = DBPlugin()
 plugin.ma = plugin.marshmallow = ma
-plugin.Schema = Schema
+# plugin.Schema = Schema
 sys.modules[__name__] = plugin

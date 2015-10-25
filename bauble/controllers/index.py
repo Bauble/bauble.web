@@ -11,7 +11,7 @@ root_path, _ = os.path.split(__file__)
 blueprint = bp = Blueprint('index', __name__)
 
 
-# @bp.route('/', defaults={'path': ''})
+@bp.route('/', defaults={'path': ''})
 @bp.route('/<path:path>')
 @login_required
 def index(path):

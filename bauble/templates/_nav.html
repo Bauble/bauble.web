@@ -17,11 +17,13 @@
         <div class="collapse navbar-collapse" id="navbar-collapse">
             <ul class="nav navbar-nav">
                 <li><a href="/search">Search</a></li>
-                <li class="dropdown">
-                    <a class="dropdown-toggle">New
-                        <b class="caret"></b>
-                    </a>
-                    <ul class="dropdown-menu pull-right">
+
+                <li uib-dropdown>
+                    <a href="#" class="dropdown-toggle" role="button"
+                       uib-dropdown-toggle
+                       aria-haspopup="true" aria-expanded="false">New
+                        <span class="caret"></span></a>
+                    <ul class="dropdown-menu pull-right" uib-dropdown-menu>
                         <li>
                             <a class="pull-right" href="/family/add">Family</a>
                         </li>

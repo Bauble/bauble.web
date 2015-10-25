@@ -1,2 +1,2 @@
-web: gunicorn -c gunicorn.cfg wuphf.app:app
-worker: celery worker -A wuphf.app.celery 
+web: gunicorn -c gunicorn.cfg bauble.app:app
+
