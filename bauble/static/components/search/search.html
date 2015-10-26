@@ -26,13 +26,14 @@
     <div class="row">
 
         <div class="col-md-4">
-            <accordion>
-                <accordion-group ng-if="values.length" ng-repeat="(group, values) in results track by $index"
-                                 class="result-group" is-open="isOpen" close-others="false">
-                    <accordion-heading>
+            <uib-accordion>
+                <uib-accordion-group ng-if="values.length"
+                                     ng-repeat="(group, values) in results track by $index"
+                                     class="result-group" is-open="isOpen" close-others="false">
+                    <uib-accordion-heading>
                         {{capitalize(group)}}
                         <span class="pull-right">{{values.length}}</span>
-                    </accordion-heading>
+                    </uib-accordion-heading>
                     <ul>
                         <li class="result-item" ng-repeat="result in values"
                             ng-class="{'selected': $parent.selected.id===result.id}"
@@ -40,8 +41,8 @@
                             {{result.str}}
                         </li>
                     </ul>
-                </accordion-group>
-            </accordion>
+                </uib-accordion-group>
+            </uib-accordion>
         </div> <!-- .col-md-4 -->
 
 

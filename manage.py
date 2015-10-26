@@ -3,6 +3,7 @@
 
 from datetime import datetime, timedelta
 from importlib import import_module
+import pathlib
 import sys
 import subprocess
 
@@ -86,6 +87,11 @@ def test():
 def livereload():
     from livereload import Server, shell
     server = Server(app)
+
+    # watch all js files else we'll only reload when app.js changes
+    paths = pathlib.Path('bauble/static/').glob('**/*.js')
+    for f in filter(lambda p: 'vendor' not in p, map(str, paths)):
+        server.watch(f)
     server.serve(port=app.config.get('PORT', 5000))
 
 

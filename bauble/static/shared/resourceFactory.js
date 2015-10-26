@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 export default function ResourceFactory ($http, User) {
     return function(resourceRoot, name) {
         var resourceUrl = resourceRoot;

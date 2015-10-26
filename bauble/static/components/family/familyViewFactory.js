@@ -1,7 +1,7 @@
 export default function FamilyViewFactory () {
     return {
-        editor: "/static/partials/family-edit.html",
-        view: "/static/partials/family-view.html",
+        editor: "/static/components/family/family-edit.html",
+        view: "/static/components/family/family-view.html",
 
         buttons: [
             { name: "Edit", event: "family-edit" },

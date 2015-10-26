@@ -1,5 +1,5 @@
 export default function FamilyFactory (Resource, $http) {
-    var resource = Resource('/family', 'family');
+    var resource = Resource('/api/family', 'family');
 
     resource.getSynonym = function(family, synonym){
         return $http({

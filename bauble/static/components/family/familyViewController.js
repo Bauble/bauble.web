@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 export default function FamilyViewController ($scope, $stateParams, $state, $location,
                                               Alert, Family, DeleteModal) {
 

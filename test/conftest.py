@@ -79,3 +79,19 @@ def family():
 def genus(family):
     from bauble.models import Genus
     return Genus(genus=faker.first_name(), family=family)
+
+
+@pytest.fixture()
+def taxon(genus):
+    from bauble.models import Taxon
+    return Taxon(sp=faker.first_name(), genus=genus)
+
+@pytest.fixture()
+def accession(taxon):
+    from bauble.models import Accession
+    return Accession(code=faker.pyint(), taxon=taxon)
+
+@pytest.fixture()
+def plant(accession):
+    from bauble.models import Plant
+    return Plant(code=faker.pyint(), acession=accession)

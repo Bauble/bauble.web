@@ -1,3 +1,5 @@
+import os
+
 from flask import abort, jsonify, render_template, request
 from flask.ext.login import login_required
 from marshmallow import Schema
@@ -11,8 +13,8 @@ from bauble.search import search
 root_path, _ = os.path.split(__file__)
 
 class SearchResultSchema(Schema):
-# TODO: pass
-pass
+    # TODO: pass
+    pass
 
 @api.route('/search')
 # @login_required

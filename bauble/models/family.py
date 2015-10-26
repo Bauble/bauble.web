@@ -2,6 +2,7 @@ from sqlalchemy import (func, Column, Date, Enum, ForeignKey, Integer, String, T
                         UniqueConstraint)
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.ext.hybrid import hybrid_property
 
 import bauble.db as db
 import bauble.search as search
@@ -67,13 +68,13 @@ class Family(db.Model):
     def __str__(self):
         return Family.str(self)
 
-    @staticmethod
+
+    @hybrid_property
     def str(family, qualifier=False):
         if family.family is None:
             return repr(family)
-        else:
-            return ' '.join([s for s in [family.family, family.qualifier]
-                             if s not in (None, '')])
+        return ''.join(filter(lambda s: s not in (None, ''),
+                              [family.family, family.qualifier]))
 
 
 class FamilyNote(db.Model):

@@ -3,7 +3,7 @@ export default function SearchFactory ($http, User) {
         query: function(q) {
             var user = User.local();
             var config = {
-                url: "/search",
+                url: "/api/search",
                 method: 'GET',
                 params: {
                     q: q

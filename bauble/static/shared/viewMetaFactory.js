@@ -1,6 +1,5 @@
 export default function ViewMetaFactory (FamilyView, GenusView, TaxonView, AccessionView,
                                          PlantView, LocationView) {
-    console.log('FamilyView: ', FamilyView);
     return {
         getView: function(resource)  {
             // allow get the view based on the ref

@@ -6,8 +6,10 @@ from flask.ext.sqlalchemy import (SQLAlchemy, Model as ExtModel, _BoundDeclarati
                                   _QueryProperty)
 from flask.ext.migrate import Migrate
 from flask_marshmallow import Marshmallow
+from marshmallow import fields
 from sqlalchemy import func, Column, DateTime, Integer, MetaData
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from bauble.utils import combomethod
 
@@ -24,17 +26,17 @@ class SerializationError(Exception):
 class _BaseSchema(ma.Schema):
 
     def dump(self, *args, **kwargs):
+        """Wrap marshmallow.Schema to raise a SerializationError on error.
+        """
         data, err = super().dump(*args, **kwargs)
         if len(err) > 0:
             raise SerializationError(err)
         return data
 
-    def make_object(self, data):
-        return AttrDict(**data)
-
 
 class _JSONSchema(_BaseSchema, ma.ModelSchema):
-    pass
+    str = fields.String(dump_only=True)
+
 
 
 class _Model(ExtModel):
@@ -66,8 +68,15 @@ class _Model(ExtModel):
         if isinstance(param, _Model):
             # called as instance method
             return param.JSONSchema().dump(param, *args, **kwargs)
+
         # called as class method
         return param.JSONSchema().dump(*args, **kwargs)
+
+
+    # @declared_attr
+    @hybrid_property
+    def str(self):
+        str(self)
 
 
 class DBPlugin(SQLAlchemy):

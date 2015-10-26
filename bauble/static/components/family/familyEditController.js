@@ -1,6 +1,5 @@
+import _ from 'lodash'
 import {InstrumentedArray} from '../..//utils'
-
-console.log('InstrumentedArray: ', InstrumentedArray);
 
 export default function FamilyEditController ($scope, $q, $location, $stateParams,
                                               locationStack, Alert, Family, overlay) {

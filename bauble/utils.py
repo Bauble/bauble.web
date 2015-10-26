@@ -4,6 +4,7 @@ import re
 
 from flask import json, current_app
 
+
 def json_response(data, status=200, **kwargs):
     """Shortcut for building a flask JSON response."""
     if not isinstance(data, str):
@@ -43,3 +44,25 @@ class combomethod(object):
             else:
                 return self.method(objtype, *args, **kwargs)
         return _wrapper
+
+
+def count_relation(mapped_instance, relation):
+    import bauble.db as db
+    import sqlalchemy.orm as orm
+    mapped_class = type(mapped_instance)
+    mapper = orm.object_mapper(mapped_instance)
+    path = []  # building the path helps avoid extra slashes and
+    print('relation: ', relation)
+    for name in relation.split('/'):
+        if name.strip() != "":
+            path.append(name)
+            mapper = getattr(mapper.relationships, name).mapper
+
+    # query the mapped class and the end point relation using the
+    # list of the passed relations to create the join between the
+    # two
+    query = db.session.query(mapped_class, mapper.class_).\
+        filter(getattr(mapped_class, 'id') == mapped_instance.id).\
+        join(*path)
+
+    return query.count()

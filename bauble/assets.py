@@ -24,6 +24,8 @@ css_all = Bundle(sass_app,
                  filters="cssmin", output="css/all.min.css")
 
 js_bundle = Bundle("app.js",
+                   # depends=("*.js", "components/**/*.js", "shared/**/*.js"),
+                   depends="**/*.js",
                    filters=[
                        "babel",
                        "browserify",
