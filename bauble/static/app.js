@@ -61,7 +61,7 @@ app.config(function ($stateProvider, $urlRouterProvider) {
             url: '/:resource/:id/edit',
             templateUrl: function($stateParams) {
                 const resource = stateParams.resource.toLowerCase()
-                return `/static/components/${resource}/${resource}-edit.html`;
+                return `/static/components/${resource}/edit.html`;
             },
             controllerProvider: ['$stateParams', function($stateParams) {
                 var resource = $stateParams.resource;
@@ -74,7 +74,7 @@ app.config(function ($stateProvider, $urlRouterProvider) {
             url: '/:resource/add',
             templateUrl: function($stateParams) {
                 const resource = $stateParams.resource.toLowerCase()
-                return `/static/components/${resource}/${resource}-edit.html`
+                return `/static/components/${resource}/edit.html`
             },
             controllerProvider: ['$stateParams', function($stateParams) {
                 var resource = $stateParams.resource;
