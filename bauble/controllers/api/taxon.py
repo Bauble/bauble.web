@@ -1,240 +1,172 @@
-import types
+from flask import abort
+from flask.ext.login import login_required
+import sqlalchemy.orm as orm
+from webargs import fields
+from webargs.flaskparser import use_args
 
-import bottle
-from bottle import request, response
-import sqlalchemy as sa
+from bauble.controllers.api import api
+import bauble.db as db
+from bauble.models import Taxon, TaxonNote, TaxonSynonym, Genus
+import bauble.utils as utils
 
-from bauble import app, API_ROOT
-from bauble.middleware import basic_auth, filter_param, build_counts
-from bauble.model import Taxon, TaxonDistribution, VernacularName, Geography, get_relation  # TaxonNote
-
-
-taxon_column_names = [col.name for col in sa.inspect(Taxon).columns]
-taxon_mutable = [col for col in taxon_column_names
-                 if col not in ['id'] and not col.startswith('_')]
-
-vn_column_names = [col.name for col in sa.inspect(VernacularName).columns]
-vn_mutable = [col for col in vn_column_names
-              if col not in ['id'] and not col.startswith('_')]
-
-def resolve_taxon(next):
-    def _wrapped(*args, **kwargs):
-        request.taxon = request.session.query(Taxon).get(request.args['taxon_id'])
-        if not request.taxon:
-            bottle.abort(404, "Taxon not found")
-        return next(*args, **kwargs)
-    return _wrapped
-
-
-def resolve_name(next):
-    def _wrapped(*args, **kwargs):
-        request.name = request.session.query(VernacularName).get(request.args['name_id'])
-        if not request.name:
-            bottle.abort(404, "Name not found")
-        return next(*args, **kwargs)
-    return _wrapped
-
-
-def build_embedded(embed, taxon):
-    if embed == 'synonyms':
-        return (embed, [obj.json() for obj in taxon.synonyms])
-
-    data = get_relation(Taxon, taxon.id, embed, session=request.session)
-    if isinstance(data, (list, types.GeneratorType)):
-        return (embed, [obj.json() for obj in data])
-    else:
-        return (embed, data.json() if data else {})
-
-
-@app.get(API_ROOT + "/taxon")
-@basic_auth
-@filter_param(Taxon, taxon_column_names)
+@api.route("/taxon")
+@login_required
 def index_taxon():
-    # TODO: we're not doing any sanitization or validation...see preggy or validate.py
+    genera = Taxon.query.all()
+    data = Taxon.jsonify(genera, many=True)
+    return utils.json_response(data)
 
-    taxa = request.filter if request.filter else request.session.query(Taxon)
-    return [taxon.json() for taxon in taxa]
 
-
-@app.get(API_ROOT + "/taxon/<taxon_id:int>")
-@basic_auth
-@resolve_taxon
+@api.route("/taxon/<int:taxon_id>")
+@login_required
 def get_taxon(taxon_id):
-
-    json_data = request.taxon.json()
-
-    if 'embed' in request.params:
-        embed_list = request.params.embed if isinstance(request.params.embed, list) \
-            else [request.params.embed]
-        embedded = map(lambda embed: build_embedded(embed, request.taxon), embed_list)
-        json_data.update(embedded)
-
-    return json_data
+    taxon = Taxon.query.get_or_404(taxon_id)
+    return utils.json_response(taxon.jsonify())
 
 
-@app.route(API_ROOT + "/taxon/<taxon_id:int>", method='PATCH')
-@basic_auth
-@resolve_taxon
-def patch_taxon(taxon_id):
-
-    if not request.json:
-        bottle.abort(400, 'The request doesn\'t contain a request body')
-
-    # create a copy of the request data with only mutable
-    data = {col: request.json[col] for col in request.json.keys()
-            if col in taxon_mutable}
-    for key, value in data.items():
-        setattr(request.taxon, key, data[key])
-    request.session.commit()
-    return request.taxon.json()
+@api.route("/taxon/<int:taxon_id>", methods=['PATCH'])
+@login_required
+@use_args({
+    'sp': fields.String()
+})
+def patch_taxon(args, taxon_id):
+    taxon = Taxon.query.get_or_404(taxon_id)
+    for key, value in args.items():
+        setattr(taxon, key, value)
+    db.session.commit()
+    return utils.json_response(taxon.jsonify())
 
 
-@app.post(API_ROOT + "/taxon")
-@basic_auth
-def post_taxon():
+@api.route("/taxon", methods=['POST'])
+@login_required
+@use_args({
+    'sp': fields.String(),
+    'genus_id': fields.Int(required=True)
+})
+def post_taxon(args):
+    genus = Genus.query.filter_by(id=args['genus_id']).first()
+    if not genus:
+        abort(422, "Invalid genus id")
 
-    if not request.json:
-        bottle.abort(400, 'The request doesn\'t contain a request body')
-
-    # create a copy of the request data with only the columns
-    data = {col: request.json[col] for col in request.json.keys()
-            if col in taxon_mutable}
-
-    # if there isn't a genus_id look for a genus relation on the request data
-    if not 'genus_id' in data and 'genus' in request.json and isinstance(request.json['genus'], dict) and 'id' in request.json['genus']:
-        data['genus_id'] = request.json['genus']['id']
-
-    # make a copy of the data for only those fields that are columns
-    taxon = Taxon(**data)
-    request.session.add(taxon)
-    request.session.commit()
-    response.status = 201
-    return taxon.json()
+    taxon = Taxon(**args)
+    db.session.add(taxon)
+    db.session.commit()
+    return utils.json_response(taxon.jsonify(), 201)
 
 
-@app.delete(API_ROOT + "/taxon/<taxon_id:int>")
-@basic_auth
-@resolve_taxon
+@api.route("/taxon/<int:taxon_id>", methods=['DELETE'])
+@login_required
 def delete_taxon(taxon_id):
-    request.session.delete(request.taxon)
-    request.session.commit()
-    response.status = 204
+    taxon = Taxon.query.get_or_404(taxon_id)
+    db.session.delete(taxon)
+    db.session.commit()
+    return '', 204
 
 
-@app.get(API_ROOT + "/taxon/<taxon_id:int>/count")
-@basic_auth
-@resolve_taxon
-@build_counts(Taxon, 'taxon_id')
-def count(taxon_id):
-    return request.counts
+@api.route("/taxon/<int:taxon_id>/count")
+@login_required
+@use_args({
+    'relation': fields.DelimitedList(fields.String(), required=True)
+})
+def taxon_count(args, taxon_id):
+    data = {}
+    taxon = Taxon.query.get_or_404(taxon_id)
+    for relation in args['relation']:
+        _, base = relation.rsplit('/', 1)
+        data[base] = utils.count_relation(taxon, relation)
+    return utils.json_response(data)
 
-
-#############################################################
 #
-# Synonyms routes
+# Synonym routes
 #
-#############################################################
-
-@app.get(API_ROOT + "/taxon/<taxon_id:int>/synonyms")
-@basic_auth
-@resolve_taxon
-def list_synonyms(taxon_id):
-    return request.taxon.synonyms
 
 
-# @app.get(API_ROOT + "/taxon/<taxon_id:int>/synonyms/<synonym_id:int>")
-# @basic_auth
-# @resolve_taxon
-# def get_synonym(taxon_id, synonym_id):
+@api.route("/taxon/<int:taxon_id>/synonyms")
+@login_required
+def list_taxon_synonyms(taxon_id):
+    taxon = Taxon.query \
+                 .options(orm.joinedload('synonyms')) \
+                 .get_or_404(taxon_id)
+    return TaxonSynonym.jsonify(taxon.synonyms, many=True)
+
+
+# @api.route("/taxon/<int:taxon_id>/synonyms/<synonym_id:int>")
+# @login_required
+# # def get_synonym(taxon_id, synonym_id):
 #     return request.taxon.synonyms
 
 
-@app.post(API_ROOT + "/taxon/<taxon_id:int>/synonyms")
-@basic_auth
-@resolve_taxon
-def add_synonym(taxon_id):
-    synonym_json = request.json
-    if 'id' not in synonym_json:
-        bottle.abort(400, "No id in request body")
-    syn_taxon = request.session.query(Taxon).get(synonym_json['id'])
-    request.taxon.synonyms.append(syn_taxon)
-    request.session.commit()
-    response.status = 201
+# @api.post("/taxon/<int:taxon_id>/synonyms")
+# @login_required
+# def add_synonym(taxon_id):
+#     synonym_json = request.json
+#     if 'id' not in synonym_json:
+#         bottle.abort(400, "No id in request body")
+#     syn_taxon = request.session.query(Taxon).get(synonym_json['id'])
+#     request.taxon.synonyms.append(syn_taxon)
+#     request.session.commit()
+#     response.status = 201
 
 
-@app.delete(API_ROOT + "/taxon/<taxon_id:int>/synonyms/<synonym_id:int>")
-@basic_auth
-@resolve_taxon
-def remove_synonym_(taxon_id, synonym_id):
-    # synonym_id is the id of the taxon not the TaxonSynonym object
-    syn_taxon = request.session.query(Taxon).get(synonym_id)
-    request.taxon.synonyms.remove(syn_taxon)
-    request.session.commit()
-    response.status = 204
+@api.route("/taxon/<int:taxon_id>/synonyms/<int:synonym_id>", methods=['DELETE'])
+@login_required
+def remove_taxon_synonym(taxon_id, synonym_id):
+    taxon = Taxon.query.get_or_404(taxon_id)
+    syn_taxon = Taxon.query.get_or_404(synonym_id)
+    taxon.synonyms.remove(syn_taxon)
+    db.session.commit()
+    return '', 204
 
-
-#############################################################
 #
 # Vernacular Names routes
 #
-#############################################################
 
-@app.get(API_ROOT + "/taxon/<taxon_id:int>/names")
-@basic_auth
-@resolve_taxon
+@api.route("/taxon/<int:taxon_id>/names")
+@login_required
 def list_names(taxon_id):
-    return [name.json() for name in request.taxon.vernacular_names]
+    taxon = Taxon.query.get_or_404(taxon_id)
+    return [name.json() for name in taxon.vernacular_names]
 
 
-# @app.get(API_ROOT + "/taxon/<taxon_id:int>/names/<synonym_id:int>")
-# @basic_auth
-# @resolve_taxon
-# def get_synonym(taxon_id, synonym_id):
-#     return request.taxon.names
+# @api.post("/taxon/<int:taxon_id>/names")
+# @login_required
+# def post_name(taxon_id):
+#     name_json = request.json
+#     name = VernacularName(name=name_json['name'], language=name_json['language']
+#                           if 'language' in name_json else None)
+#     request.taxon.vernacular_names.append(name)
+#     if 'default' in name_json and name_json['default'] is True:
+#         request.taxon.default_vernacular_name = name
+#     request.session.commit()
+#     response.status = 201
+#     return name.json()
 
 
-@app.post(API_ROOT + "/taxon/<taxon_id:int>/names")
-@basic_auth
-@resolve_taxon
-def post_name(taxon_id):
-    name_json = request.json
-    name = VernacularName(name=name_json['name'], language=name_json['language']
-                          if 'language' in name_json else None)
-    request.taxon.vernacular_names.append(name)
-    if 'default' in name_json and name_json['default'] is True:
-        request.taxon.default_vernacular_name = name
-    request.session.commit()
-    response.status = 201
-    return name.json()
+# @api.route("/taxon/<int:taxon_id>/names/<name_id:int>", method='PATCH')
+# @login_required
+# @resolve_name
+# def patch_name(taxon_id, name_id):
+
+#     if not request.json:
+#         bottle.abort(400, 'The request doesn\'t contain a request body')
+
+#     # create a copy of the request data with only the columns
+#     data = {col: request.json[col] for col in request.json.keys()
+#             if col in vn_mutable}
+#     for key, value in data.items():
+#         setattr(request.name, key, data[key])
+
+#     request.session.commit()
+#     return request.taxon.json()
 
 
-@app.route(API_ROOT + "/taxon/<taxon_id:int>/names/<name_id:int>", method='PATCH')
-@basic_auth
-@resolve_taxon
-@resolve_name
-def patch_name(taxon_id, name_id):
-
-    if not request.json:
-        bottle.abort(400, 'The request doesn\'t contain a request body')
-
-    # create a copy of the request data with only the columns
-    data = {col: request.json[col] for col in request.json.keys()
-            if col in vn_mutable}
-    for key, value in data.items():
-        setattr(request.name, key, data[key])
-
-    request.session.commit()
-    return request.taxon.json()
-
-
-@app.delete(API_ROOT + "/taxon/<taxon_id:int>/names/<name_id:int>")
-@basic_auth
-@resolve_taxon
-@resolve_name
-def remove_name(taxon_id, name_id):
-    request.taxon.vernacular_names.remove(request.name)
-    request.session.commit()
-    response.status = 204
+# @api.delete("/taxon/<int:taxon_id>/names/<name_id:int>")
+# @login_required
+# @resolve_name
+# def remove_name(taxon_id, name_id):
+#     request.taxon.vernacular_names.remove(request.name)
+#     request.session.commit()
+#     response.status = 204
 
 
 #############################################################
@@ -243,16 +175,14 @@ def remove_name(taxon_id, name_id):
 #
 #############################################################
 
-@app.get(API_ROOT + "/taxon/<taxon_id:int>/distributions")
-@basic_auth
-@resolve_taxon
+@api.route("/taxon/<int:taxon_id>/distributions")
+@login_required
 def list_distributions(taxon_id):
     return [dist.json() for dist in request.taxon.distribution]
 
 
-@app.post(API_ROOT + "/taxon/<taxon_id:int>/distributions")
-@basic_auth
-@resolve_taxon
+@api.route("/taxon/<int:taxon_id>/distributions", methods=['POST'])
+@login_required
 def post_distribution(taxon_id):
     if 'id' not in request.json:
         bottle.abort(400, "JSON object does not contain a geography id")
@@ -275,9 +205,8 @@ def post_distribution(taxon_id):
     return dist.json()
 
 
-@app.delete(API_ROOT + "/taxon/<taxon_id:int>/distributions/<geography_id:int>")
-@basic_auth
-@resolve_taxon
+@api.route("/taxon/<int:taxon_id>/distributions/<int:geography_id>", methods=['DELETE'])
+@login_required
 def remove_distribution(taxon_id, geography_id):
 
     # should we remove all occurrences of this geography only the first??

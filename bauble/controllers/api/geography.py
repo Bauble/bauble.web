@@ -1,22 +1,19 @@
+from flask.ext.login import login_required
 
-import bottle
-from bottle import request
-
-from bauble import app, API_ROOT
-from bauble.middleware import basic_auth
-from bauble.model import Geography
+from bauble.controllers.api import api
+from bauble.models import Geography
+import bauble.utils as utils
 
 
-@app.get(API_ROOT + "/geographies")
-@basic_auth
+@api.route("/geographies")
+@login_required
 def list_geography():
-    return [geo.json() for geo in request.session.query(Geography)]
+    geographies = Geography.query.all()
+    return utils.json_response(Geography.jsonify(geographies, many=True))
 
 
-@app.get(API_ROOT + "/geographies/<geography_id:int>")
-@basic_auth
+@api.route("/geographies/<int:geography_id>")
+@login_required
 def get_geography(geography_id):
-    geography = request.session.query(Geography).get(geography_id)
-    if not geography:
-        bottle.abort(404, "Geography not found")
-    return geography.json()
+    geography = Geography.query.get_or_404(geography_id)
+    return utils.json_response(geography.jsonify())

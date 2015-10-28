@@ -52,7 +52,6 @@ def count_relation(mapped_instance, relation):
     mapped_class = type(mapped_instance)
     mapper = orm.object_mapper(mapped_instance)
     path = []  # building the path helps avoid extra slashes and
-    print('relation: ', relation)
     for name in relation.split('/'):
         if name.strip() != "":
             path.append(name)

@@ -9,7 +9,6 @@ import bauble.db as db
 from bauble.models import Genus, GenusNote, GenusSynonym, Family
 import bauble.utils as utils
 
-
 @api.route("/genus")
 @login_required
 def index_genus():
@@ -68,8 +67,8 @@ def delete_genus(genus_id):
 @login_required
 def list_genus_synonyms(genus_id):
     genus = Genus.query \
-                   .options(orm.joinedload('synonyms')) \
-                   .get_or_404(genus_id)
+                 .options(orm.joinedload('synonyms')) \
+                 .get_or_404(genus_id)
     return GenusSynonym.jsonify(genus.synonyms, many=True)
 
 
