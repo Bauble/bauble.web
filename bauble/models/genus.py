@@ -4,6 +4,7 @@ from sqlalchemy import (func, Column, Date, Enum, ForeignKey, Integer, String, T
                         UniqueConstraint)
 from sqlalchemy.orm import backref, relationship
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.ext.hybrid import hybrid_property
 
 import bauble.db as db
 import bauble.search as search
@@ -92,17 +93,17 @@ class Genus(db.Model):
         return Genus.str(self)
 
 
-    @staticmethod
-    def str(genus, author=False):
+    def str(self, *args, author=False):
         # TODO: the genus should be italicized for markup
-        if genus.genus is None:
-            return repr(genus)
-        elif not author or genus.author is None:
-            return ' '.join([s for s in [genus.genus, genus.qualifier] if s not in ('', None)])
+        if self.genus is None:
+            return repr(self)
+        elif not author or self.author is None:
+
+            return ' '.join([s for s in [self.genus, self.qualifier] if s not in ('', None)])
         else:
             return ' '.join(
-                [s for s in [genus.genus, genus.qualifier,
-                             xml.sax.saxutils.escape(genus.author)] if s not in ('', None)])
+                [s for s in [self.genus, self.qualifier,
+                             xml.sax.saxutils.escape(self.author)] if s not in ('', None)])
 
 
 

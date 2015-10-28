@@ -1,6 +1,6 @@
 from bauble.models.geography import Geography
 from bauble.models.family import Family, FamilyNote, FamilySynonym
-from bauble.models.genus import Genus, GenusNote
+from bauble.models.genus import Genus, GenusNote, GenusSynonym
 from bauble.models.taxon import (Taxon, TaxonDistribution, TaxonNote, TaxonSynonym,
                                  VernacularName)
 from bauble.models.accession import Accession, AccessionNote

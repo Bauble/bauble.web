@@ -1,4 +1,6 @@
-export default function GenusViewCtrl ($scope, $location, Alert, Genus, DeleteModal) {
+import _ from 'lodash'
+
+export default function GenusViewController ($scope, $location, Alert, Genus, DeleteModal) {
     $scope.genus = null;
     $scope.counts = null;
 

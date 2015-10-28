@@ -1,5 +1,7 @@
+import _ from 'lodash'
+
 export default function GenusFactory (Resource, $http) {
-    var resource =  $resource('/genus');
+    var resource =  Resource('/api/genus', 'genus');
 
     resource.getSynonym = function(genus, synonym){
         return $http({

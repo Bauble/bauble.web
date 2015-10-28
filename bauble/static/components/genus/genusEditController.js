@@ -1,3 +1,6 @@
+import _ from 'lodash'
+import {InstrumentedArray} from '../..//utils'
+
 export default function GenusEditController ($scope, $q, $location, $stateParams,
                                              locationStack, Alert, Family, Genus, overlay) {
 

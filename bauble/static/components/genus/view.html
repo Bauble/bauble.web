@@ -1,0 +1,53 @@
+<div ng-controller="GenusViewController">
+
+  <div class="row">
+    <div class="col-md-10">
+      <h3>{{genus.str}}</h3>
+
+      <h4><a ng-href="#/search?q=family where id%3d'{{genus.family.id}}'">{{genus.family.str}}</a></h4>
+
+      <div># of Taxa:
+        <a ng-href="#/search?q=taxon where genus.id%3d'{{genus.id}}'"
+           loading-spinner="counts.taxa">
+          {{counts.taxa}}</a>
+      </div>
+
+      <div># of Accessions:
+        <a ng-href="#/search?q=accession where taxon.genus.id%3d'{{genus.id}}'"
+           loading-spinner="counts.accessions">
+          {{counts.accessions}}</a>
+      </div>
+
+      <div># of Plants:
+        <a ng-href="#/search?q=plant where accession.taxon.genus.id%3d'{{genus.id}}'"
+           loading-spinner="counts.plants">
+          {{counts.plants}}</a>
+      </div>
+
+      <h4>Synonyms</h4>
+      <div ng-show="!genus.synonyms || genus.synonyms.length < 1" style="color: #aaa">
+        This genus has no synonyms.
+      </div>
+      <ul>
+        <li ng-repeat="synonym in genus.synonyms" loading-spinner="genus.synonyms">
+          <a ng-href="#/search?q=genus where id%3d'{{synonym.id}}'">{{synonym.str}}</a>
+        </li>
+      </ul>
+
+    </div>
+
+    <div class="col-md-2">
+      <div id="summary-buttons">
+        <a class="btn btn-default" location-push ng-href="#/genus/{{genus.id}}/edit">
+          <i class="fa fa-pencil"></i>Edit</a>
+
+        <a class="btn btn-default" location-push ng-href="#/taxon/add?genus={{genus.id}}">
+          <i class="fa fa-plus"></i>Add Taxon</a>
+
+        <a class="btn btn-default" ng-click="delete(genus.id)">
+          <i class="fa fa-trash-o"></i>Delete</a>
+      </div>
+    </div>
+
+  </div> <!-- .row -->
+</div>
