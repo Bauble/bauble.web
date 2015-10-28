@@ -7,7 +7,7 @@ from flask.ext.sqlalchemy import (SQLAlchemy, Model as ExtModel, _BoundDeclarati
 from flask.ext.migrate import Migrate
 from flask_marshmallow import Marshmallow
 from marshmallow import fields
-from sqlalchemy import func, Column, DateTime, Integer, MetaData
+from sqlalchemy import func, inspect, Column, DateTime, Integer, MetaData
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -53,24 +53,36 @@ class _Model(ExtModel):
     updated_at = Column(DateTime(True), server_default=func.now(),
                         onupdate=func.now())
 
-    def __new__(cls, *args, **kwargs):
-        if not hasattr(cls, 'JSONSchema'):
-            class JSONSchema(_JSONSchema):
-                class Meta:
-                    model = cls
-                    # fields = cls.json_default
-            cls.JSONSchema = JSONSchema
+    json_default = None
 
-        return super().__new__(cls)
+    @classmethod
+    def _create_default_schema(cls):
+        if cls.json_default is None:
+            cls.json_default = tuple(c for c in inspect(cls).mapper.columns.keys()
+                                     if not c.startswith('_')) + ('str',)
+
+        class JSONSchema(_JSONSchema):
+            class Meta:
+                model = cls
+                fields = cls.json_default
+
+        return JSONSchema
+    _default_schema_cls = None
+
 
     @combomethod
-    def jsonify(param, *args, **kwargs):
-        if isinstance(param, _Model):
-            # called as instance method
-            return param.JSONSchema().dump(param, *args, **kwargs)
+    def jsonify(param, *args, schema_cls=None, **kwargs):
+        cls = type(param) if isinstance(param, _Model) else param
+        instance = param if isinstance(param, _Model) else args[0]
 
-        # called as class method
-        return param.JSONSchema().dump(*args, **kwargs)
+        # use the default schema if no schema_cls was passed
+        if schema_cls is None:
+            if cls._default_schema_cls is None:
+                # create the default schema cls if it hasn't been created yet
+                cls._default_schema_cls = param._create_default_schema()
+            schema_cls = cls._default_schema_cls
+
+        return schema_cls().dump(instance, **kwargs)
 
 
     # @declared_attr
