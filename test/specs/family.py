@@ -1,8 +1,11 @@
+from bauble.models import Family
+
 def test_serializer(session, family):
     session.add(family)
     session.commit()
-    data = family.jsonify()
-    assert 'str' in data
+    family_json = family.jsonify()
+    assert Family.jsonify(family) == family_json
+    assert 'str' in family_json
 
 
 def test_index_family(client, session, family):

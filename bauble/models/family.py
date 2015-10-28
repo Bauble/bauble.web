@@ -15,9 +15,7 @@ def family_markup_func(family):
     """
     return family
 
-#
-# Family
-#
+
 class Family(db.Model):
     """
     :Table name: family
@@ -69,12 +67,11 @@ class Family(db.Model):
         return Family.str(self)
 
 
-    @hybrid_property
-    def str(family, qualifier=False):
-        if family.family is None:
-            return repr(family)
+    def str(self, qualifier=False):
+        if self.family is None:
+            return repr(self)
         return ''.join(filter(lambda s: s not in (None, ''),
-                              [family.family, family.qualifier]))
+                              [self.family, self.qualifier]))
 
 
 class FamilyNote(db.Model):

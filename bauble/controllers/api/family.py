@@ -23,7 +23,6 @@ def get_family(family_id):
     family = Family.query.get_or_404(family_id)
     return utils.json_response(family.jsonify())
 
-
 @api.route("/family/<int:family_id>", methods=['PATCH'])
 @login_required
 @use_args({
@@ -60,7 +59,7 @@ def delete_family(family_id):
 
 @api.route("/family/<int:family_id>/synonyms", methods=['GET'])
 @login_required
-def list_synonyms(family_id):
+def list_family_synonyms(family_id):
     family = Family.query \
                    .options(orm.joinedload('synonyms')) \
                    .get_or_404(family_id)
@@ -74,24 +73,32 @@ def list_synonyms(family_id):
 #     return request.family.synonyms
 
 
-@api.route("/family/<int:family_id>/synonyms", methods=['POST'])
-@login_required
-@use_args({
+# @api.route("/family/<int:family_id>/synonyms", methods=['POST'])
+# @login_required
+# @use_args({
 
-})
-def add_synonym(args, family_id):
-    synonym_json = request.json
-    if 'id' not in synonym_json:
-        abort(400, "No id in request body")
-    syn_family = db.session.query(Family).get(synonym_json['id'])
-    request.family.synonyms.append(syn_family)
-    db.session.commit()
-    return '', 201
+# })
+# def add_synonym(args, family_id):
+#     family = Family.query.get_or_404(family_id)
+
+#     # TODO: not finished
+
+#     synonym_json = request.json
+#     if 'id' not in synonym_json:
+#         abort(400, "No id in request body")
+
+#     syn_family = db.session.query(Family).get(synonym_json['id'])
+#     if not syn_family:
+#         abort(422, 'Invalid family id for synonym')
+
+#     request.family.synonyms.append(syn_family)
+#     db.session.commit()
+#     return '', 201
 
 
 @api.route("/family/<int:family_id>/synonyms/<int:synonym_id>", methods=['DELETE'])
 @login_required
-def remove_synonym(family_id, synonym_id):
+def remove_family_synonym(family_id, synonym_id):
     family = Family.query.get_or_404(family_id)
     syn_family = Family.query.get_or_404(synonym_id)
     family.synonyms.remove(syn_family)
@@ -99,13 +106,12 @@ def remove_synonym(family_id, synonym_id):
     return '', 204
 
 
-
 @api.route("/family/<int:family_id>/count")
 @login_required
 @use_args({
     'relation': fields.DelimitedList(fields.String(), required=True)
 })
-def count(args, family_id):
+def family_count(args, family_id):
     data = {}
     family = Family.query.get_or_404(family_id)
     for relation in args['relation']:
