@@ -1,4 +1,4 @@
-export default function LocationView () {
+export default function LocationViewFactory () {
     return {
         editor: "/static/partials/location-edit.html",
         view: "/static/partials/location-view.html",

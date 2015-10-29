@@ -1,0 +1,33 @@
+<div ng-controller="LocationViewCtrl">
+
+  <div class="row">
+    <div class="col-md-10">
+      <h3>{{location.str}}</h3>
+
+      <div># of Plants:
+        <a ng-href="#/search?q=plant where location.id%3d'{{location.id}}'">
+          {{counts.plants}}</a>
+      </div>
+
+      <h4>Description</h4>
+      <div ng-show="!location.description" style="color: #aaa">
+        This location has no description.
+      </div>
+      <div>
+        {{location.description}}
+      </div>
+
+    </div>
+
+    <div class="col-md-2">
+      <div id="summary-buttons" class="pull-right">
+        <a class="btn btn-default" location-push ng-href="#/location/{{location.id}}/edit">
+          <i class="fa fa-pencil"></i>Edit</a>
+
+        <a class="btn btn-default" ng-click="delete(location.id)">
+          <i class="fa fa-trash-o"></i>Delete</a>
+      </div>
+    </div>
+
+  </div> <!-- .row -->
+</div>
