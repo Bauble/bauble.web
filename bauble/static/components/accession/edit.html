@@ -1,0 +1,413 @@
+<div ng-form name="accessionForm" class="bauble-editor accession-editor">
+
+  <alert class="col-md-6" ng-repeat="alert in alerts" type="alert.type"
+         close="closeAlert($index)">{{alert.msg}}</alert>
+
+  <h3>{{header}}</h3>
+
+  <div class="editor-body">
+
+    <uib-tabset>
+      <uib-tab heading="General">
+        <form class="form-horizontal">
+
+          <h4>Taxon</h4>
+
+          <div class="form-group">
+            <label class="control-label col-md-2" for="taxonField">Taxon</label>
+            <div class="col-md-8">
+              <input type="text" ng-model="model.taxon"
+                     placeholder="required" typeahead-editable="false"
+                     uib-typeahead="taxon as taxon.str for taxon in getTaxa($viewValue)"
+                     typeahead-on-select="onSelectTaxon()"
+                     typeahead-input-formatter="model.taxon.str"
+                     typeahead-loading="loadingTaxa" class="form-control" required>
+            </div>
+          </div> <!-- .form-group -->
+
+          <div class="form-group">
+            <label class="control-label col-md-2" for="idQualField">ID qual</label>
+            <div class="col-md-2">
+              <select ng-model="model.accession.id_qual" ng-options="q for q in id_qualifiers"
+                      class="form-control"></select>
+            </div>
+
+            <label class="control-label col-md-2">Qualifier rank</label>
+            <div class="col-md-3">
+              <select ng-model="model.accession.id_qual_rank"
+                      ng-options="value as prop for (value, prop) in qualifier_rank"
+                      class="form-control"></select>
+            </div>
+          </div> <!-- .form-group -->
+
+
+          <h4>Accession</h4>
+
+          <div class="form-group">
+            <label class="control-label col-md-2" for="accessionField">
+              Accession</label>
+            <div class="col-md-2">
+              <input type="text" ng-model="model.accession.code" id="accessionField"
+                     placeholder="required" class="form-control" required/>
+            </div>
+
+            <label class="control-label col-md-2">Date Received</label>
+            <div class="col-md-2">
+              <div class="input-group date-picker-input">
+                <input type="text" class="form-control" uib-datepicker-popup="MM/dd/yyyy"
+                       show-weeks="false" show-button-bar="false"
+                       ng-model="model.accession.date_recvd"
+                       is-open="date_recvd_opened"  datepicker-options="dateOptions"
+                       date-disabled="disabled(date, mode)" close-text="Close"/>
+                <span class="input-group-btn">
+                  <button type="button" class="btn btn-default"
+                          ng-click="openDatePopup($event, 'date_recvd')">
+                    <i class="fa fa-calendar"></i>
+                  </button>
+                </span>
+              </div>
+            </div>
+          </div> <!-- .form-group -->
+
+          <div class="form-group">
+            <label class="control-label col-md-2">Type of material</label>
+            <div class="col-md-2">
+              <select ng-model="model.accession.recvd_type"
+                      ng-options="value as text for (value, text) in recvd_type_values"
+                      class="form-control"></select>
+            </div>
+
+            <label class="control-label col-md-2">Date Accessioned</label>
+            <div class="col-md-2">
+              <div class="input-group date-picker-input">
+                <input type="text" class="form-control" uib-datepicker-popup="MM/dd/yyyy"
+                       show-weeks="false" show-button-bar="false"
+                       ng-model="model.accession.date_accd"
+                       is-open="date_accd_opened"  datepicker-options="dateOptions"
+                       date-disabled="disabled(date, mode)" close-text="Close" />
+                <span class="input-group-btn">
+                  <button type="button" class="btn btn-default"
+                          ng-click="openDatePopup($event, 'date_accd')">
+                    <i class="fa fa-calendar"></i>
+                  </button>
+                </span>
+              </div>
+            </div>
+          </div> <!-- .form-group -->
+
+          <div class="form-group">
+            <label class="control-label col-md-2">Quantity</label>
+            <div class="col-md-2">
+              <input type="text" ng-model="model.accession.quantity_recvd"
+                     placeholder="required" class="form-control" required/>
+            </div>
+          </div> <!-- .form-group -->
+
+          <h4>Intended locations</h4>
+          <div class="form-group">
+            <label class="control-label col-md-2">Location 1</label>
+            <div class="col-md-4">
+              <input type="text" ng-model="model.accession.intended_location_id"
+                     class="form-control"/>
+            </div>
+          </div> <!-- .form-group -->
+
+          <div class="form-group">
+            <label class="control-label col-md-2">Location 2</label>
+            <div class="col-md-4">
+              <input type="text" ng-model="model.accession.intended2_location_id"
+                     class="form-control"/>
+            </div>
+          </div> <!-- .form-group -->
+
+          <h4>Flags</h4>
+          <div class="form-group">
+            <label class="control-label col-md-2">Private</label>
+            <div class="col-md-1">
+              <input type="checkbox" ng-model="model.accession.intended2_location_id"/>
+            </div>
+          </div>
+
+
+          <h4>Provenance</h4>
+          <div class="form-group">
+            <label class="control-label col-md-2" for="provenanceField">Provenance</label>
+            <div class="col-md-4">
+              <select ng-model="model.accession.prov_type" class="form-control"
+                      id="provenanceField"
+                      ng-options="value as text for (value, text) in prov_type_values">
+              </select>
+            </div>
+          </div> <!-- .form-group -->
+
+          <div class="form-group">
+            <label class="control-label col-md-2" for="wildStatusField">Wild Status</label>
+            <div class="col-md-4">
+              <select ng-model="model.accession.wild_prov_status"
+                      id="wildStatusField" class="form-control"
+                      ng-options="value as text for (value, text) in wild_prov_status_values">
+              </select>
+            </div>
+          </div> <!-- .form-group -->
+
+        </form> <!-- .form-horizontal -->
+      </uib-tab>   <!-- end "General" tab -->
+
+      <uib-tab heading="Source">
+        <form class="form-horizontal">
+
+          <div class="form-group">
+            <label class="control-label col-md-2" for="source-detail-input">Source</label>
+            <div class="col-md-5">
+              <input type="text" ng-model="model.sourceDetail" id="source-detail-input"
+                     placeholder="Source" typeahead-editable="false"
+                     uib-typeahead="source as source.str for source in getSources($viewValue)"
+                     typeahead-input-formatter="model.sourceDetail.str"
+                     typeahead-on-select="onSelectSourceDetail()"
+                     typeahead-loading="loadingSources" class="form-control">
+            </div>
+            <button class="btn btn-default" ng-click="editSource()">New</button>
+            <button class="btn btn-default" ng-click="editSource(model.sourceDetail)">Edit</button>
+          </div> <!-- .form-group -->
+
+          <div class="form-group">
+            <label class="control-label col-md-2" for="sources-code-input">Source's Code</label>
+            <div class="col-md-3">
+            <input type="text" class="form-control"
+                   ng-model="model.accession.source.sources_code" id="sources-code-input">
+            </div>
+          </div>
+
+
+          <!-- <accordion>
+          <accordion-group heading="Collection"> -->
+          <h4>Collection</h4>
+              <div class="form-group">
+                <label class="col-md-2 control-label">Locale</label>
+                <div class="col-md-3">
+                  <input type="text" ng-model="model.accession.source.collection.locale"
+                         class="col-md-6 form-control"/>
+                </div> <!-- .controls -->
+              </div> <!-- .form-group -->
+
+              <div class="form-group">
+                <label class="control-label col-md-2">Region</label>
+                <div class="col-md-3">
+                  <input type="text" ng-model="model.accession.source.collection.region" class="form-control"/>
+                </div> <!-- .col-md-3 -->
+              </div> <!-- .form-group -->
+
+              <div class="form-group">
+                <label class="control-label col-md-2">Collector</label>
+                <div class="col-md-3">
+                  <input type="text" ng-model="model.accession.source.collection.collector" class="form-control"/>
+                </div> <!-- . -->
+              </div> <!-- .form-group -->
+
+              <div class="form-group">
+                <label class="control-label col-md-2">Collection ID</label>
+                <div class="col-md-3">
+                  <input type="text" ng-model="model.accession.source.collection.collectors_code"
+                         class="form-control"/>
+                </div> <!-- . -->
+              </div> <!-- .form-group -->
+
+              <div class="form-group">
+                <label class="control-label col-md-2">Date</label>
+                <div class="col-md-2">
+                  <div class="input-group date-picker-input">
+                    <input type="text" class="form-control" uib-datepicker-popup="MM/dd/yyyy"
+                           show-weeks="false" show-button-bar="false"
+                           ng-model="model.accession.source.collection.date"
+                           is-open="coll_date_opened"  datepicker-options="dateOptions"
+                           date-disabled="disabled(date, mode)" close-text="Close" />
+                    <span class="input-group-btn">
+                      <button type="button" class="btn btn-default"
+                              ng-click="openDatePopup($event, 'coll_date')">
+                        <i class="fa fa-calendar"></i>
+                      </button>
+                    </span>
+                  </div>
+              <!-- <input ui-date ng-model="model.accession.source.collection.date" type="text"
+              class="form-control"/> -->
+                </div> <!-- .controls -->
+              </div> <!-- .form-group -->
+
+              <div class="form-group">
+                <label class="control-label col-md-2">Notes</label>
+                <div class="col-md-3">
+                  <textarea ng-model="model.accession.source.collection.notes" class="col-md-6 form-control">
+                  </textarea>
+                </div> <!-- .col -->
+              </div> <!-- .form-group -->
+
+              <div class="editor-section">
+                <h4>Location Details</h4>
+
+                <div class="long-lat-group">
+                  <div class="form-group">
+                    <label class="control-label col-md-2">Latitude</label>
+                    <div class="col-md-3">
+                      <input type="text" ng-model="model.accession.source.collection.latitude"
+                             class="form-control"/>
+                      <label class="radio-inline">
+                        <input type="radio" name="north_south_group" value="North" checked/>North
+                      </label>
+                      <label class="radio-inline">
+                        <input type="radio" name="north_south_group" value="South"/>South
+                      </label>
+                    </div> <!-- .controls -->
+                  </div> <!-- .form-group -->
+
+                  <div class="form-group">
+                    <label class="control-label col-md-2">Longitude</label>
+                    <div class="col-md-3">
+                      <input type="text" ng-model="model.accession.source.collection.longitude"
+                             class="form-control"/>
+                      <label class="radio-inline">
+                        <input type="radio" name="east_west_group" value="East" checked/>East
+                      </label>
+                      <label class="radio-inline">
+                        <input type="radio" name="east_west_group" value="West"/>West
+                      </label>
+                    </div> <!-- .controls -->
+                  </div> <!-- .form-group -->
+                </div> <!-- long-lat-group -->
+
+                <div class="form-group">
+                  <label class="control-label col-md-2">Accuracy</label>
+                  <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-addon">+/-</span>
+                        <input type="text" ng-model="model.accession.source.collection.geo_accy"
+                               class="form-control"/>
+                        <span class="input-group-addon">m</span>
+                    </div> <!-- .input-group -->
+                  </div> <!-- .col -->
+                </div> <!-- .form-group -->
+
+                <div class="form-group">
+                  <label class="control-label col-md-2">GPS Datum</label>
+                  <div class="col-md-3">
+                    <input type="text" ng-model="model.accession.source.collection.gps_datum"
+                           class="form-control"/>
+                  </div> <!-- .col -->
+                </div> <!-- .form-group -->
+
+                <div class="form-group">
+                  <label class="control-label col-md-2">Altitude/Depth</label>
+                  <div class="col-md-3">
+                    <input type="text" ng-model="model.accession.source.collection.elevation"
+                           class="form-control"/>
+                  </div>
+                  <div class="col-md-2">
+                    <div class="input-group">
+                      <span class="input-group-addon">+/-</span>
+                      <input type="text" ng-model="model.accession.source.collection.elevation_accy"
+                             class="form-control"/>
+                      <span class="input-group-addon">m</span>
+                    </div> <!-- .input-group -->
+                  </div> <!-- .col -->
+                </div> <!-- .form-group -->
+
+                <div class="form-group">
+                  <label class="control-label col-md-2">Habitat description</label>
+                  <div class="col-md-4">
+                    <textarea class="col-md-6 form-control"
+                              ng-model="model.accession.source.collection.habitat"></textarea>
+                  </div> <!-- .col -->
+                </div> <!-- .form-group -->
+              </div> <!-- .editor-section -->
+              <!-- </accordion-group> -->
+
+            <!-- <accordion-group heading="Propagation of source material">
+            <div ng-include="'/static/partials/propagation-edit.html'"></div>
+            </accordion-group> -->
+            <!-- </accordion> -->
+
+        </form> <!-- .form-horizontal -->
+      </uib-tab>   <!-- end "Source" tab -->
+
+      <uib-tab heading="Verification" ng-if="false">
+        <div class="not-ready-warning">
+          <p>We're still working on this one.</p>
+        </div>
+        <accordion>
+          <accordion-group ng-repeat="verification in verifications"
+                           heading="Verification">
+            <form class="form-horizontal">
+            <div class="form-group">
+              <label class="control-label col-md-2">Verifier</label>
+              <div class="col-md-3">
+                <input type="text" ng-model="verification.verifier" class="form-control"/>
+              </div> <!-- .col -->
+            </div> <!-- .form-group -->
+
+            <div class="form-group">
+              <label class="control-label col-md-2">Date</label>
+              <div class="col-md-3">
+                <input ui-date type="text" ng-model="verification.date" class="form-control"/>
+              </div> <!-- .col -->
+            </div> <!-- .form-group -->
+
+            <div class="form-group">
+              <label class="control-label col-md-2">New taxon</label>
+              <div class="col-md-3">
+                <input type="text" ng-model="verification.taxon" class="form-control"/>
+              </div> <!-- .col -->
+            </div> <!-- .form-group -->
+
+            <div class="form-group">
+              <label class="control-label col-md-2">Previous taxon</label>
+              <div class="col-md-3">
+                <input type="text" ng-model="verification.prev_taxon" class="form-control"/>
+              </div> <!-- .col -->
+            </div> <!-- .form-group -->
+
+            <div class="form-group">
+              <label class="control-label col-md-2">Level</label>
+              <div class="col-md-3">
+                <input type="text" ng-model="verification.level" class="form-control"/>
+              </div> <!-- .col -->
+            </div> <!-- .form-group -->
+
+            <div class="form-group">
+              <label class="control-label col-md-2">Reference</label>
+              <div class="col-md-3">
+                <input type="text" ng-model="verification.reference" class="form-control"/>
+              </div> <!-- .col -->
+            </div> <!-- .form-group -->
+
+            <div class="form-group">
+              <label class="control-label col-md-2">Notes</label>
+              <div class="col-md-6">
+                <textarea type="text" ng-model="verification.notes" class="form-control">
+                </textarea>
+              </div> <!-- .col -->
+            </div> <!-- .form-group -->
+            </form>
+          </accordion-group>
+        </accordion>
+      </uib-tab> <!-- end "Verification" tab -->
+
+      <uib-tab heading="Voucher" ng-if="false">
+        <div class="not-ready-warning">
+          <p>We're still working on this one.</p>
+        </div>
+      </uib-tab> <!-- end "Voucher" tab -->
+
+      <!-- <tab heading="Notes">
+      <div ng-include="'/static/partials/notes_editor.html'"></div>
+      </tab> -->
+
+  </uib-tabset>
+
+  </div> <!-- .editor-body -->
+
+  <div class="action-buttons">
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button type="submit" class="btn btn-primary" ng-click="save()">Save</button>
+    <button type="submit" class="btn btn-primary" ng-click="save(true)">Save and Add Plant</button>
+  </div>
+
+</div>

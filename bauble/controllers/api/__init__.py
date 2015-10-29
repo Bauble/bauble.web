@@ -7,7 +7,7 @@ root_path, _ = os.path.split(__file__)
 
 class API(Blueprint):
     def register(self, *args, **kwargs):
-        for controller in ['search', 'family', 'genus', 'taxon', 'geography']:
+        for controller in ['search', 'family', 'genus', 'taxon', 'accession', 'geography']:
             import_module('bauble.controllers.api.{}'.format(controller))
 
         super().register(*args, **kwargs)
