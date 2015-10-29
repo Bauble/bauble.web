@@ -1,91 +1,74 @@
+from flask.ext.login import login_required
+from webargs import fields
+from webargs.flaskparser import use_args
 
-import bottle
-from bottle import request, response
-import sqlalchemy as sa
-
-from bauble import app, API_ROOT
-from bauble.middleware import basic_auth, build_counts, filter_param
-from bauble.model import Location
-
-
-location_column_names = [col.name for col in sa.inspect(Location).columns]
-location_mutable = [col for col in location_column_names
-                    if col not in ['id'] and not col.startswith('_')]
-
-def resolve_location(next):
-    def _wrapped(*args, **kwargs):
-        request.location = request.session.query(Location).get(request.args['location_id'])
-        if not request.location:
-            bottle.abort(404, "Location not found")
-        return next(*args, **kwargs)
-    return _wrapped
+from bauble.controllers.api import api
+import bauble.db as db
+from bauble.models import Location
+import bauble.utils as utils
 
 
-@app.get(API_ROOT + "/location")
-@basic_auth
-@filter_param(Location, location_column_names)
+@api.route("/location")
+@login_required
 def index_location():
-    # TODO: we're not doing any sanitization or validation...see preggy or validate.py
+    locations = Location.query.all()
+    data = Location.jsonify(locations, many=True)
+    return utils.json_response(data)
 
-    locations = request.filter if request.filter else request.session.query(Location)
-    return [location.json() for location in locations]
 
-
-@app.get(API_ROOT + "/location/<location_id:int>")
-@basic_auth
-@resolve_location
+@api.route("/location/<int:location_id>")
+@login_required
 def get_location(location_id):
-    return request.location.json(1)
+    location = Location.query.get_or_404(location_id)
+    return utils.json_response(location.jsonify())
 
 
-@app.route(API_ROOT + "/location/<location_id:int>", method='PATCH')
-@basic_auth
-@resolve_location
-def patch_location(location_id):
-
-    if not request.json:
-        bottle.abort(400, 'The request doesn\'t contain a request body')
-
-    # create a copy of the request data with only the columns
-    data = {col: request.json[col] for col in request.json.keys()
-            if col in location_mutable}
-    for key, value in data.items():
-        setattr(request.location, key, data[key])
-    request.session.commit()
-    return request.location.json()
+@api.route("/location/<int:location_id>", methods=['PATCH'])
+@use_args({
+    'code': fields.String(),
+    'name': fields.String(),
+    'description': fields.String()
+})
+def patch_location(args, location_id):
+    location = Location.query.get_or_404(location_id)
+    for key, value in args.items():
+        setattr(location, key, value)
+    db.session.commit()
+    return utils.json_response(location.jsonify())
 
 
-@app.post(API_ROOT + "/location")
-@basic_auth
-def post_location():
-
-    if not request.json:
-        bottle.abort(400, 'The request doesn\'t contain a request body')
-
-    # create a copy of the request data with only the columns
-    data = {col: request.json[col] for col in request.json.keys()
-            if col in location_mutable}
-
-    # make a copy of the data for only those fields that are columns
-    location = Location(**data)
-    request.session.add(location)
-    request.session.commit()
-    response.status = 201
-    return location.json()
+@api.route("/location", methods=['POST'])
+@login_required
+@use_args({
+    'code': fields.String(required=True),
+    'name': fields.String(),
+    'description': fields.String()
+})
+def post_location(args):
+    location = Location(**args)
+    db.session.add(location)
+    db.session.commit()
+    return utils.json_response(location.jsonify(), 201)
 
 
-@app.delete(API_ROOT + "/location/<location_id:int>")
-@basic_auth
-@resolve_location
+@api.route("/location/<int:location_id>", methods=['DELETE'])
+@login_required
 def delete_location(location_id):
-    request.session.delete(request.location)
-    request.session.commit()
-    response.status = 204
+    location = Location.query.get_or_404(location_id)
+    db.session.delete(location)
+    db.session.commit()
+    return '', 204
 
 
-@app.get(API_ROOT + "/location/<location_id:int>/count")
-@basic_auth
-@resolve_location
-@build_counts(Location, 'location_id')
-def count(location_id):
-    return request.counts
+@api.route("/location/<int:location_id>/count")
+@login_required
+@use_args({
+    'relation': fields.DelimitedList(fields.String(), required=True)
+})
+def location_count(args, location_id):
+    data = {}
+    location = Location.query.get_or_404(location_id)
+    for relation in args['relation']:
+        _, base = relation.rsplit('/', 1)
+        data[base] = utils.count_relation(location, relation)
+    return utils.json_response(data)
