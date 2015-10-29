@@ -1,7 +1,7 @@
 export default function TaxonView () {
     return {
-        editor: "/static/partials/taxon-edit.html",
-        view: "/static/partials/taxon-view.html",
+        editor: "/static/components/taxon/edit.html",
+        view: "/static/components/taxon/view.html",
 
         buttons: [
             { name: "Edit", event: "taxon-edit" },

@@ -12,8 +12,8 @@ import bauble.utils as utils
 @api.route("/taxon")
 @login_required
 def index_taxon():
-    genera = Taxon.query.all()
-    data = Taxon.jsonify(genera, many=True)
+    taxon = Taxon.query.all()
+    data = Taxon.jsonify(taxon, many=True)
     return utils.json_response(data)
 
 
@@ -27,6 +27,7 @@ def get_taxon(taxon_id):
 @api.route("/taxon/<int:taxon_id>", methods=['PATCH'])
 @login_required
 @use_args({
+    'genus_id': fields.Int(),
     'sp': fields.String()
 })
 def patch_taxon(args, taxon_id):
