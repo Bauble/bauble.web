@@ -8,7 +8,6 @@ export default function SearchCtrl ($scope, $location, $state, $http, Search, Vi
     $scope.loading = false;
 
     $scope.capitalize = function(str) {
-        console.log('str: ', str);
         return str.slice(0,1).toUpperCase() + str.slice(1,str.length);
     };
 
@@ -35,12 +34,6 @@ export default function SearchCtrl ($scope, $location, $state, $http, Search, Vi
         $scope.message = "Searching....";
         $scope.selected = $scope.viewMeta = $scope.results = null;
 
-        $http.get('/api/search?q=' + query)
-            .success(function(data, status, headers, config) {
-                console.log('data: ', data);
-            })
-
-        return
         Search.query(query)
             .success(function(data, status, headers, config) {
                 console.log('data: ', data);
