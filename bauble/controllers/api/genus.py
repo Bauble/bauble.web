@@ -27,6 +27,7 @@ def get_genus(genus_id):
 @api.route("/genus/<int:genus_id>", methods=['PATCH'])
 @login_required
 @use_args({
+    'family_id': fields.Int(),
     'genus': fields.String()
 })
 def patch_genus(args, genus_id):
