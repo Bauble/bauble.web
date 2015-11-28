@@ -17,7 +17,7 @@ class SearchResultSchema(Schema):
     pass
 
 @api.route('/search')
-# @login_required
+@login_required
 @use_args({
     'q': fields.String(required=True, validate=validate.Length(min=1))
 })
