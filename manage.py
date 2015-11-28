@@ -92,6 +92,7 @@ def livereload():
     paths = pathlib.Path('bauble/static/').glob('**/*.js')
     for f in filter(lambda p: 'vendor' not in p, map(str, paths)):
         server.watch(f)
+    server.watch('./webpack.config.js')
     server.serve(port=app.config.get('PORT', 5000))
 
 

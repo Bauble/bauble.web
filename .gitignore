@@ -7,4 +7,5 @@ bauble/static/css/main.css
 bauble/static/css/all.min.css
 bauble/static/vendor
 bauble/static/.webassets-cache
+bauble/static/dist
 node_modules

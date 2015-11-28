@@ -13,6 +13,7 @@ from flask.ext.mail import Mail
 from flask.ext.migrate import Migrate
 from flask.ext.login import LoginManager
 from flask.ext.sslify import SSLify
+from flask.ext.webpack import Webpack
 
 class JSONEncoder(flask.json.JSONEncoder):
     def default(self, obj):
