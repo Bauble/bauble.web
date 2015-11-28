@@ -2,26 +2,24 @@ import _ from 'lodash'
 import {InstrumentedArray} from '../../utils'
 
 export default function TaxonEditController ($scope, $location, $q, $http, $timeout, $stateParams,
-                              locationStack, Alert, Genus, Taxon, overlay) {
-    // isNew is inherited from the NewCtrl if this is a /new editor
-    $scope.taxon = {
-        genus_id: $location.search().genus,
-    };
+                                             locationStack, Alert, Genus, Taxon, overlay) {
 
     $scope.activeTab = "general";
     $scope.qualifiers = ["agg.", "s. lat.", "s. str."];
     $scope.ranks = ["cv.", "f.", "subf.", "subsp.", "subvar.", "var."];
 
     $scope.data = {
+        taxon: {
+            genus_id: $location.search().genus,
+        },
+        genus: {},
         synonyms: new InstrumentedArray(),
         names: new InstrumentedArray(),
         notes: new InstrumentedArray(),
         distribution: new InstrumentedArray(),
         selectedDistItem: null,
-        deletingItem: null
+        deletingItem: null,
     };
-
-    $scope.genus = {};
 
     // $http.get('/data/geography.json')
     $http.get('/api/geographies')
@@ -39,17 +37,17 @@ export default function TaxonEditController ($scope, $location, $q, $http, $time
         overlay('loading...');
         Taxon.get($stateParams.id, {embed: ['genus', 'vernacular_names', 'synonyms', 'distribution']})
             .success(function(data, status, headers, config) {
-                $scope.taxon = data;
-                $scope.genus = data.genus;
-                $scope.data.notes = new InstrumentedArray($scope.taxon.notes || []);
-                $scope.data.distribution = new InstrumentedArray(_.sortBy($scope.taxon.distribution, 'id') || []);
-                $scope.data.names = new InstrumentedArray($scope.taxon.vernacular_names || [{}]);
-                $scope.data.synonyms = new InstrumentedArray($scope.taxon.synonyms || []);
+                $scope.data.taxon = data;
+                $scope.data.genus = data.genus;
+                $scope.data.notes = new InstrumentedArray($scope.data.taxon.notes || []);
+                $scope.data.distribution = new InstrumentedArray(_.sortBy($scope.data.taxon.distribution, 'id') || []);
+                $scope.data.names = new InstrumentedArray($scope.data.taxon.vernacular_names || [{}]);
+                $scope.data.synonyms = new InstrumentedArray($scope.data.taxon.synonyms || []);
                 // delete the embedded properties so we don't resubmit them
-                delete $scope.taxon.genus;
-                delete $scope.taxon.synonyms;
-                delete $scope.taxon.vernacular_names;
-                delete $scope.taxon.notes;
+                delete $scope.data.taxon.genus;
+                delete $scope.data.taxon.synonyms;
+                delete $scope.data.taxon.vernacular_names;
+                delete $scope.data.taxon.notes;
             })
             .error(function(data, status, headers, config) {
                 var defaultMessage = "Could not get taxon details.";
@@ -58,11 +56,11 @@ export default function TaxonEditController ($scope, $location, $q, $http, $time
             .finally(function() {
                 overlay.clear();
             });
-    } else if($scope.taxon.genus_id) {
+    } else if($scope.data.taxon.genus_id) {
         overlay('loading...');
-        Genus.get($scope.taxon.genus_id)
+        Genus.get($scope.data.taxon.genus_id)
             .success(function(data, status, headers, config) {
-                $scope.genus = data;
+                $scope.data.genus = data;
             })
             .error(function(data, status, headers, config) {
                 var defaultMessage = "Could not get genus details.";
@@ -72,7 +70,6 @@ export default function TaxonEditController ($scope, $location, $q, $http, $time
                 overlay.clear();
             });
     }
-
 
     // get genera for the genus completions
     $scope.getGenera = function($viewValue) {
@@ -137,8 +134,7 @@ export default function TaxonEditController ($scope, $location, $q, $http, $time
 
     // called when the save button is clicked on the editor
     $scope.save = function(addAccession) {
-
-        $scope.taxon.genus_id = $scope.genus.id;
+        console.log('$scope.data.genus: ', $scope.data.genus);
 
         // remove any notes without a note
         // angular.forEach($scope.notes, function(note, key) {
@@ -150,10 +146,10 @@ export default function TaxonEditController ($scope, $location, $q, $http, $time
         function saveNames() {
             return $q.all(_.flatten(
                 _.map($scope.data.names.added, function(name) {
-                    return Taxon.saveName($scope.taxon, name);
+                    return Taxon.saveName($scope.data.taxon, name);
                 }),
                 _.map($scope.data.names.removed, function(name) {
-                    return Taxon.removeName($scope.taxon, name);
+                    return Taxon.removeName($scope.data.taxon, name);
                 })))
                 .catch(function(result) {
                     var defaultMessage = "Some names could not be saved.";
@@ -165,10 +161,10 @@ export default function TaxonEditController ($scope, $location, $q, $http, $time
         function saveSynonyms() {
             return $q.all(_.flatten(
                 _.map($scope.data.synonyms.added, function(synonym) {
-                    return Taxon.addSynonym($scope.taxon, synonym);
+                    return Taxon.addSynonym($scope.data.taxon, synonym);
                 }),
                 _.map($scope.data.synonyms.removed, function(synonym) {
-                    return Taxon.removeSynonym($scope.taxon, synonym);
+                    return Taxon.removeSynonym($scope.data.taxon, synonym);
                 })))
                 .catch(function(result) {
                     var defaultMessage = "Some synonyms could not be saved.";
@@ -180,10 +176,10 @@ export default function TaxonEditController ($scope, $location, $q, $http, $time
         function saveDistributions() {
             return $q.all(_.flatten(
                 _.map($scope.data.distribution.added, function(distribution) {
-                    return Taxon.addDistribution($scope.taxon, distribution);
+                    return Taxon.addDistribution($scope.data.taxon, distribution);
                 }),
                 _.map($scope.data.distribution.removed, function(distribution) {
-                    return Taxon.removeDistribution($scope.taxon, distribution);
+                    return Taxon.removeDistribution($scope.data.taxon, distribution);
                 })))
                 .catch(function(result) {
                     var defaultMessage = "Some distributions could not be saved.";
@@ -193,17 +189,17 @@ export default function TaxonEditController ($scope, $location, $q, $http, $time
 
         }
 
-        Taxon.save($scope.taxon)
+        Taxon.save($scope.data.taxon)
             .success(function(data, status, headers, config) {
 
-                $scope.taxon = data;
+                $scope.data.taxon = data;
 
                 $q.all(saveSynonyms(),
                        saveNames(),
                        saveDistributions())
                     .then(function(results) {
                         if(addAccession) {
-                            $location.path('/accession/add').search({'taxon': $scope.taxon.id});
+                            $location.path('/accession/add').search({'taxon': $scope.data.taxon.id});
                         } else {
                             locationStack.pop();
                         }

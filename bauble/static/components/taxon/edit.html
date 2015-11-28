@@ -16,26 +16,26 @@
               <div class="form-group">
                 <label for="genus-input" class="col-sm-2 control-label">Genus</label>
                 <div class="col-sm-8">
-                  <input type="text" ng-model="$parent.genus" id="genus-input"
-                         typeahead-min-length="2"
-                         placeholder="required" typeahead-editable="false"
-                         uib-typeahead="genus as genus.str for genus in getGenera($viewValue)"
-                         typeahead-input-formatter="genus.str"
-                         typeahead-loading="loadingGenera" class="form-control">
+                    <input type="text" ng-model="data.genus" id="genus-input"
+                           typeahead-on-select="data.taxon.genus_id = $item.id"
+                           typeahead-min-length="2" placeholder="required"
+                           typeahead-editable="false" typeahead-input-formatter="data.genus.str"
+                           uib-typeahead="genus as genus.str for genus in getGenera($viewValue)"
+                           typeahead-loading="loadingGenera" class="form-control">
                 </div>
               </div> <!-- .form-group -->
 
               <div class="form-group">
                 <label for="hybrid-input" class="col-sm-2 control-label">Hybrid</label>
                 <div class="col-sm-2">
-                  <input type="checkbox" ng-model="taxon.hybrid" id="hybrid-input">
+                  <input type="checkbox" ng-model="data.taxon.hybrid" id="hybrid-input">
                 </div>
               </div> <!-- .form-group -->
 
               <div class="form-group">
                 <label for="species-input" class="col-sm-2 control-label">Species</label>
                 <div class="col-sm-6">
-                  <input type="text" ng-model="taxon.sp" id="species-input"
+                  <input type="text" ng-model="data.taxon.sp" id="species-input"
                          class="form-control"/>
                 </div>
               </div> <!-- .form-group -->
@@ -43,7 +43,7 @@
               <div class="form-group">
                 <label for="author-input" class="col-sm-2 control-label">Author</label>
                 <div class="col-sm-6">
-                  <input type="text" ng-model="taxon.sp_author" id="author-input"
+                  <input type="text" ng-model="data.taxon.sp_author" id="author-input"
                          class="form-control"/>
                 </div>
               </div> <!-- .form-group -->
@@ -51,7 +51,7 @@
               <div class="form-group">
                 <label for="cv-group-input" class="col-sm-2 control-label">Cultivar Group</label>
                 <div class="col-sm-6">
-                  <input type="text" ng-model="taxon.cv_group" class="form-control"
+                  <input type="text" ng-model="data.taxon.cv_group" class="form-control"
                          id="cultivar-group-input">
                 </div>
               </div> <!-- .form-group -->
@@ -60,7 +60,7 @@
                 <label for="species-qual-input" class="col-sm-2 control-label">
                   Species qualifier</label>
                 <div class="col-sm-3">
-                  <select ng-model="taxon.sp_qual" ng-options="q for q in qualifiers"
+                  <select ng-model="data.taxon.sp_qual" ng-options="q for q in qualifiers"
                           class="form-control" id="species-qual-input"></select>
                 </div>
               </div>
@@ -81,42 +81,42 @@
 
               <div class="infrasp-row row">
                 <div class="col-md-4">
-                  <select ng-model="taxon.infrasp1_rank" class="form-control"
+                  <select ng-model="data.taxon.infrasp1_rank" class="form-control"
                           ng-options="q for q in ranks"></select>
                 </div>
                 <div class="col-md-4">
-                  <input class="form-control" type="text" ng-model="taxon.infrasp1"/>
+                  <input class="form-control" type="text" ng-model="data.taxon.infrasp1"/>
                 </div>
                 <div class="col-md-4">
-                  <input class="form-control"type="text" ng-model="taxon.infrasp1_author"/>
-                </div>
-              </div> <!-- .row -->
-
-              <div class="infrasp-row row">
-                <div class="col-md-4">
-                  <select ng-model="taxon.infrasp2_rank" ng-options="q for q in ranks"
-                          class="form-control"></select>
-                </div>
-                <div class="col-md-4">
-                  <input class="form-control" type="text" ng-model="taxon.infrasp2"/>
-                </div>
-                <div class="col-md-4">
-                  <input class="form-control"type="text"
-                  ng-model="taxon.infrasp2_author"/>
+                  <input class="form-control"type="text" ng-model="data.taxon.infrasp1_author"/>
                 </div>
               </div> <!-- .row -->
 
               <div class="infrasp-row row">
                 <div class="col-md-4">
-                  <select ng-model="taxon.infrasp3_rank" ng-options="q for q in ranks"
+                  <select ng-model="data.taxon.infrasp2_rank" ng-options="q for q in ranks"
                           class="form-control"></select>
                 </div>
                 <div class="col-md-4">
-                  <input class="form-control" type="text" ng-model="taxon.infrasp3"/>
+                  <input class="form-control" type="text" ng-model="data.taxon.infrasp2"/>
                 </div>
                 <div class="col-md-4">
                   <input class="form-control"type="text"
-                  ng-model="taxon.infrasp3_author"/>
+                  ng-model="data.taxon.infrasp2_author"/>
+                </div>
+              </div> <!-- .row -->
+
+              <div class="infrasp-row row">
+                <div class="col-md-4">
+                  <select ng-model="data.taxon.infrasp3_rank" ng-options="q for q in ranks"
+                          class="form-control"></select>
+                </div>
+                <div class="col-md-4">
+                  <input class="form-control" type="text" ng-model="data.taxon.infrasp3"/>
+                </div>
+                <div class="col-md-4">
+                  <input class="form-control"type="text"
+                         ng-model="data.taxon.infrasp3_author"/>
                 </div>
               </div> <!-- .row -->
 

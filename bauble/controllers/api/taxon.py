@@ -26,10 +26,7 @@ def get_taxon(taxon_id):
 
 @api.route("/taxon/<int:taxon_id>", methods=['PATCH'])
 @login_required
-@use_args({
-    'genus_id': fields.Int(),
-    'sp': fields.String()
-})
+@use_args(Taxon.MutableSchema())
 def patch_taxon(args, taxon_id):
     taxon = Taxon.query.get_or_404(taxon_id)
     for key, value in args.items():
@@ -40,10 +37,7 @@ def patch_taxon(args, taxon_id):
 
 @api.route("/taxon", methods=['POST'])
 @login_required
-@use_args({
-    'sp': fields.String(),
-    'genus_id': fields.Int(required=True)
-})
+@use_args(Taxon.MutableSchema())
 def post_taxon(args):
     genus = Genus.query.filter_by(id=args['genus_id']).first()
     if not genus:

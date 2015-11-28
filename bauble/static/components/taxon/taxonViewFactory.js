@@ -5,8 +5,8 @@ export default function TaxonView () {
 
         buttons: [
             { name: "Edit", event: "taxon-edit" },
-            { name: "Add Accession", event: "taxon-addaccession" }, // add accession to selected Taxon
-            { name: "Delete", event: "taxon-delete" } // delete the selected Taxon
+            { name: "Add Accession", event: "taxon-addaccession" },
+            { name: "Delete", event: "taxon-delete" }
         ]
     };
 }
