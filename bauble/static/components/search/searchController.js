@@ -36,8 +36,6 @@ export default function SearchCtrl ($scope, $location, $state, $http, Search, Vi
 
         Search.query(query)
             .success(function(data, status, headers, config) {
-                console.log('data: ', data);
-                return
                 $scope.results = data;
                 // if($scope.results.length===0) {
                 //     $scope.alert = "No results for your search query";
@@ -56,7 +54,6 @@ export default function SearchCtrl ($scope, $location, $state, $http, Search, Vi
                 } else {
                     $scope.isOpen = false;
                 }
-
                 $scope.loading = false;
             })
             .error(function(data, status, headers, config) {
