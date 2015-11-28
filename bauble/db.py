@@ -38,6 +38,10 @@ class _JSONSchema(_BaseSchema, ma.ModelSchema):
     str = fields.String(dump_only=True)
 
 
+class _MutableSchema(_BaseSchema, ma.ModelSchema):
+    pass
+
+
 class _Model(ExtModel):
     """The default Model base class.
     """
@@ -55,7 +59,7 @@ class _Model(ExtModel):
     json_default = None
 
     @classmethod
-    def _create_default_schema(cls):
+    def _create_json_schema(cls):
         if cls.json_default is None:
             cls.json_default = tuple(c for c in inspect(cls).mapper.columns.keys()
                                      if not c.startswith('_')) + ('str',)
@@ -66,8 +70,9 @@ class _Model(ExtModel):
                 fields = cls.json_default
 
         return JSONSchema
-    _default_schema_cls = None
 
+
+    _json_schema_cls = None
 
     @combomethod
     def jsonify(param, *args, schema_cls=None, **kwargs):
@@ -76,12 +81,41 @@ class _Model(ExtModel):
 
         # use the default schema if no schema_cls was passed
         if schema_cls is None:
-            if cls._default_schema_cls is None:
+            if cls._json_schema_cls is None:
                 # create the default schema cls if it hasn't been created yet
-                cls._default_schema_cls = param._create_default_schema()
-            schema_cls = cls._default_schema_cls
+                cls._json_schema_cls = param._create_json_schema()
+            schema_cls = cls._json_schema_cls
 
         return schema_cls().dump(instance, **kwargs)
+
+
+    mutable_default = None
+
+    @classmethod
+    def _create_mutable_schema(cls):
+        skip = 'created_at', 'updated_at'
+        if cls.mutable_default is None:
+            cls.mutable_default = tuple(c for c in inspect(cls).mapper.columns.keys()
+                                        if not c.startswith('_') and c not in skip)
+
+        class MutableSchema(_MutableSchema):
+            class Meta:
+                model = cls
+                fields = cls.mutable_default
+
+        return MutableSchema
+
+
+    _mutable_schema_cls = None
+
+    @combomethod
+    def MutableSchema(param):
+        cls = type(param) if isinstance(param, _Model) else param
+
+        if cls._mutable_schema_cls is None:
+            _mutable_schema_cls = cls._create_mutable_schema()
+
+        return _mutable_schema_cls()
 
 
     # @hybrid_property

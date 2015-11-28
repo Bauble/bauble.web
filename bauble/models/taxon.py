@@ -168,12 +168,27 @@ class Taxon(db.Model):
     def __init__(self, *args, **kwargs):
         super(Taxon, self).__init__(*args, **kwargs)
 
+
     def __str__(self):
         '''
         returns a string representation of this taxon,
         calls Taxon.str(self)
         '''
         return Taxon.str(self)
+
+
+    def jsonify(self):
+        d = super().jsonify()
+        d['genus'] = self.genus.jsonify()
+        return d
+
+
+    @classmethod
+    def _create_json_schema(cls):
+        schema_cls = super()._create_json_schema()
+        schema_cls.Meta.fields += ('genus',)
+        return schema_cls
+
 
     def _get_default_vernacular_name(self):
         if self._default_vernacular_name is None:
