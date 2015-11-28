@@ -1,4 +1,4 @@
-<div ng-controller="TaxonViewCtrl">
+<div ng-controller="TaxonViewController">
 
   <div class="row">
     <div class="col-md-10">
@@ -44,10 +44,10 @@
 
     <div class="col-md-2">
       <div id="summary-buttons">
-        <a class="btn btn-default" location-push ng-href="#/taxon/{{taxon.id}}/edit">
+        <a class="btn btn-default" ng-href="/taxon/{{taxon.id}}/edit">
           <i class="fa fa-pencil"></i>Edit</a>
 
-        <a class="btn btn-default" location-push ng-href="#/accession/add?taxon={{taxon.id}}">
+        <a class="btn btn-default" ng-href="/accession/add?taxon={{taxon.id}}">
           <i class="fa fa-plus"></i>Add Accession</a>
 
         <a class="btn btn-default" ng-click="delete(taxon.id)">
