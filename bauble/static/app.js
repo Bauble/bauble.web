@@ -60,8 +60,8 @@ app.config(function ($stateProvider, $urlRouterProvider) {
         .state('resource-edit', {
             url: '/:resource/:id/edit',
             templateUrl: function($stateParams) {
-                const resource = stateParams.resource.toLowerCase()
-                return `/static/components/${resource}/edit.html`;
+                const resource = $stateParams.resource.toLowerCase()
+                return `/static/components/${resource}/edit.html`
             },
             controllerProvider: ['$stateParams', function($stateParams) {
                 var resource = $stateParams.resource;
