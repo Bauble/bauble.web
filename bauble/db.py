@@ -38,7 +38,6 @@ class _JSONSchema(_BaseSchema, ma.ModelSchema):
     str = fields.String(dump_only=True)
 
 
-
 class _Model(ExtModel):
     """The default Model base class.
     """
@@ -85,8 +84,8 @@ class _Model(ExtModel):
         return schema_cls().dump(instance, **kwargs)
 
 
-    # @declared_attr
-    @hybrid_property
+    # @hybrid_property
+    @declared_attr
     def str(self):
         str(self)
 
