@@ -1,3 +1,5 @@
+from itertools import chain
+from pathlib import Path
 import os
 
 from flask_assets import Bundle
@@ -24,8 +26,9 @@ css_all = Bundle(sass_app,
                  filters="cssmin", output="css/all.min.css")
 
 js_bundle = Bundle("app.js",
-                   # depends=("*.js", "components/**/*.js", "shared/**/*.js"),
-                   depends="**/*.js",
+                   depends=map(str,
+                               chain(Path('bauble/static/components').glob('**/*.js'),
+                                     Path('bauble/static/shared').glob('**/*.js'))),
                    filters=[
                        "babel",
                        "browserify",
