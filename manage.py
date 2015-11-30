@@ -85,7 +85,7 @@ def test():
 
 @manager.command
 def livereload():
-    from livereload import Server, shell
+    from livereload import Server
     server = Server(app)
 
     # watch all js files else we'll only reload when app.js changes
