@@ -3,6 +3,7 @@
 __pycache__/
 *~
 bauble/static/bundle*.js
+bauble/static/dist
 bauble/static/css/main.css
 bauble/static/css/all.min.css
 bauble/static/vendor
