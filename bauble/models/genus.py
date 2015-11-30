@@ -105,6 +105,11 @@ class Genus(db.Model):
                 [s for s in [self.genus, self.qualifier,
                              xml.sax.saxutils.escape(self.author)] if s not in ('', None)])
 
+    def jsonify(self):
+        d = super().jsonify()
+        d['family'] = self.family.jsonify()
+        return d
+
 
 
 class GenusNote(db.Model):

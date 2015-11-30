@@ -1,6 +1,6 @@
 <div ng-form name="genusForm" class="row bauble-editor genus-editor">
 
-  <h3>{{genus.str || 'New genus'}}</h3>
+  <h3>{{data.genus.str || 'New genus'}}</h3>
 
   <div class="editor-body">
 
@@ -14,10 +14,12 @@
               <div class="form-group">
                 <label for="family-input" class="col-sm-2 control-label">Family</label>
                 <div class="col-sm-10">
-                  <input type="text" ng-model="family" id="family-input"
+                  <input type="text" ng-model="data.family" id="family-input"
                          placeholder="required" typeahead-editable="false"
+
                          uib-typeahead="family as family.str for family in getFamilies($viewValue)"
-                         typeahead-input-formatter="family.str"
+                         typeahead-on-select="data.genus.family_id = $item.id"
+                         typeahead-input-formatter="data.family.str"
                          typeahead-loading="loadingFamilies" class="form-control" required>
                 </div>
               </div>   <!-- .form-group -->
@@ -25,7 +27,7 @@
               <div class="form-group">
                 <label for="genus-input" class="col-sm-2 control-label">Genus</label>
                 <div class="col-sm-10">
-                  <input id="genus-input" type="text" ng-model="genus.genus"
+                  <input id="genus-input" type="text" ng-model="data.genus.genus"
                          placeholder="required" class="form-control" required/>
                 </div>
               </div> <!-- .form-group -->
@@ -33,7 +35,7 @@
               <div class="form-group">
                 <label id="author-input" class="col-sm-2 control-label">Author</label>
                 <div class="col-sm-10">
-                  <input type="text" ng-model="genus.author" class="form-control"
+                  <input type="text" ng-model="data.genus.author" class="form-control"
                          id="author-input"/>
                 </div>
               </div>

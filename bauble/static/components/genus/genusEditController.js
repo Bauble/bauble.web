@@ -4,12 +4,11 @@ import {InstrumentedArray} from '../../utils'
 export default function GenusEditController ($scope, $q, $location, $stateParams,
                                              locationStack, Alert, Family, Genus, overlay) {
 
-    // isNew is inherited from the NewCtrl if this is a /new editor
-    $scope.genus = {
-        family_id: $location.search().family,
-    };
-
     $scope.data = {
+        genus: {
+            family_id: $location.search().family,
+        },
+        family: {},
         synonyms: new InstrumentedArray(),
         notes: new InstrumentedArray()
     };
@@ -19,14 +18,15 @@ export default function GenusEditController ($scope, $q, $location, $stateParams
         overlay('loading...');
         Genus.get($stateParams.id, {embed: ['family', 'notes', 'synonyms']})
             .success(function(data, status, headers, config) {
-                $scope.genus = data;
-                $scope.family = data.family;
+                $scope.data.genus = data;
+                $scope.data.family = data.family;
                 // pull out the notes and synonyms so we don't resubmit them
                 // back on save
-                $scope.data.notes = new InstrumentedArray($scope.genus.notes || []);
-                $scope.data.synonyms = new InstrumentedArray($scope.genus.synonyms || []);
-                delete $scope.genus.synonyms;
-                delete $scope.genus.notes;
+                $scope.data.notes = new InstrumentedArray($scope.data.genus.notes || []);
+                $scope.data.synonyms = new InstrumentedArray($scope.data.genus.synonyms || []);
+                delete $scope.data.genus.family;
+                delete $scope.data.genus.synonyms;
+                delete $scope.data.genus.notes;
             })
             .error(function(data, status, headers, config) {
                 var defaultMessage = "Could not get genus details.";
@@ -35,11 +35,11 @@ export default function GenusEditController ($scope, $q, $location, $stateParams
             .finally(function() {
                 overlay.clear();
             });
-    } else if($scope.genus.family_id) {
-        Family.get($scope.genus.family_id, {
+    } else if($scope.data.genus.family_id) {
+        Family.get($scope.data.genus.family_id, {
             pick: ['id', 'str']
         }).success(function(data, status, headers, config) {
-            $scope.family = data;
+            $scope.data.family = data;
         }).error(function(data, status, headers, config) {
             var defaultMessage = "Could not get family details.";
             Alert.onErrorResponse(data, defaultMessage);
@@ -53,8 +53,8 @@ export default function GenusEditController ($scope, $q, $location, $stateParams
     $scope.activeTab = "general";
 
     $scope.formatInput = function() {
-        console.log('$scope.family: ', $scope.family);
-        var s = $scope.family ? $scope.family.str : '';
+        console.log('$scope.data.family: ', $scope.data.family);
+        var s = $scope.data.family ? $scope.data.family.str : '';
         console.log('s: ', s);
         return s;
     };
@@ -83,23 +83,22 @@ export default function GenusEditController ($scope, $q, $location, $stateParams
         // object an whether we whould be calling save or edit
         // TODO: we should probably also update the selected result to reflect
         // any changes in the search result
-        //$scope.genus.notes = $scope.notes;
-        $scope.genus.family_id = $scope.family.id;
-        Genus.save($scope.genus)
+        //$scope.data.genus.notes = $scope.notes;
+        Genus.save($scope.data.genus)
             .success(function(data, status, headers, config) {
 
-                $scope.genus = data;
+                $scope.data.genus = data;
 
                 // update the synonyms
                 $q.all(_.flatten(
                     _.map($scope.data.synonyms.added, function(synonym) {
-                        return Genus.addSynonym($scope.genus, synonym);
+                        return Genus.addSynonym($scope.data.genus, synonym);
                     }),
                     _.map($scope.data.synonyms.removed, function(synonym) {
-                        return Genus.removeSynonym($scope.genus, synonym);
+                        return Genus.removeSynonym($scope.data.genus, synonym);
                     }))).then(function(result) {
                         if(addTaxon) {
-                            $location.path('/taxon/add').search({'genus': $scope.genus.id});
+                            $location.path('/taxon/add').search({'genus': $scope.data.genus.id});
                         } else {
                             locationStack.pop();
                         }

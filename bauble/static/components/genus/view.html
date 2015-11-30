@@ -38,10 +38,10 @@
 
     <div class="col-md-2">
       <div id="summary-buttons">
-        <a class="btn btn-default" location-push ng-href="#/genus/{{genus.id}}/edit">
+        <a class="btn btn-default" location-push ng-href="/genus/{{genus.id}}/edit">
           <i class="fa fa-pencil"></i>Edit</a>
 
-        <a class="btn btn-default" location-push ng-href="#/taxon/add?genus={{genus.id}}">
+        <a class="btn btn-default" location-push ng-href="/taxon/add?genus={{genus.id}}">
           <i class="fa fa-plus"></i>Add Taxon</a>
 
         <a class="btn btn-default" ng-click="delete(genus.id)">
