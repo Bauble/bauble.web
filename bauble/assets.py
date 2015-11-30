@@ -2,8 +2,7 @@ from itertools import chain
 from pathlib import Path
 import os
 
-from flask_assets import Bundle
-from flask.ext.assets import Environment
+from flask.ext.assets import Bundle, Environment
 from webassets.filter import register_filter
 
 from webassets_babel import BabelFilter
@@ -25,10 +24,11 @@ css_all = Bundle(sass_app,
                  # css_vendor,
                  filters="cssmin", output="css/all.min.css")
 
+find_files = lambda p, g: (str(p.relative_to('bauble/static')) for p in Path(p).glob(g))
+
 js_bundle = Bundle("app.js",
-                   depends=map(str,
-                               chain(Path('bauble/static/components').glob('**/*.js'),
-                                     Path('bauble/static/shared').glob('**/*.js'))),
+                   depends=chain(find_files('bauble/static/components', '**/*.js'),
+                                 find_files('bauble/static/shared', '**/*.js')),
                    filters=[
                        "babel",
                        "browserify",
@@ -48,10 +48,8 @@ def init_app(app):
     webassets.register('css_all', css_all)
     webassets.register('js_all', js_all)
 
-    # ** always cache to speed up dev build time
-    # webassets.manifest = 'cache' if not app.debug else False
-    # webassets.cache = not app.debug
-    webassets.cache = True
+    webassets.manifest = 'cache' if not app.debug else False
+    webassets.cache = not app.debug
     webassets.debug = app.debug
     webassets.config['BROWSERIFY_EXTRA_ARGS'] = ['--extension=.es6']
     webassets.config['BROWSERIFY_TRANSFORMS'] = ['babelify', 'resolvify']
