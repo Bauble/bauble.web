@@ -1,8 +1,9 @@
 import _ from 'lodash'
 import {InstrumentedArray} from '../../utils'
 
-export default function TaxonEditController ($scope, $location, $q, $http, $timeout, $stateParams,
-                                             locationStack, Alert, Genus, Taxon, overlay) {
+export default function TaxonEditController ($scope, $location, $q, $http, $timeout,
+                                             $stateParams, $window, Alert, Genus, Taxon,
+                                             overlay) {
 
     $scope.activeTab = "general";
     $scope.qualifiers = ["agg.", "s. lat.", "s. str."];
@@ -91,7 +92,7 @@ export default function TaxonEditController ($scope, $location, $q, $http, $time
     };
 
     $scope.cancel = function() {
-        locationStack.pop();
+        $window.history.back()
     };
 
 
@@ -201,7 +202,7 @@ export default function TaxonEditController ($scope, $location, $q, $http, $time
                         if(addAccession) {
                             $location.path('/accession/add').search({'taxon': $scope.data.taxon.id});
                         } else {
-                            locationStack.pop();
+                            $window.history.back()
                         }
                         //return results;
                     });

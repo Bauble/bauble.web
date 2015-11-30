@@ -2,7 +2,7 @@ import _ from 'lodash'
 import {InstrumentedArray} from '../..//utils'
 
 export default function FamilyEditController ($scope, $q, $location, $stateParams,
-                                              locationStack, Alert, Family, overlay) {
+                                              $window, Alert, Family, overlay) {
 
     $scope.family = {};
     $scope.data = {
@@ -44,7 +44,7 @@ export default function FamilyEditController ($scope, $q, $location, $stateParam
 
 
     $scope.cancel = function() {
-        locationStack.pop();
+        $window.history.back()
     };
 
 
@@ -70,7 +70,7 @@ export default function FamilyEditController ($scope, $q, $location, $stateParam
                         if(addGenus) {
                             $location.path('/genus/add').search({'family': $scope.family.id});
                         } else {
-                            locationStack.pop();
+                            $window.history.back()
                         }
 
                     }).catch(function(result) {

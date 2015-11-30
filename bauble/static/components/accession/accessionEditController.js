@@ -53,7 +53,7 @@ const recvd_type_values = {
 
 
 export default function AccessionEditController ($scope, $location, $uibModal,
-                                                 $stateParams, locationStack, Alert,
+                                                 $stateParams, $window, Alert,
                                                  Taxon, Accession, Source, overlay) {
     $scope.model = {
         accession: {
@@ -239,7 +239,7 @@ export default function AccessionEditController ($scope, $location, $uibModal,
 
 
     $scope.cancel = function() {
-        locationStack.pop();
+        $window.history.back()
     };
 
     // called when the save button is clicked on the editor
@@ -266,7 +266,7 @@ export default function AccessionEditController ($scope, $location, $uibModal,
                 if(addPlant) {
                     $location.path('/plant/add').search({'accession': $scope.model.accession.id});
                 } else {
-                    locationStack.pop();
+                    $window.history.back()
                 }
             })
             .error(function(data, status, headers, config) {

@@ -2,8 +2,7 @@ import _ from 'lodash'
 import {InstrumentedArray} from '../../utils'
 
 export default function GenusEditController ($scope, $q, $location, $stateParams,
-                                             locationStack, Alert, Family, Genus, overlay) {
-
+                                             $window, Alert, Family, Genus, overlay) {
     $scope.data = {
         genus: {
             family_id: $location.search().family,
@@ -74,7 +73,7 @@ export default function GenusEditController ($scope, $q, $location, $stateParams
     };
 
     $scope.cancel = function() {
-        locationStack.pop();
+        window.history.back()
     };
 
     // called when the save button is clicked on the editor
@@ -100,7 +99,7 @@ export default function GenusEditController ($scope, $q, $location, $stateParams
                         if(addTaxon) {
                             $location.path('/taxon/add').search({'genus': $scope.data.genus.id});
                         } else {
-                            locationStack.pop();
+                            $window.history.back()
                         }
                     }).catch(function(result) {
                         var defaultMessage = "Some synonyms could not be saved.";

@@ -8,7 +8,7 @@ const acc_type_values ={
 };
 
 
-export default function PlantEditCtrl ($scope, $location, $stateParams, locationStack,
+export default function PlantEditCtrl ($scope, $location, $stateParams, $window,
                                        Alert, Accession, Plant, Location, overlay) {
     $scope.model = {
         accession: null,
@@ -111,7 +111,7 @@ export default function PlantEditCtrl ($scope, $location, $stateParams, location
     };
 
     $scope.cancel = function() {
-        locationStack.pop();
+        $window.history.back()
     };
 
     // called when the save button is clicked on the editor
@@ -121,7 +121,7 @@ export default function PlantEditCtrl ($scope, $location, $stateParams, location
         $scope.plant.location_id = $scope.model.location.id;
         Plant.save($scope.plant)
             .success(function(data, status, headers, config) {
-                locationStack.pop();
+                $window.history.back()
             })
             .error(function(data, status, headers, config) {
                 var defaultMessage = 'Could not save the plant.';
