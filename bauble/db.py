@@ -7,14 +7,15 @@ from flask.ext.sqlalchemy import (SQLAlchemy, Model as ExtModel, _BoundDeclarati
 from flask.ext.migrate import Migrate
 from flask_marshmallow import Marshmallow
 from marshmallow import fields
+from marshmallow_sqlalchemy import ModelSchema
 from sqlalchemy import func, inspect, Column, DateTime, Integer, MetaData
+from sqlalchemy.orm import ColumnProperty, RelationshipProperty
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from bauble.utils import combomethod
 
 ma = Marshmallow()
-
 
 class SerializationError(Exception):
 
@@ -23,22 +24,11 @@ class SerializationError(Exception):
         super().__init__()
 
 
-class _BaseSchema(ma.Schema):
-
-    def dump(self, *args, **kwargs):
-        """Wrap marshmallow.Schema to raise a SerializationError on error.
-        """
-        data, err = super().dump(*args, **kwargs)
-        if len(err) > 0:
-            raise SerializationError(err)
-        return data
-
-
-class _JSONSchema(_BaseSchema, ma.ModelSchema):
+class _JSONSchema(ModelSchema):
     str = fields.String(dump_only=True)
 
 
-class _MutableSchema(_BaseSchema, ma.ModelSchema):
+class _MutableSchema(ModelSchema):
     pass
 
 
@@ -51,71 +41,23 @@ class _Model(ExtModel):
         # return underscore cased class name
         return re.sub('(?!^)([A-Z]+)', r'_\1', cls.__name__).lower()
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    created_at = Column(DateTime(True), server_default=func.now())
+    id = Column(Integer, primary_key=True, autoincrement=True,
+                info={'mutable': False})
+    created_at = Column(DateTime(True), server_default=func.now(),
+                        info={'mutable': False, 'jsonify': False})
     updated_at = Column(DateTime(True), server_default=func.now(),
-                        onupdate=func.now())
-
-    json_default = None
-
-    @classmethod
-    def _create_json_schema(cls):
-        if cls.json_default is None:
-            cls.json_default = tuple(c for c in inspect(cls).mapper.columns.keys()
-                                     if not c.startswith('_')) + ('str',)
-
-        class JSONSchema(_JSONSchema):
-            class Meta:
-                model = cls
-                fields = cls.json_default
-
-        return JSONSchema
-
-
-    _json_schema_cls = None
+                        onupdate=func.now(),
+                        info={'mutable': False, 'jsonify': False})
 
     @combomethod
     def jsonify(param, *args, schema_cls=None, **kwargs):
         cls = type(param) if isinstance(param, _Model) else param
         instance = param if isinstance(param, _Model) else args[0]
 
-        # use the default schema if no schema_cls was passed
-        if schema_cls is None:
-            if cls._json_schema_cls is None:
-                # create the default schema cls if it hasn't been created yet
-                cls._json_schema_cls = param._create_json_schema()
-            schema_cls = cls._json_schema_cls
-
-        return schema_cls().dump(instance, **kwargs)
-
-
-    mutable_default = None
-
-    @classmethod
-    def _create_mutable_schema(cls):
-        skip = 'created_at', 'updated_at'
-        if cls.mutable_default is None:
-            cls.mutable_default = tuple(c for c in inspect(cls).mapper.columns.keys()
-                                        if not c.startswith('_') and c not in skip)
-
-        class MutableSchema(_MutableSchema):
-            class Meta:
-                model = cls
-                fields = cls.mutable_default
-
-        return MutableSchema
-
-
-    _mutable_schema_cls = None
-
-    @combomethod
-    def MutableSchema(param):
-        cls = type(param) if isinstance(param, _Model) else param
-
-        if cls._mutable_schema_cls is None:
-            _mutable_schema_cls = cls._create_mutable_schema()
-
-        return _mutable_schema_cls()
+        data, err = cls.JSONSchema().dump(instance, **kwargs)
+        if len(err) > 0:
+            raise SerializationError(err)
+        return data
 
 
     # @hybrid_property
@@ -134,6 +76,51 @@ class DBPlugin(SQLAlchemy):
         super().init_app(app)
         ma.init_app(app)
         Migrate(app, self)
+        self._init_schemas()
+
+    def _init_schemas(self):
+        import bauble.models
+        json_nested_fields = []
+
+        for cls in plugin.Model._decl_class_registry.values():
+            if not hasattr(cls, '__mapper__'):
+                continue
+            mapper_cls = inspect(cls)
+            json_fields = ['str']
+            mutable_fields = []
+            for attr_property in mapper_cls.attrs:
+                attr_name = attr_property.key
+                is_column = isinstance(attr_property, ColumnProperty)
+                attr = getattr(cls, attr_name)
+                if attr.info.get('jsonify', is_column):
+                    if isinstance(attr_property, RelationshipProperty):
+                        json_nested_fields.append((cls, attr_property))
+
+                    json_fields.append(attr_name)
+
+                # only columns can be mutable
+                if is_column and attr.info.get('mutable', True):
+                    mutable_fields.append(attr_name)
+
+            class JSONSchema(_JSONSchema):
+                class Meta:
+                    model = cls
+                    fields = json_fields
+                    sqla_session = self.session
+            cls.JSONSchema = JSONSchema
+
+            class MutableSchema(_MutableSchema):
+                class Meta:
+                    model = cls
+                    fields = mutable_fields
+                    sqla_session = self.session
+            cls.MutableSchema = MutableSchema
+
+        # late bind the nested property after all the parent JSONSchema
+        # classes have been created
+        for cls, attr_property in json_nested_fields:
+            cls.JSONSchema._declared_fields[attr_property.key] \
+                = fields.Nested(attr_property.mapper.class_.JSONSchema)
 
 
     def make_declarative_base(self, *args):
@@ -146,5 +133,4 @@ class DBPlugin(SQLAlchemy):
 
 plugin = DBPlugin()
 plugin.ma = plugin.marshmallow = ma
-# plugin.Schema = Schema
 sys.modules[__name__] = plugin

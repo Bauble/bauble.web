@@ -38,11 +38,8 @@ def patch_family(args, family_id):
 
 @api.route("/family", methods=['POST'])
 @login_required
-@use_args({
-    'family': fields.String()
-})
-def post_family(args):
-    family = Family(**args)
+@use_args(Family.MutableSchema())
+def post_family(family):
     db.session.add(family)
     db.session.commit()
     return utils.json_response(family.jsonify(), 201)

@@ -52,11 +52,6 @@ def create_app(config_filename=None):
         logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
     db.init_app(app)
-    db.ma.init_app(app)
-    Migrate(app, db)
-
-    # import bauble.models as models
-    # models.init_app(app)
 
     # register flask extensionsa
     SSLify(app, permanent=True)
