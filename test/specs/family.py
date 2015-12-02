@@ -1,4 +1,8 @@
+from faker import Faker
+
 from bauble.models import Family
+
+faker = Faker()
 
 def test_serializer(session, family):
     session.add(family)
@@ -15,6 +19,22 @@ def test_index_family(client, session, family):
     assert resp.status_code == 200
     assert len(resp.json) == 1
     assert resp.json[0]['id'] == family.id
+
+
+def test_post_family(client, session, family):
+    resp = client.post('/api/family', data=family.jsonify())
+    assert resp.status_code == 201
+    assert resp.json['id'] is not None
+    assert resp.json['family'] == family.family
+
+def test_patch_family(client, session, family):
+    session.add(family)
+    session.commit()
+    family.family = faker.first_name() + 'aceae'
+    resp = client.patch('/api/family/{}'.format(family.id), data=family.jsonify())
+    assert resp.status_code == 200
+    assert resp.json['id'] == family.id
+    assert resp.json['family'] == family.family
 
 
 def test_count(client, session, family, genus, taxon, accession):

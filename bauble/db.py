@@ -7,7 +7,7 @@ from flask.ext.sqlalchemy import (SQLAlchemy, Model as ExtModel, _BoundDeclarati
 from flask.ext.migrate import Migrate
 from flask_marshmallow import Marshmallow
 from marshmallow import fields
-from marshmallow_sqlalchemy import ModelSchema
+from marshmallow_sqlalchemy import ModelSchema as _ModelSchema
 from sqlalchemy import func, inspect, Column, DateTime, Integer, MetaData
 from sqlalchemy.orm import ColumnProperty, RelationshipProperty
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
@@ -24,12 +24,8 @@ class SerializationError(Exception):
         super().__init__()
 
 
-class _JSONSchema(ModelSchema):
+class DefaultSchema(_ModelSchema):
     str = fields.String(dump_only=True)
-
-
-class _MutableSchema(ModelSchema):
-    pass
 
 
 class _Model(ExtModel):
@@ -42,19 +38,19 @@ class _Model(ExtModel):
         return re.sub('(?!^)([A-Z]+)', r'_\1', cls.__name__).lower()
 
     id = Column(Integer, primary_key=True, autoincrement=True,
-                info={'mutable': False})
+                info={'loadable': False})
     created_at = Column(DateTime(True), server_default=func.now(),
-                        info={'mutable': False, 'jsonify': False})
+                        info={'loadable': False})
     updated_at = Column(DateTime(True), server_default=func.now(),
                         onupdate=func.now(),
-                        info={'mutable': False, 'jsonify': False})
+                        info={'loadable': False})
 
     @combomethod
     def jsonify(param, *args, schema_cls=None, **kwargs):
         cls = type(param) if isinstance(param, _Model) else param
         instance = param if isinstance(param, _Model) else args[0]
 
-        data, err = cls.JSONSchema().dump(instance, **kwargs)
+        data, err = cls.__schema__().dump(instance, **kwargs)
         if len(err) > 0:
             raise SerializationError(err)
         return data
@@ -80,47 +76,50 @@ class DBPlugin(SQLAlchemy):
 
     def _init_schemas(self):
         import bauble.models
-        json_nested_fields = []
+        nested_fields = []
 
         for cls in plugin.Model._decl_class_registry.values():
             if not hasattr(cls, '__mapper__'):
                 continue
             mapper_cls = inspect(cls)
-            json_fields = ['str']
-            mutable_fields = []
+            _dump_only = ['str']
+            _load_only = []
+            _fields = ['str']
+
             for attr_property in mapper_cls.attrs:
                 attr_name = attr_property.key
                 is_column = isinstance(attr_property, ColumnProperty)
                 attr = getattr(cls, attr_name)
-                if attr.info.get('jsonify', is_column):
-                    if isinstance(attr_property, RelationshipProperty):
-                        json_nested_fields.append((cls, attr_property))
 
-                    json_fields.append(attr_name)
+                dumpable = attr.info.get('dumpable', is_column)
+                loadable = attr.info.get('loadable', is_column)
 
-                # only columns can be mutable
-                if is_column and attr.info.get('mutable', True):
-                    mutable_fields.append(attr_name)
+                if loadable or dumpable:
+                    _fields.append(attr_name)
 
-            class JSONSchema(_JSONSchema):
+                if dumpable and not loadable:
+                    _dump_only.append(attr_name)
+                elif loadable and not dumpable:
+                    _load_only.append(attr_name)
+
+                if loadable and isinstance(attr_property, RelationshipProperty):
+                    nested_fields.append((cls, attr_property))
+
+            class ModelSchema(DefaultSchema):
                 class Meta:
                     model = cls
-                    fields = json_fields
+                    fields = _fields
+                    dump_only = _dump_only
+                    load_only = _load_only
                     sqla_session = self.session
-            cls.JSONSchema = JSONSchema
+                    strict = True
+            cls.__schema__ = ModelSchema
 
-            class MutableSchema(_MutableSchema):
-                class Meta:
-                    model = cls
-                    fields = mutable_fields
-                    sqla_session = self.session
-            cls.MutableSchema = MutableSchema
-
-        # late bind the nested property after all the parent JSONSchema
-        # classes have been created
-        for cls, attr_property in json_nested_fields:
-            cls.JSONSchema._declared_fields[attr_property.key] \
-                = fields.Nested(attr_property.mapper.class_.JSONSchema)
+        # late bind the nested property after all the parent schema classes have
+        # been created
+        for cls, attr_property in nested_fields:
+            cls.__schema__._declared_fields[attr_property.key] \
+                = fields.Nested(attr_property.mapper.class_.__schema__, dump_only=True)
 
 
     def make_declarative_base(self, *args):
