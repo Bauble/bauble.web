@@ -96,14 +96,13 @@ class DBPlugin(SQLAlchemy):
 
                 if loadable or dumpable:
                     _fields.append(attr_name)
+                    if isinstance(attr_property, RelationshipProperty):
+                        nested_fields.append((cls, attr_property))
 
                 if dumpable and not loadable:
                     _dump_only.append(attr_name)
                 elif loadable and not dumpable:
                     _load_only.append(attr_name)
-
-                if loadable and isinstance(attr_property, RelationshipProperty):
-                    nested_fields.append((cls, attr_property))
 
             class ModelSchema(DefaultSchema):
                 class Meta:
