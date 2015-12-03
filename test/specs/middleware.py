@@ -34,3 +34,7 @@ def test_use_model_with_pk(client, session, family):
 def test_use_model_without_pk(client, session):
     resp = client.get('/t')
     assert resp.status_code == 200
+
+
+# TODO: test to make sure if the request data contain the primary key then
+# it doesn't get set in the model when loading
