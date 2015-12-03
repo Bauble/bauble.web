@@ -6,6 +6,7 @@ from webargs.flaskparser import use_args
 
 from bauble.controllers.api import api
 import bauble.db as db
+from bauble.middleware import use_model
 from bauble.models import Genus, GenusNote, GenusSynonym, Family
 import bauble.utils as utils
 
@@ -17,48 +18,34 @@ def index_genus():
     return utils.json_response(data)
 
 
-@api.route("/genus/<int:genus_id>")
+@api.route("/genus/<int:id>")
 @login_required
-def get_genus(genus_id):
-    genus = Genus.query.get_or_404(genus_id)
+@use_model(Genus)
+def get_genus(genus, genus_id):
     return utils.json_response(genus.jsonify())
 
 
-@api.route("/genus/<int:genus_id>", methods=['PATCH'])
+@api.route("/genus/<int:id>", methods=['PATCH'])
 @login_required
-@use_args({
-    'family_id': fields.Int(),
-    'genus': fields.String()
-})
-def patch_genus(args, genus_id):
-    genus = Genus.query.get_or_404(genus_id)
-    for key, value in args.items():
-        setattr(genus, key, value)
+@use_model(Genus)
+def patch_genus(genus, genus_id):
     db.session.commit()
     return utils.json_response(genus.jsonify())
 
 
 @api.route("/genus", methods=['POST'])
 @login_required
-@use_args({
-    'genus': fields.String(),
-    'family_id': fields.Int(required=True)
-})
-def post_genus(args):
-    family = Family.query.filter_by(id=args['family_id']).first()
-    if not family:
-        abort(422, "Invalid family id")
-
-    genus = Genus(**args)
+@use_model(Genus)
+def post_genus(genus):
     db.session.add(genus)
     db.session.commit()
     return utils.json_response(genus.jsonify(), 201)
 
 
-@api.route("/genus/<int:genus_id>", methods=['DELETE'])
+@api.route("/genus/<int:id>", methods=['DELETE'])
 @login_required
-def delete_genus(genus_id):
-    genus = Genus.query.get_or_404(genus_id)
+@use_model(Genus)
+def delete_genus(genus, id):
     db.session.delete(genus)
     db.session.commit()
     return '', 204
@@ -70,7 +57,8 @@ def list_genus_synonyms(genus_id):
     genus = Genus.query \
                  .options(orm.joinedload('synonyms')) \
                  .get_or_404(genus_id)
-    return GenusSynonym.jsonify(genus.synonyms, many=True)
+    # return GenusSynonym.jsonify(genus.synonyms, many=True)
+    return GenusSynonym.jsonify(genus.synonyms)
 
 
 # @api.get("/genus/<int:genus_id>/synonyms/<synonym_id:int>")

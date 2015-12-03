@@ -6,7 +6,7 @@ from webargs.flaskparser import use_args
 from bauble.controllers.api import api
 import bauble.db as db
 from bauble.models import Family, FamilySynonym
-from bauble.helpers import use_model
+from bauble.middleware import use_model
 import bauble.utils as utils
 
 @api.route("/family")

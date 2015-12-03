@@ -80,7 +80,8 @@ class Genus(db.Model):
     qualifier = Column(Enum('s. lat.', 's. str', ''))
 
     family_id = Column(Integer, ForeignKey('family.id'), nullable=False)
-    family = relationship('Family', backref=backref('genera', cascade='all,delete-orphan'))
+    family = relationship('Family', backref=backref('genera', cascade='all,delete-orphan'),
+                          info={'dumpable': True})
 
     # relations
     synonyms = association_proxy('_synonyms', 'synonym')
@@ -104,12 +105,6 @@ class Genus(db.Model):
             return ' '.join(
                 [s for s in [self.genus, self.qualifier,
                              xml.sax.saxutils.escape(self.author)] if s not in ('', None)])
-
-    def jsonify(self):
-        d = super().jsonify()
-        d['family'] = self.family.jsonify()
-        return d
-
 
 
 class GenusNote(db.Model):
