@@ -89,14 +89,14 @@ def remove_genus_synonym(genus_id, synonym_id):
     return '', 204
 
 
-@api.route("/genus/<int:genus_id>/count")
+@api.route("/genus/<int:id>/count")
 @login_required
 @use_args({
     'relation': fields.DelimitedList(fields.String(), required=True)
 })
-def genus_count(args, genus_id):
+def genus_count(args, id):
     data = {}
-    genus = Genus.query.get_or_404(genus_id)
+    genus = Genus.query.get_or_404(id)
     for relation in args['relation']:
         _, base = relation.rsplit('/', 1)
         data[base] = utils.count_relation(genus, relation)

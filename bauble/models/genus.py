@@ -151,13 +151,6 @@ class GenusSynonym(db.Model):
         return str(self.synonym)
 
 
-
-# TODO: could probably incorporate this into the class since if we can
-# avoid using the Taxon class name in the order_by
-Genus.taxa = relationship('Taxon', cascade='all, delete-orphan',
-                          backref=backref('genus', uselist=False))
-
-
 #  setup the search matches
 mapper_search = search.get_strategy('MapperSearch')
 mapper_search.add_meta(('genera', 'genus', 'gen'), Genus, ['genus'])

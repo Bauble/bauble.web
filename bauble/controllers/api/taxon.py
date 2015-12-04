@@ -6,6 +6,7 @@ from webargs.flaskparser import use_args
 
 from bauble.controllers.api import api
 import bauble.db as db
+from bauble.middleware import use_model
 from bauble.models import Taxon, TaxonNote, TaxonSynonym, Genus
 import bauble.utils as utils
 
@@ -17,55 +18,50 @@ def index_taxon():
     return utils.json_response(data)
 
 
-@api.route("/taxon/<int:taxon_id>")
+@api.route("/taxon/<int:id>")
 @login_required
-def get_taxon(taxon_id):
-    taxon = Taxon.query.get_or_404(taxon_id)
+@use_model(Taxon)
+def get_taxon(taxon, id):
     return utils.json_response(taxon.jsonify())
 
 
-@api.route("/taxon/<int:taxon_id>", methods=['PATCH'])
+@api.route("/taxon/<int:id>", methods=['PATCH'])
 @login_required
-@use_args(Taxon.MutableSchema())
-def patch_taxon(args, taxon_id):
-    taxon = Taxon.query.get_or_404(taxon_id)
-    for key, value in args.items():
-        setattr(taxon, key, value)
+@use_model(Taxon)
+def patch_taxon(taxon, taxon_id):
     db.session.commit()
     return utils.json_response(taxon.jsonify())
 
 
 @api.route("/taxon", methods=['POST'])
 @login_required
-@use_args(Taxon.MutableSchema())
-def post_taxon(args):
-    genus = Genus.query.filter_by(id=args['genus_id']).first()
+@use_model(Taxon)
+def post_taxon(taxon):
+    genus = Genus.query.filter_by(id=taxon.genus_id).first()
     if not genus:
         abort(422, "Invalid genus id")
-
-    taxon = Taxon(**args)
     db.session.add(taxon)
     db.session.commit()
     return utils.json_response(taxon.jsonify(), 201)
 
 
-@api.route("/taxon/<int:taxon_id>", methods=['DELETE'])
+@api.route("/taxon/<int:id>", methods=['DELETE'])
 @login_required
-def delete_taxon(taxon_id):
-    taxon = Taxon.query.get_or_404(taxon_id)
+@use_model(Taxon)
+def delete_taxon(taxon):
     db.session.delete(taxon)
     db.session.commit()
     return '', 204
 
 
-@api.route("/taxon/<int:taxon_id>/count")
+@api.route("/taxon/<int:id>/count")
 @login_required
 @use_args({
     'relation': fields.DelimitedList(fields.String(), required=True)
 })
-def taxon_count(args, taxon_id):
+def taxon_count(args, id):
     data = {}
-    taxon = Taxon.query.get_or_404(taxon_id)
+    taxon = Taxon.query.get_or_404(id)
     for relation in args['relation']:
         _, base = relation.rsplit('/', 1)
         data[base] = utils.count_relation(taxon, relation)

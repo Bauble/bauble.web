@@ -9,7 +9,6 @@ from sqlalchemy.ext.associationproxy import association_proxy
 import bauble.db as db
 import bauble.search as search
 
-
 class VNList(list):
     """
     A Collection class for Taxon.vernacular_names
@@ -134,6 +133,9 @@ class Taxon(db.Model):
     infrasp4_author = Column(String(64))
 
     genus_id = Column(Integer, ForeignKey('genus.id'), nullable=False)
+    genus = relationship('Genus', uselist=False,
+                         info={'dumpable': True},
+                         backref=backref('taxa', cascade='all, delete-orphan'))
 
     label_distribution = Column(Text)
 

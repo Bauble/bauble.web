@@ -92,6 +92,12 @@ def accession(taxon):
     return Accession(code=faker.pyint(), taxon=taxon)
 
 @pytest.fixture()
-def plant(accession):
+def location():
+    from bauble.models import Location
+    return Location(code=faker.pystr(10))
+
+@pytest.fixture()
+def plant(accession, location):
     from bauble.models import Plant
-    return Plant(code=faker.pyint(), acession=accession)
+    return Plant(code=faker.pyint(), quantity=faker.pyint(), accession=accession,
+                 location=location)
