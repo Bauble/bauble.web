@@ -6,7 +6,8 @@ from webargs.flaskparser import use_args
 
 from bauble.controllers.api import api
 import bauble.db as db
-from bauble.models import Accession, Collection, Propagation, Source
+from bauble.middleware import use_model
+from bauble.models import Accession, Collection, Propagation, Source, Taxon
 import bauble.utils as utils
 
 
@@ -18,26 +19,17 @@ def index_accession():
     return utils.json_response(data)
 
 
-@api.route("/accession/<int:accession_id>")
+@api.route("/accession/<int:id>")
 @login_required
-def get_accession(accession_id):
-    accession = Accession.query.get_or_404(accession_id)
+@use_model(Accession)
+def get_accession(accession, id):
     return utils.json_response(accession.jsonify())
 
 
-@api.route("/accession/<int:accession_id>", methods=['PATCH'])
+@api.route("/accession/<int:id>", methods=['PATCH'])
 @login_required
-@use_args({
-    'taxon_id': fields.Int(),
-    'code': fields.String()
-})
-def patch_accession(args, accession_id):
-    accession = Accession.query.get_or_404(accession_id)
-    for key, value in args.items():
-        setattr(accession, key, value)
-    db.session.commit()
-    return utils.json_response(accession.jsonify())
-
+@use_model(Accession)
+def patch_accession(accession, id):
     # if 'source' in request.json:
     #     if request.accession.source is None:
     #         request.accession.source = Source()
@@ -73,79 +65,70 @@ def patch_accession(args, accession_id):
     #         coll_data = {col: value for col, value in source_json['collection'].items()
     #                      if col in coll_mutable}
     #         source.collection.set_attributes(coll_data)
-
     db.session.commit()
     return utils.json_response(accession.jsonify())
 
 
 @api.route("/accession", methods=['POST'])
 @login_required
-@use_args({
-    'sp': fields.String(),
-    'genus_id': fields.Int(required=True)
-})
-def post_accession():
-    # create a copy of the request data with only the columns
-    data = {col: request.json[col] for col in request.json.keys()
-            if col in acc_mutable}
+@use_model(Accession)
+def post_accession(accession):
+    taxon = Taxon.query.filter_by(id=accession.taxon_id).first()
+    if not taxon:
+        abort(422, "Invalid taxon id")
 
-    # make a copy of the data for only those fields that are columns
-    accession = Accession(**data)
-    request.session.add(accession)
+    # if 'source' in request.json:
+    #     source_json = request.json['source']
+    #     source_data = {col: source_json[col] for col in source_json.keys()
+    #                    if col in source_mutable}
+    #     source_data['source_detail_id'] = source_data.pop('id', None)
 
-    if 'source' in request.json:
-        source_json = request.json['source']
-        source_data = {col: source_json[col] for col in source_json.keys()
-                       if col in source_mutable}
-        source_data['source_detail_id'] = source_data.pop('id', None)
+    #     # make a copy of the data for only those fields that are columns
+    #     source = Source(**source_data)
+    #     request.session.add(source)
 
-        # make a copy of the data for only those fields that are columns
-        source = Source(**source_data)
-        request.session.add(source)
+    #     if 'propagation' in source_json:
+    #         # TODO: validate prop_type
+    #         prop_data = source_json['propagation']
+    #         propagation = Propagation(prop_type=prop_data.pop('prop_type'))
+    #         prop_mutable = prop_seed_mutable if propagation.prop_type == 'Seed' \
+    #             else prop_cutting_mutable
 
-        if 'propagation' in source_json:
-            # TODO: validate prop_type
-            prop_data = source_json['propagation']
-            propagation = Propagation(prop_type=prop_data.pop('prop_type'))
-            prop_mutable = prop_seed_mutable if propagation.prop_type == 'Seed' \
-                else prop_cutting_mutable
-
-            propagation.details = {col: prop_data[col] for col in prop_data.keys()
-                                   if col in prop_mutable}
-            source.propagation = propagation
+    #         propagation.details = {col: prop_data[col] for col in prop_data.keys()
+    #                                if col in prop_mutable}
+    #         source.propagation = propagation
 
 
-        collection = Collection()
-        if 'collection' in source_json:
-            # TODO: validate collection datand set mutable properties
-            coll_data = {col: value for col, value in source_json['collection'].items()
-                         if col in coll_mutable}
-            collection = Collection(**coll_data)
-            source.collection = collection
+    #     collection = Collection()
+    #     if 'collection' in source_json:
+    #         # TODO: validate collection datand set mutable properties
+    #         coll_data = {col: value for col, value in source_json['collection'].items()
+    #                      if col in coll_mutable}
+    #         collection = Collection(**coll_data)
+    #         source.collection = collection
+
+    db.session.add(accession)
+    db.session.commit()
+    return utils.json_response(accession.jsonify(), 201)
 
 
-    request.session.commit()
-    response.status = 201
-    return accession.json()
-
-
-@api.route("/accession/<int:accession_id>", methods=['DELETE'])
+@api.route("/accession/<int:id>", methods=['DELETE'])
 @login_required
-def delete_accession(accession_id):
-    accession = Accession.query.get_or_404(accession_id)
+@use_model(Accession)
+def delete_accession(accession, id):
     db.session.delete(accession)
     db.session.commit()
     return '', 204
 
 
-@api.route("/accession/<int:accession_id>/count")
+@api.route("/accession/<int:id>/count")
 @login_required
 @use_args({
     'relation': fields.DelimitedList(fields.String(), required=True)
 })
-def accession_count(args, accession_id):
+def accession_count(args, id):
     data = {}
-    accession = Accession.query.get_or_404(accession_id)
+    accession = Accession.query.get_or_404(id)
     for relation in args['relation']:
         _, base = relation.rsplit('/', 1)
         data[base] = utils.count_relation(accession, relation)

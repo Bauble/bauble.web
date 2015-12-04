@@ -30,7 +30,6 @@ def test_post_taxon(client, session, genus):
     data = {'sp': sp, 'genus_id': genus.id}
     resp = client.post('/api/taxon', data=data)
     assert resp.status_code == 201
-    print('resp.json: ', resp.json)
     assert resp.json['id'] is not None
     assert resp.json['sp'] == sp
 

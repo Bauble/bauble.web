@@ -285,8 +285,8 @@ class Accession(db.Model):
                           backref=backref('accession', uselist=False))
 
     # relations
-    taxon = relationship('Taxon', uselist=False,
-                         backref=backref('accessions', cascade='all, delete-orphan'))
+    taxon = relationship('Taxon', uselist=False, info={'dumpable': True},
+                         backref=backref('accessions', cascade='all, delete-orphan'),)
 
     # use Plant.code for the order_by to avoid ambiguous column names
     plants = relationship('Plant', cascade='all, delete-orphan',
