@@ -4,6 +4,7 @@ from webargs.flaskparser import use_args
 
 from bauble.controllers.api import api
 import bauble.db as db
+from bauble.middleware import use_model
 from bauble.models import Location
 import bauble.utils as utils
 
@@ -16,36 +17,25 @@ def index_location():
     return utils.json_response(data)
 
 
-@api.route("/location/<int:location_id>")
+@api.route("/location/<int:id>")
 @login_required
-def get_location(location_id):
-    location = Location.query.get_or_404(location_id)
+@use_model(Location)
+def get_location(location, id):
     return utils.json_response(location.jsonify())
 
 
-@api.route("/location/<int:location_id>", methods=['PATCH'])
-@use_args({
-    'code': fields.String(),
-    'name': fields.String(),
-    'description': fields.String()
-})
-def patch_location(args, location_id):
-    location = Location.query.get_or_404(location_id)
-    for key, value in args.items():
-        setattr(location, key, value)
+@api.route("/location/<int:id>", methods=['PATCH'])
+@login_required
+@use_model(Location)
+def patch_location(location, id):
     db.session.commit()
     return utils.json_response(location.jsonify())
 
 
 @api.route("/location", methods=['POST'])
 @login_required
-@use_args({
-    'code': fields.String(required=True),
-    'name': fields.String(),
-    'description': fields.String()
-})
-def post_location(args):
-    location = Location(**args)
+@use_model(Location)
+def post_location(location):
     db.session.add(location)
     db.session.commit()
     return utils.json_response(location.jsonify(), 201)

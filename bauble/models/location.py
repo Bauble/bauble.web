@@ -28,14 +28,10 @@ class Location(db.Model):
     """
     __mapper_args__ = {'order_by': 'name'}
 
-    # columns
     # refers to beds by unique codes
     code = Column(String(10), unique=True, nullable=False)
     name = Column(String(64))
     description = Column(Text)
-
-    # relations
-    plants = relationship('Plant', backref=backref('location', uselist=False))
 
     def __str__(self):
         if self.name:
