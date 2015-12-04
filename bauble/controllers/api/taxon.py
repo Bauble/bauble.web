@@ -48,7 +48,7 @@ def post_taxon(taxon):
 @api.route("/taxon/<int:id>", methods=['DELETE'])
 @login_required
 @use_model(Taxon)
-def delete_taxon(taxon):
+def delete_taxon(taxon, id):
     db.session.delete(taxon)
     db.session.commit()
     return '', 204
