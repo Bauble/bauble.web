@@ -328,11 +328,6 @@ class Plant(db.Model):
     def __str__(self):
         return "%s%s%s" % (self.accession, self.delimiter, self.code)
 
-    def json(self, pick=None):
-        d = super().json()
-        d['changes'] = [change.json() for change in self.changes]
-        return d
-
 
     def duplicate(self, code=None, session=None):
         """

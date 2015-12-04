@@ -1,4 +1,4 @@
-from flask import abort
+from flask import abort, request
 from flask.ext.login import login_required
 from webargs import fields
 from webargs.flaskparser import use_args
@@ -6,6 +6,7 @@ from webargs.flaskparser import use_args
 from bauble.controllers.api import api
 import bauble.db as db
 from bauble.models import Accession, Location, Plant
+from bauble.middleware import use_model
 import bauble.utils as utils
 
 
@@ -17,29 +18,27 @@ def index_plant():
     return utils.json_response(data)
 
 
-@api.route("/plant/<int:plant_id>")
+@api.route("/plant/<int:id>")
 @login_required
-def get_plant(plant_id):
-    plant = Plant.query.get_or_404(plant_id)
+@use_model(Plant)
+def get_plant(plant, id):
     return utils.json_response(plant.jsonify())
 
 
-@api.route("/plant/<int:plant_id>", methods=['PATCH'])
-@use_args({
-    'accession_id': fields.Int(),
-    'location_id': fields.Int(),
-    'code': fields.String()
-})
-def patch_plant(args, plant_id):
-    if 'location_id' in args:
-        location = Location.query.filter_by(id=args['location_id']).first()
+@api.route("/plant/<int:id>", methods=['PATCH'])
+@use_model(Plant)
+def patch_plant(plant, id):
+    location_id = request.values.get('location_id', None)
+    if location_id is not None:
+        location = Location.query.filter_by(id=location_id).first()
         if not location:
             abort(422, "Invalid location id")
 
-    if 'accession_id' in args:
-        accession = Accession.query.filter_by(id=args['accession_id']).first()
+    accession_id = request.values.get('accession_id', None)
+    if accession_id is not None:
+        accession = Accession.query.filter_by(id=accession_id).first()
         if not accession:
-            abort(422, "Invalid session id")
+            abort(422, "Invalid accession id")
 
     # create the plant change
     # change = PlantChange(plant_id=request.plant.id,
@@ -53,12 +52,6 @@ def patch_plant(args, plant_id):
     #                      )
 
     # request.session.add(change)
-
-    # create a copy of the request data with only the mutable columns
-    plant = Plant.query.get_or_404(plant_id)
-    for key, value in args.items():
-        setattr(plant, key, value)
-
 
     # if change.from_location_id != request.plant.location_id:
     #     # the change quantity represent the number of plants tranferred to a new location
@@ -77,21 +70,20 @@ def patch_plant(args, plant_id):
 
 @api.route("/plant", methods=['POST'])
 @login_required
-@use_args({
-    'location_id': fields.Int(required=True),
-    'accession_id': fields.Int(required=True),
-    'code': fields.String()
-})
-def post_plant(args):
-    location = Location.query.filter_by(id=args['location_id']).first()
-    if not location:
-        abort(422, "Invalid location id")
+@use_model(Plant)
+def post_plant(plant):
+    location_id = request.values.get('location_id', None)
+    if location_id is not None:
+        location = Location.query.filter_by(id=location_id).first()
+        if not location:
+            abort(422, "Invalid location id")
 
-    accession = db.Accession.query.filter_by(id=args['accession_id']).first()
-    if not accession:
-        abort(422, "Invalid session id")
+    accession_id = request.values.get('accession_id', None)
+    if accession_id is not None:
+        accession = Accession.query.filter_by(id=accession_id).first()
+        if not accession:
+            abort(422, "Invalid accession id")
 
-    plant = Plant(**args)
     db.session.add(plant)
 
     # change = PlantChange(to_location_id=plant.location_id,
@@ -108,23 +100,23 @@ def post_plant(args):
     return utils.json_response(plant.jsonify(), 201)
 
 
-@api.route("/plant/<int:plant_id>", methods=['DELETE'])
+@api.route("/plant/<int:id>", methods=['DELETE'])
 @login_required
-def delete_plant(plant_id):
-    plant = Plant.query.get_or_404(plant_id)
+@use_model(Plant)
+def delete_plant(plant, id):
     db.session.delete(plant)
     db.session.commit()
     return '', 204
 
 
-@api.route("/plant/<int:plant_id>/count")
+@api.route("/plant/<int:id>/count")
 @login_required
 @use_args({
     'relation': fields.DelimitedList(fields.String(), required=True)
 })
-def plant_count(args, plant_id):
+def plant_count(args, id):
     data = {}
-    plant = Plant.query.get_or_404(plant_id)
+    plant = Plant.query.get_or_404(id)
     for relation in args['relation']:
         _, base = relation.rsplit('/', 1)
         data[base] = utils.count_relation(plant, relation)
