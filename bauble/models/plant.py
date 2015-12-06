@@ -295,8 +295,7 @@ class Plant(db.Model):
 
     accession_id = Column(Integer, ForeignKey('accession.id'), nullable=False)
     location_id = Column(Integer, ForeignKey('location.id'), nullable=False)
-    location = relationship('Location', uselist=False, info={'dumpable': True},
-                            backref=backref('plants'))
+    location = relationship('Location', uselist=False, backref=backref('plants'))
 
     propagations = relationship('Propagation', cascade='all, delete-orphan',
                                 single_parent=True,

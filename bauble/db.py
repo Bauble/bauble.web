@@ -7,7 +7,8 @@ from flask.ext.sqlalchemy import (SQLAlchemy, Model as ExtModel, _BoundDeclarati
 from flask.ext.migrate import Migrate
 from flask_marshmallow import Marshmallow
 from marshmallow import fields
-from marshmallow_sqlalchemy import ModelSchema as _ModelSchema
+from marshmallow_sqlalchemy import (ModelSchema as _ModelSchema,
+                                    ModelConverter as _ModelConverter)
 from sqlalchemy import func, inspect, Column, DateTime, Integer, MetaData
 from sqlalchemy.orm import ColumnProperty, RelationshipProperty
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
@@ -22,6 +23,19 @@ class SerializationError(Exception):
     def __init__(self, errors):
         self.errors = errors
         super().__init__()
+
+class ModelConverter(_ModelConverter):
+
+    def fields_for_model(self, *args, **kwargs):
+        kwargs['include_fk'] = True
+        return super().fields_for_model(*args, **kwargs)
+
+    def _get_field_kwargs_for_property(self, prop):
+        kwargs = super()._get_field_kwargs_for_property(prop)
+        if isinstance(prop, RelationshipProperty):
+            kwargs['dump_only'] = True
+        kwargs.update(prop.class_attribute.info.get('field_kwargs', {}))
+        return kwargs
 
 
 class DefaultSchema(_ModelSchema):
@@ -38,12 +52,12 @@ class _Model(ExtModel):
         return re.sub('(?!^)([A-Z]+)', r'_\1', cls.__name__).lower()
 
     id = Column(Integer, primary_key=True, autoincrement=True,
-                info={'loadable': False})
+                info={'field_kwargs': {'dump_only': True}})
     created_at = Column(DateTime(True), server_default=func.now(),
-                        info={'loadable': False})
+                        nullable=False, info={'field_kwargs': {'dump_only': True}})
     updated_at = Column(DateTime(True), server_default=func.now(),
-                        onupdate=func.now(),
-                        info={'loadable': False})
+                        nullable=False, onupdate=func.now(),
+                        info={'field_kwargs': {'dump_only': True}})
 
     @combomethod
     def jsonify(param, *args, schema_cls=None, **kwargs):
@@ -56,7 +70,6 @@ class _Model(ExtModel):
         return data
 
 
-    # @hybrid_property
     @declared_attr
     def str(self):
         str(self)
@@ -75,50 +88,31 @@ class DBPlugin(SQLAlchemy):
         self._init_schemas()
 
     def _init_schemas(self):
-        import bauble.models
+        import bauble.models # import all models
         nested_fields = []
 
         for cls in plugin.Model._decl_class_registry.values():
             if not hasattr(cls, '__mapper__'):
                 continue
-            mapper_cls = inspect(cls)
-            _dump_only = ['str']
-            _load_only = []
-            _fields = ['str']
 
-            for attr_property in mapper_cls.attrs:
-                attr_name = attr_property.key
-                is_column = isinstance(attr_property, ColumnProperty)
-                attr = getattr(cls, attr_name)
-
-                dumpable = attr.info.get('dumpable', is_column)
-                loadable = attr.info.get('loadable', is_column)
-
-                if loadable or dumpable:
-                    _fields.append(attr_name)
-                    if isinstance(attr_property, RelationshipProperty):
-                        nested_fields.append((cls, attr_property))
-
-                if dumpable and not loadable:
-                    _dump_only.append(attr_name)
-                elif loadable and not dumpable:
-                    _load_only.append(attr_name)
+            # nest many to one fields
+            nested_fields.extend([cls, p] for p in inspect(cls).relationships
+                                 if p.direction.name == 'MANYTOONE')
 
             class ModelSchema(DefaultSchema):
                 class Meta:
                     model = cls
-                    fields = _fields
-                    dump_only = _dump_only
-                    load_only = _load_only
+                    dump_only = ['str']
                     sqla_session = self.session
                     strict = True
+                    model_converter = ModelConverter
             cls.__schema__ = ModelSchema
 
         # late bind the nested property after all the parent schema classes have
         # been created
-        for cls, attr_property in nested_fields:
-            cls.__schema__._declared_fields[attr_property.key] \
-                = fields.Nested(attr_property.mapper.class_.__schema__, dump_only=True)
+        for cls, prop in nested_fields:
+            cls.__schema__._declared_fields[prop.key] \
+                = fields.Nested(prop.mapper.class_.__schema__, dump_only=True)
 
 
     def make_declarative_base(self, *args):

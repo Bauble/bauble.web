@@ -80,8 +80,7 @@ class Genus(db.Model):
     qualifier = Column(Enum('s. lat.', 's. str', ''))
 
     family_id = Column(Integer, ForeignKey('family.id'), nullable=False)
-    family = relationship('Family', backref=backref('genera', cascade='all,delete-orphan'),
-                          info={'dumpable': True})
+    family = relationship('Family', backref=backref('genera', cascade='all,delete-orphan'))
 
     # relations
     synonyms = association_proxy('_synonyms', 'synonym')

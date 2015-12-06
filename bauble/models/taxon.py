@@ -134,7 +134,6 @@ class Taxon(db.Model):
 
     genus_id = Column(Integer, ForeignKey('genus.id'), nullable=False)
     genus = relationship('Genus', uselist=False,
-                         info={'dumpable': True},
                          backref=backref('taxa', cascade='all, delete-orphan'))
 
     label_distribution = Column(Text)

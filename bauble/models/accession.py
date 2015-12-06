@@ -285,14 +285,13 @@ class Accession(db.Model):
                           backref=backref('accession', uselist=False))
 
     # relations
-    taxon = relationship('Taxon', uselist=False, info={'dumpable': True},
+    taxon = relationship('Taxon', uselist=False,
                          backref=backref('accessions', cascade='all, delete-orphan'),)
 
     # use Plant.code for the order_by to avoid ambiguous column names
     plants = relationship('Plant', cascade='all, delete-orphan',
                           #order_by='plant.code',
-                          backref=backref('accession', uselist=False,
-                                          info={'dumpable': True}))
+                          backref=backref('accession', uselist=False))
     verifications = relationship('Verification',  # order_by='date',
                                  cascade='all, delete-orphan',
                                  backref=backref('accession', uselist=False))

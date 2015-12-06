@@ -67,8 +67,9 @@ class User(db.Model, UserMixin):
     # organization object
     organization_id = Column(Integer, ForeignKey('organization.id'))
 
+    # password is a hybrid property, see below
     _password = Column('password', String, nullable=False,
-                       info={'dumpable': False})  # hybrid property, see below
+                       info={'field_kwargs': {'load_only': False}})
 
     @hybrid_property
     def password(self):

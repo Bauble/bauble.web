@@ -38,7 +38,7 @@ def patch_genus(genus, genus_id):
 @use_model(Genus)
 def post_genus(genus):
     # TODO: do an exists query instead of loading the family
-    family = Family.query.filter_by(id=taxon.family_id).first()
+    family = Family.query.filter_by(id=genus.family_id).first()
     if not family:
         abort(422, "Invalid family id")
     db.session.add(genus)
