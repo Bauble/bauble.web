@@ -70,6 +70,13 @@ def session():
 
 
 @pytest.fixture()
+def user():
+    from bauble.models import User
+    profile = faker.profile()
+    return User(username=profile['username'], password=faker.password(),
+                email=profile['mail'])
+
+@pytest.fixture()
 def family():
     from bauble.models import Family
     return Family(family=faker.first_name())

@@ -69,7 +69,7 @@ class User(db.Model, UserMixin):
 
     # password is a hybrid property, see below
     _password = Column('password', String, nullable=False,
-                       info={'field_kwargs': {'load_only': False}})
+                       info={'field_kwargs': {'load_only': True}})
 
     @hybrid_property
     def password(self):
