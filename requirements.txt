@@ -1,5 +1,5 @@
 # pin oauthlib to 0.7.2 until flask-oauthlib works with 1.0
-SQLAlchemy==1.0.4
+SQLAlchemy==1.0.9
 attrdict
 bcrypt
 celery
