@@ -25,9 +25,6 @@ def get_source(source_detail, id):
 @login_required
 @use_model(SourceDetail)
 def patch_source(source_detail, id):
-    print('patch source_detail: ', source_detail)
-    from flask import request
-    print('request.json: ', request.json)
     db.session.commit()
     return utils.json_response(source_detail.jsonify())
 
@@ -36,9 +33,6 @@ def patch_source(source_detail, id):
 @login_required
 @use_model(SourceDetail)
 def post_source(source_detail):
-    print('post source_detail: ', source_detail)
-    from flask import request
-    print('request.json: ', request.json)
     db.session.add(source_detail)
     db.session.commit()
     return utils.json_response(source_detail.jsonify(), 201)
