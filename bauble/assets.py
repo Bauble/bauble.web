@@ -18,11 +18,11 @@ register_filter(Browserify)
 register_filter(LibSass)
 
 # not sure why but the debug false is required here
-sass_app = Bundle("sass/main.scss", filters="libsass", output="css/main.css", debug=False)
+sass_app = Bundle("sass/main.scss", filters="libsass", debug=False, output='dist/main.css')
 # css_vendor = Bundle("vendor/node_modules/toastr/build/toastr.css")
 css_all = Bundle(sass_app,
                  # css_vendor,
-                 filters="cssmin", output="css/all.min.css")
+                 filters="cssmin", output="dist/all.min.css")
 
 find_files = lambda p, g: (str(p.relative_to('bauble/static')) for p in Path(p).glob(g))
 
