@@ -1,7 +1,7 @@
 import _ from 'lodash'
 
 export default
-function AccessionViewCtrl ($scope, $location, $state, Alert, Accession, DeleteModal) {
+function AccessionViewController ($scope, $location, $state, Alert, Accession, DeleteModal) {
 
     $scope.accession = null;
     $scope.counts = null;
