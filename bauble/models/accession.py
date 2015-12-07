@@ -321,7 +321,7 @@ class Accession(db.Model):
 
 
     def __str__(self):
-        return self.code
+        return self.code if self.code else ''
 
 
     def taxon_str(self, authors=False, markup=False):
