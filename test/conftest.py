@@ -108,3 +108,8 @@ def plant(accession, location):
     from bauble.models import Plant
     return Plant(code=faker.pyint(), quantity=faker.pyint(), accession=accession,
                  location=location)
+
+@pytest.fixture()
+def source_detail():
+    from bauble.models import SourceDetail
+    return SourceDetail(name=faker.company())

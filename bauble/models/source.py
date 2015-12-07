@@ -77,11 +77,11 @@ source_type_values = {
 class SourceDetail(db.Model):
     __mapper_args__ = {'order_by': 'name'}
 
-    name = Column(String(75), unique=True)
+    name = Column(String(75), unique=True, nullable=False)
     description = Column(Text)
     source_type = Column(Enum(*source_type_values.keys()))
 
-    def __str__(self):
+    def str(self):
         return self.name if self.name else ""
 
 

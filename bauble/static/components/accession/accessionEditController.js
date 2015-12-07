@@ -204,9 +204,9 @@ export default function AccessionEditController ($scope, $location, $uibModal,
 
 
     $scope.editSource = function(sourceDetail) {
-        var modalInstance = $modal.open({
+        var modalInstance = $uibModal.open({
             templateUrl: '/static/components/accession/source-edit.html',
-            controller: "SourceEditController",
+            controller: "SourceDetailEditCtrl",
             resolve: {
                 sourceDetail: function() {
                     console.log('resolve sourceDetail: ', sourceDetail);

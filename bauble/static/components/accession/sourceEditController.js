@@ -14,7 +14,7 @@ const source_type_values = {
     null: ''
 };
 
-export default function SourceDetailEditCtrl ($scope, $modalInstance, Alert, Source,
+export default function SourceDetailEditCtrl ($scope, $uibModalInstance, Alert, Source,
                                               sourceDetail) {
 
     $scope.sourceDetail = sourceDetail;
@@ -24,7 +24,7 @@ export default function SourceDetailEditCtrl ($scope, $modalInstance, Alert, Sou
     $scope.save = function() {
         Source.save($scope.sourceDetail)
             .success(function(data, status, headers, config) {
-                $modalInstance.close(data);
+                $uibModalInstance.close(data);
             })
             .error(function(data, status, headers, config) {
                 var defaultMessage = "Could not save source detail";
@@ -33,6 +33,6 @@ export default function SourceDetailEditCtrl ($scope, $modalInstance, Alert, Sou
     };
 
     $scope.cancel = function() {
-        $modalInstance.dismiss('cancel');
+        $uibModalInstance.dismiss('cancel');
     };
 }
