@@ -33,12 +33,10 @@ def use_model(model_cls):
                 ident = tuple(request.view_args[pk] for pk in pk)
                 instance = model_cls.query.get_or_404(ident)
 
-            # set request values on instance
-            schema = model_cls.__schema__(instance)
-            _instance = parser.parse(schema, request)
-            if instance is None:
-                instance = _instance
-
+            # parse() uses ModelSchema.load which will either populate an existing
+            # instance or create a new one if one doesn't exist
+            schema = model_cls.__schema__(instance=instance)
+            parser.parse(schema, request)
             return next(instance, *request.view_args)
         return wrapper
     return decorator
