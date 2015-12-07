@@ -70,9 +70,9 @@ class _Model(ExtModel):
         return data
 
 
-    @declared_attr
+    @hybrid_property
     def str(self):
-        str(self)
+        return str(self)
 
 
 class DBPlugin(SQLAlchemy):

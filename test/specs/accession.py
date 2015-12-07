@@ -11,7 +11,6 @@ def test_serializer(session, accession):
     accession_json = accession.jsonify()
     # class and instance json are the same
     assert Accession.jsonify(accession) == accession_json
-    assert 'str' in accession_json
     assert accession_json['taxon']['id'] == accession.taxon_id
 
 

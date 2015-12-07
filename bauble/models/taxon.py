@@ -5,6 +5,7 @@ from sqlalchemy import (func, Boolean, Column, Date, Enum, ForeignKey, Integer, 
                         Text, UniqueConstraint)
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.ext.hybrid import hybrid_property
 
 import bauble.db as db
 import bauble.search as search
@@ -223,7 +224,7 @@ class Taxon(db.Model):
     # in PlantPlugins.init() we set this to 'x' for win32
     hybrid_char = '\u2a09'  # U+2A09
 
-    @staticmethod
+    @hybrid_property
     def str(taxon, authors=False, markup=False):
         '''
         returns a string for taxon
