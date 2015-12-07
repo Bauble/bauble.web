@@ -3,6 +3,10 @@ from flask import request
 import bauble.db as db
 import sqlalchemy as sa
 import functools
+# from webargs.core import Parser
+from webargs.flaskparser import FlaskParser as Parser
+
+parser = Parser()
 
 def use_model(model_cls):
     """
@@ -22,20 +26,19 @@ def use_model(model_cls):
             # if all the primary keys are available then load the request.view_args
             # then load the instance or 404 if its not found
             pk = [pk.key for pk in sa.inspect(model_cls).primary_key]
+            instance = None
+
+            # TODO: eager load any schema fields that are relationships
             if set(request.view_args.keys()) >= set(pk):
                 ident = tuple(request.view_args[pk] for pk in pk)
                 instance = model_cls.query.get_or_404(ident)
-                if instance is not None:
-                    # if we got an instance of our model then set its properties
-                    # from the request values
-                    for key, value in request.values.items():
-                        setattr(instance, key, value)
-            else:
-                instance, error = model_cls.__schema__().load(request.values)
-                if error:
-                    raise db.SerializationError(error)
 
-            # TODO: pass only the view args we didn't use to load the instance
+            # set request values on instance
+            schema = model_cls.__schema__(instance)
+            _instance = parser.parse(schema, request)
+            if instance is None:
+                instance = _instance
+
             return next(instance, *request.view_args)
         return wrapper
     return decorator
