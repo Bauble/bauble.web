@@ -112,6 +112,10 @@ class DBPlugin(SQLAlchemy):
                     sqla_session = self.session
                     strict = True
                     model_converter = ModelConverter
+
+            if hasattr(cls, '_additional_schema_fields'):
+                ModelSchema._declared_fields.update(cls._additional_schema_fields)
+
             cls.__schema__ = ModelSchema
 
         # late bind the nested property after all the parent schema classes have
