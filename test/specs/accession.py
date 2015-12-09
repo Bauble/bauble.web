@@ -12,6 +12,7 @@ def test_serializer(session, accession):
     # class and instance json are the same
     assert Accession.jsonify(accession) == accession_json
     assert accession_json['taxon']['id'] == accession.taxon_id
+    assert accession_json['taxon_str'] == accession.taxon_str()
 
 
 def test_index_accession(client, session, accession):

@@ -1,5 +1,7 @@
+from marshmallow import fields
 from sqlalchemy import (event, func, Boolean, Column, Date, Enum, ForeignKey, Integer,
                         String, Text, UniqueConstraint)
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import (backref, object_mapper, reconstructor, relationship,
                             MapperExtension, EXT_CONTINUE)
 from sqlalchemy.orm.session import object_session
@@ -252,6 +254,12 @@ class Accession(db.Model):
     """
     __mapper_args__ = {'order_by': 'code'}
 
+    @declared_attr
+    def _additional_schema_fields(self):
+        return {
+            'taxon_str': fields.Function(lambda obj: obj.taxon_str())
+        }
+
     # columns
     #: the accession code
     code = Column(String(20), nullable=False, unique=True)
@@ -303,8 +311,8 @@ class Accession(db.Model):
                                       primaryjoin='Accession.intended2_location_id==Location.id')
 
     def __init__(self, *args, **kwargs):
-        super(Accession, self).__init__(*args, **kwargs)
         self.__cached_taxon_str = {}
+        super().__init__(*args, **kwargs)
 
 
     @reconstructor
