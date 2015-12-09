@@ -26,9 +26,14 @@ class SerializationError(Exception):
 
 class ModelConverter(_ModelConverter):
 
-    def fields_for_model(self, *args, **kwargs):
+    def fields_for_model(self, model, *args, **kwargs):
         kwargs['include_fk'] = True
-        return super().fields_for_model(*args, **kwargs)
+        exclude = kwargs.pop('exclude', tuple())
+        # exclude relation properties by default...the nested fields for
+        # MANYTOONE relationships are added in DBPlugin._init_schema so we
+        # can late bind the nested fields after all the schemas have been added
+        exclude += tuple(p.key for p in inspect(model).relationships)
+        return super().fields_for_model(model, *args, exclude=exclude, **kwargs)
 
     def _get_field_kwargs_for_property(self, prop):
         kwargs = super()._get_field_kwargs_for_property(prop)
