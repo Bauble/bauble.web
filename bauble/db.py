@@ -69,7 +69,8 @@ class _Model(ExtModel):
         cls = type(param) if isinstance(param, _Model) else param
         instance = param if isinstance(param, _Model) else args[0]
 
-        data, err = cls.__schema__().dump(instance, **kwargs)
+        schema_cls = schema_cls if schema_cls is not None else cls.__schema__
+        data, err = schema_cls().dump(instance, **kwargs)
         if len(err) > 0:
             raise SerializationError(err)
         return data
