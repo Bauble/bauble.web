@@ -6,7 +6,7 @@ $("#search-page").ready(function () {
     new Vue({
         el: '#search-page',
         data: {
-
+            loading: false
         },
         ready: function () {
             $(window).on('hashchange', this.hashChanged)
@@ -17,9 +17,14 @@ $("#search-page").ready(function () {
         methods: {
             hashChanged: function () {
                 const url = window.location.hash.substr(1)
+                const self = this;
+                self.loading = true
                 $.ajax(url)
-                    .done(function (data) {
+                    .done((data) => {
                         $('#resource-view').html(data)
+                    })
+                    .always(() => {
+                        self.loading = false
                     })
             },
             selectItem: function (event) {

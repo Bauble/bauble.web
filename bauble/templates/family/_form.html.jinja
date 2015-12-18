@@ -5,8 +5,15 @@
     <!-- <tabset>
          <tab heading="General"> -->
 
-    <form name="general" action="{{ url_for('.create') }}" method="POST"
-          role="form" class="form-horizontal">
+    {% if family.id %}
+        {% set action = url_for('.update', id=family.id) %}
+    {% else %}
+        {% set action = url_for('.create') %}
+    {% endif %}
+
+    <form name="general" action="{{ action }}" method="POST" role="form"
+          class="form-horizontal">
+        <input type="hidden" name="_method" value="{{ method }}" />
 
         <div class="row">
             <div class="col-md-5 col-sm-6">

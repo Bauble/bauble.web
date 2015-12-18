@@ -118,8 +118,8 @@ class DBPlugin(SQLAlchemy):
 
             cls.__schema_cls__ = ModelSchema
 
-            from marshmallow_form import form_factory
-            cls.__form__ = form_factory(cls.__name__ + 'Form', cls.__schema_cls__)
+            from bauble.forms import form_factory
+            cls.__form_cls__ = form_factory(cls, create=False)
 
         # late bind the nested property after all the parent schema classes have
         # been created

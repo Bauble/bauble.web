@@ -37,9 +37,8 @@ def use_model(model_cls):
             # when an instance is provided
             if instance is None:
                 instance = model_cls()
-            schema = model_cls.__schema__(instance=instance)
+            schema = model_cls.__schema_cls__(instance=instance)
             parser.parse(schema, request)
-
-            return next(instance, *request.view_args)
+            return next(instance, *args, **kwargs)
         return wrapper
     return decorator

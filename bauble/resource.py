@@ -14,7 +14,6 @@ class Resource(Blueprint):
         super().__init__(name, import_name, **kwargs)
 
     def render_html(self, template_name=None, **context):
-        print('context: ', context)
         if template_name is None:
             template_name = '{}.html.jinja'.format(self.current_action)
         return render_template('{}/{}'.format(self.name, template_name), **context)
@@ -50,15 +49,19 @@ class Resource(Blueprint):
         self.add_url_rule('/<int:id>/edit', view_func=view_func, methods=['GET'])
 
     def create(self, f):
-        func = wraps(f)(partial(f, self))
-        self.add_url_rule('', view_func=func, methods=['POST'])
+        @wraps(f)
+        def view_func(*args, **kwargs):
+            self.current_action = 'create'
+            return f(*args, **kwargs)
+        self.add_url_rule('', view_func=view_func, methods=['POST'])
+        # self.add_url_rule('/<int:id>', view_func=view_func, methods=['POST'])
 
     def update(self, f):
         @wraps(f)
         def view_func(*args, **kwargs):
             self.current_action = 'update'
             return f(*args, **kwargs)
-        self.add_url_rule('/<int:id>', view_func=view_func, methods=['PATCH'])
+        self.add_url_rule('/<int:id>', view_func=view_func, methods=['PATCH', 'POST'])
 
     def show(self, f):
         @wraps(f)
@@ -72,7 +75,7 @@ class Resource(Blueprint):
         def view_func(*args, **kwargs):
             self.current_action = 'destroy'
             return f(*args, **kwargs)
-        self.add_url_rule('/<id:int>', view_func=view_func, methods=['DELETE'])
+        self.add_url_rule('/<int:id>', view_func=view_func, methods=['DELETE'])
 
 
     # def action(self, rule, **kwargs):

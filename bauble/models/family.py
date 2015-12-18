@@ -70,8 +70,8 @@ class Family(db.Model):
     def str(self, qualifier=False):
         if self.family is None:
             return ''
-        return ''.join(filter(lambda s: s not in (None, ''),
-                              [self.family, self.qualifier]))
+        return ' '.join(filter(lambda s: s not in (None, ''),
+                               [self.family, self.qualifier]))
 
 
 class FamilyNote(db.Model):

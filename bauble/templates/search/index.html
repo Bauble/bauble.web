@@ -12,27 +12,20 @@
                        autocapitalize="off" spellcheck="false"
                        placeholder="Enter a search query" class="form-control">
                 <span class="input-group-btn">
-                    <button class="btn btn-default" type="submit" ng-click="search(query)"
-                            ng-disabled="loading || !query">Search</button>
-                </span> <!-- .input-grou-btn -->
-            </div> <!-- .input-group -->
+                    <button class="btn btn-default" type="submit">Search</button>
+                </span>
+            </div>
         </form>
-    </div> <!-- .search-box -->
-
-
-    <!-- <div ng-if="loading" id="search-spinner"><i class="fa fa-spinner fa-spin fa-3x"></i></div> -->
-
-    <!-- <div ng-show="message && !loading" class="col-md-12" style="text-align: center">
-         {{message}}
-         </div> -->
+    </div>
 
     <div class="row">
         <div class="col-md-4">
-            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+            <div class="panel-group" id="accordion" role="tablist"
+                 aria-multiselectable="true">
                 {% for group, values in results.items() %}
                     {% set heading_id = 'heading-' + group %}
                     {% set collapse_id = 'collapse-' + group %}
-                    <div class="panel panel-default">
+                    <div class="panel panel-default result-group">
                         <div class="panel-heading" role="tab" id="{{ heading_id }}">
                             <h4 class="panel-title">
                                 <a role="button" data-toggle="collapse" data-parent="#accordion"
@@ -62,13 +55,11 @@
             </div>
         </div>
 
-
         <div class="col-md-8">
-            <div ng-show="viewMeta" ng-include="viewMeta.view" class="resource-view"
-                 id="resource-view"
-            ></div>
-            <!-- <div ng-show="!viewMeta && results && !message">Select something from the list for
-                 more information.</div> -->
+            <div id="search-spinner" v-if="loading">
+                <i class="fa fa-spinner fa-spin fa-3x"></i>
+            </div>
+            <div id="resource-view" class="resource-view" v-show="!loading"></div>
         </div>
     </div>
 </div>

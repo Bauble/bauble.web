@@ -2,6 +2,7 @@ from functools import partialmethod
 
 from marshmallow import Schema
 import marshmallow.fields as fields
+from marshmallow.validate import OneOf
 from wtforms import Form
 import wtforms.fields as wtf_fields
 
@@ -15,12 +16,26 @@ def integer_converter(field):
     return wtf_fields.IntegerField()
 
 def field_converter(field):
-    # TODO: if has a OneOf validator then make it a SelectField
+    for v in field.validators:
+        if isinstance(v, OneOf):
+            # TODO: need to be able to get the values and labels from the enum
+            return wtf_fields.SelectField(choices=[(c, c) for c in v.choices])
+
     return wtf_fields.StringField()
 
 def datetime_converter(field):
     # TODO: if has a OneOf validator then make it a SelectField
     return wtf_fields.DateTimeField()
+
+def date_converter(field):
+    # TODO: if has a OneOf validator then make it a SelectField
+    return wtf_fields.DateField()
+
+def boolean_converter(field):
+    return wtf_fields.BooleanField()
+
+def float_converter(field):
+    return wtf_fields.FloatField()
 
 
 CONVERTER_MAP = {
@@ -31,8 +46,18 @@ CONVERTER_MAP = {
     fields.Str: string_converter,
 
     fields.DateTime: datetime_converter,
+    fields.Date: date_converter,
 
-    fields.Field: field_converter
+    fields.Boolean: boolean_converter,
+    fields.Float: float_converter,
+
+    fields.Field: field_converter,
+
+    # TODO: function fields should only be dump only and can be skipped
+    fields.Function: field_converter,
+
+    fields.Raw: field_converter
+
 }
 
 class MarshmallowForm(Form):
@@ -48,7 +73,7 @@ class MarshmallowForm(Form):
         errors.update(self.__schema__)
 
     @classmethod
-    def from_schema(cls, schema, **form_kwargs):
+    def from_schema(cls, schema, create=True, **form_kwargs):
         # TODO: what about just creating a schema dynamically...this would allow
         # us to extend an existing form instead of creating a new one from scratch
         schema_cls = type(schema) if isinstance(schema, Schema) else schema
@@ -67,7 +92,7 @@ class MarshmallowForm(Form):
             # print('{} validators: '.format(name), field.validators)
             validator_methods = {}
             for validator in field.validators:
-                print('validator: ', validator)
+                # print('validator: ', validator)
 
                 def validator_wrapper(form):
                     validator
@@ -76,14 +101,17 @@ class MarshmallowForm(Form):
 
             # form_cls.__dict__.update(validator_methods)
 
-        return form_cls(**form_kwargs)
+        if create is True:
+            return form_cls(**form_kwargs)
+        return form_cls
 
 
-def form_factory(model, **form_kwargs):
+def form_factory(model, create=True, **form_kwargs):
     schema_cls = model.__schema_cls__
     if isinstance(model, db.Model):
         form_kwargs['obj'] = model
-    return MarshmallowForm.from_schema(schema_cls, **form_kwargs)
+    return MarshmallowForm.from_schema(schema_cls, create, **form_kwargs)
 
-# rails-like
+
+# rails-like helper
 form_for = form_factory

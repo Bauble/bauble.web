@@ -24,14 +24,17 @@ class SearchResultSchema(Schema):
     pass
 
 
-# TODO: we could probably have a better way map search results to resources
+# TODO: we could probably have a better way map search results to resources....
+# maybe even provide a blueprint/resource and use the resource to get the url
+# with url_for
 result_resource_map = {
     'families': '/family/{}',
     'genera': '/genus/{}',
     'taxa': '/taxon/{}',
     'accessions': '/accession/{}',
     'plants': '/plant/{}',
-    'locations': '/location/{}'
+    'locations': '/location/{}',
+    'contacts': '/source/{}'
 }
 
 
@@ -55,7 +58,6 @@ def index(args):
 
     for key, values in results.items():
         if len(values) > 0:
-            # data[key] = [obj.jsonify() for obj in values]
             data[key] = [{
                 'url': result_resource_map.get(key).format(obj.id),
                 'str': obj.str()
