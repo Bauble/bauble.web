@@ -7,6 +7,7 @@ root_path, _ = os.path.split(__file__)
 
 class API(Blueprint):
     def register(self, *args, **kwargs):
+        # TODO: import everything in the package instead of specifying individual files
         controllers = ['search', 'family', 'genus', 'taxon', 'accession', 'plant',
                        'location', 'geography', 'source']
         for controller in controllers:

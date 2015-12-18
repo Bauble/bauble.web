@@ -69,7 +69,7 @@ class _Model(ExtModel):
         cls = type(param) if isinstance(param, _Model) else param
         instance = param if isinstance(param, _Model) else args[0]
 
-        schema_cls = schema_cls if schema_cls is not None else cls.__schema__
+        schema_cls = schema_cls if schema_cls is not None else cls.__schema_cls__
         data, err = schema_cls().dump(instance, **kwargs)
         if len(err) > 0:
             raise SerializationError(err)
@@ -116,13 +116,16 @@ class DBPlugin(SQLAlchemy):
             if hasattr(cls, '_additional_schema_fields'):
                 ModelSchema._declared_fields.update(cls._additional_schema_fields)
 
-            cls.__schema__ = ModelSchema
+            cls.__schema_cls__ = ModelSchema
+
+            from marshmallow_form import form_factory
+            cls.__form__ = form_factory(cls.__name__ + 'Form', cls.__schema_cls__)
 
         # late bind the nested property after all the parent schema classes have
         # been created
         for cls, prop in nested_fields:
-            cls.__schema__._declared_fields[prop.key] \
-                = fields.Nested(prop.mapper.class_.__schema__, dump_only=True)
+            cls.__schema_cls__._declared_fields[prop.key] \
+                = fields.Nested(prop.mapper.class_.__schema_cls__, dump_only=True)
 
 
     def make_declarative_base(self, *args):

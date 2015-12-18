@@ -1,11 +1,12 @@
 from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 from importlib import import_module
+from inspect import isclass
 import logging
 import os
 
 import flask
-from flask import Flask, json
+from flask import Blueprint, Flask, json
 from flask_appconfig import AppConfig, HerokuConfig
 from flask_appconfig.env import from_envvars
 from flask.ext.babel import Babel
@@ -25,8 +26,17 @@ class JSONEncoder(flask.json.JSONEncoder):
         else:
             return super().default(obj)
 
+class Request(flask.Request):
+
+    @property
+    def prefers_json(self):
+        return self.accept_mimetypes.best == 'application/json'
+
+
 def create_app(config_filename=None):
     app = Flask(__name__)
+    app.request_class = Request
+
     if config_filename is None:
         HerokuConfig(app)
     else:
@@ -63,9 +73,23 @@ def create_app(config_filename=None):
     from .assets import init_app
     init_app(app)
 
+
+    # TODO: just import everything controllers
+
     for controller in ['auth', 'index']:
         module = import_module('bauble.controllers.{}'.format(controller))
         app.register_blueprint(module.blueprint)
+
+    from bauble.resource import Resource
+    for controller in ['family', 'search']:
+        module = import_module('bauble.controllers.{}'.format(controller))
+        for attr_name in dir(module):
+            attr = getattr(module, attr_name)
+            # find all the blueprints in the files
+            if isinstance(attr, Blueprint):
+                app.register_blueprint(attr)
+            # if isclass(attr) and issubclass(attr, Blueprint) and attr != Resource:
+            #     app.register_blueprint(attr())
 
     from bauble.controllers.api import api
     app.register_blueprint(api)

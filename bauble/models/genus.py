@@ -96,7 +96,7 @@ class Genus(db.Model):
     def str(self, *args, author=False):
         # TODO: the genus should be italicized for markup
         if self.genus is None:
-            return repr(self)
+            return ''
         elif not author or self.author is None:
 
             return ' '.join([s for s in [self.genus, self.qualifier] if s not in ('', None)])

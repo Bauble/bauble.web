@@ -8,11 +8,9 @@ from webassets.filter import register_filter
 from webassets_babel import BabelFilter
 from webassets_browserify import Browserify
 from webassets_libsass import LibSass
-from webassets_ng_annotate import NgAnnotateFilter
 
 path, _ = os.path.split(__file__)
 
-register_filter(NgAnnotateFilter)
 register_filter(BabelFilter)
 register_filter(Browserify)
 register_filter(LibSass)
@@ -27,12 +25,13 @@ css_all = Bundle(sass_app,
 find_files = lambda p, g: (str(p.relative_to('bauble/static')) for p in Path(p).glob(g))
 
 js_bundle = Bundle("app.js",
-                   depends=chain(find_files('bauble/static/components', '**/*.js'),
-                                 find_files('bauble/static/shared', '**/*.js')),
+                   depends='*.js',
+                   # depends=find_files('bauble/static', '**/*.js'),
+                   # depends=chain(find_files('bauble/static/components', '**/*.js'),
+                   #               find_files('bauble/static/shared', '**/*.js')),
                    filters=[
                        "babel",
                        "browserify",
-                       "ng-annotate"
                    ],
                    output='bundle.js')
 

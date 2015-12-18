@@ -12,19 +12,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "angular": "^1.4.7",
-    "angular-animate": "^1.4.7",
-    "angular-ui-bootstrap": "^0.14.3",
-    "angular-ui-router": "^0.2.15",
     "bootstrap-sass": "^3.3.5",
+    "jquery": "^2.1.4",
     "lodash": "^3.10.1",
     "moment": "^2.10.6",
-    "parse-link-header": "^0.4.1"
+    "parse-link-header": "^0.4.1",
+    "vue": "^1.0.11"
   },
   "devDependencies": {
     "babel": "~5.8.23",
     "babelify": "^6.3.0",
-    "ng-annotate": "^1.0.2",
     "resolvify": "^1.0.2"
   }
 }

@@ -12,7 +12,6 @@ blueprint = bp = Blueprint('index', __name__)
 
 
 @bp.route('/', defaults={'path': ''})
-@bp.route('/<path:path>')
 @login_required
 def index(path):
-    return render_template('index.html')
+    return redirect(url_for('search.index'))

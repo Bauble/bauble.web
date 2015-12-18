@@ -1,0 +1,58 @@
+<div name="familyForm" class="bauble-editor" novalidate>
+
+    <h3>{{ family.str() if family.str() != '' else 'New family' }}</h3>
+
+    <!-- <tabset>
+         <tab heading="General"> -->
+
+    <form name="general" action="{{ url_for('.create') }}" method="POST"
+          role="form" class="form-horizontal">
+
+        <div class="row">
+            <div class="col-md-5 col-sm-6">
+                <div class="form-group">
+                    {{ form.family.label(class_="col-sm-2 control-label") }}
+                    <div class="col-sm-10">
+                        {{ form.family(class_="form-control") }}
+                        <!-- <input type="text" model="family.family" id="family-input" -->
+                        <!--        placeholder="required" class="form-control" name="family" required> -->
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <!-- <label for="qualifier-input" class="col-sm-2 control-label">Qualifier</label> -->
+                    {{ form.qualifier.label(class_="col-sm-2 control-label") }}
+                    <div class="col-sm-10">
+                        {{ form.qualifier(class_="form-control") }}
+                        <!-- <select ng-model="family.qualifier" class="form-control" -->
+                        <!--         id="qualifier-input" -->
+                        <!--         ng-options="q for q in qualifiers"> -->
+                        <!--   <option value="">-- choose qualifier --</option> -->
+                        <!-- </select> -->
+                    </div>
+                </div>
+
+                <!-- Synonyms Form -->
+                <div class="col-md-5 col-md-offset-1">
+                    <!-- <synonyms-form model="data.synonyms" placeholder="Family"
+                         query="getSynonyms($viewValue)"></synonyms-form> -->
+                </div>
+
+            </div>
+        </div>
+
+        <!-- </tab> -->  <!-- General tab -->
+
+        <!-- <tab heading=Notes>
+             <div ng-include src="'/static/partials/notes_editor.html'"></div>
+             </tab> -->
+        <!-- </tabset> -->
+
+        <div class="action-buttons">
+            <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+            <input type="submit" class="btn btn-primary" value="Save">
+            <!-- <button type="submit" class="btn btn-primary" ng-click="save()">Save</button> -->
+            <!-- <button type="submit" class="btn btn-primary" ng-click="save(true)">Save and Add Genus</button> -->
+        </div>
+    </form>
+</div>
