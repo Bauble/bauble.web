@@ -24,7 +24,6 @@ def show(id):
     family = Family.query \
                    .options(orm.joinedload(*Family.synonyms.attr)) \
                    .get_or_404(id)
-
     if request.prefers_json:
         return resource.render_json(family)
 
@@ -49,7 +48,7 @@ def create(family):
     db.session.add(family)
     db.session.commit()
     if request.prefers_json:
-        return resource.rendor_json(family)
+        return resource.render_json(family)
     return resource.render_html(family=family, form=form_factory(family))
 
 
@@ -59,7 +58,7 @@ def create(family):
 def update(family, id):
     db.session.commit()
     if request.prefers_json:
-        return resource.rendor_json(family)
+        return resource.render_json(family)
     # return resource.render_html(family=family, form=form_factory(family))
     return redirect(url_for('.edit', id=id))
 
@@ -68,7 +67,7 @@ def update(family, id):
 def edit(id):
     family = Family.query.get_or_404(id)
     if request.prefers_json:
-        return resource.rendor_json(family)
+        return resource.render_json(family)
     return resource.render_html(family=family, form=form_factory(family))
 
 @resource.destroy

@@ -76,7 +76,7 @@ def create_app(config_filename=None):
 
     # TODO: just import everything controllers
 
-    for controller in ['auth', 'index']:
+    for controller in ['auth', 'index', 'batch']:
         module = import_module('bauble.controllers.{}'.format(controller))
         app.register_blueprint(module.blueprint)
 

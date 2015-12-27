@@ -82,6 +82,5 @@ class User(db.Model, UserMixin):
         """
         self._password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode('utf-8')
 
-
     def __str__(self):
         return self.username if self.username else self.email
