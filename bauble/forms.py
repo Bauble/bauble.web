@@ -7,6 +7,7 @@ from wtforms import Form
 import wtforms.fields as wtf_fields
 
 import bauble.db as db
+from bauble.schema import schema_class_factory
 
 
 def string_converter(field):
@@ -37,6 +38,11 @@ def boolean_converter(field):
 def float_converter(field):
     return wtf_fields.FloatField()
 
+def nested_converted(field):
+    print('field: ', field)
+    print('dir(field): ', dir(field))
+    return wtf_fields.FormField()
+
 
 CONVERTER_MAP = {
     fields.Integer: integer_converter,
@@ -56,7 +62,10 @@ CONVERTER_MAP = {
     # TODO: function fields should only be dump only and can be skipped
     fields.Function: field_converter,
 
-    fields.Raw: field_converter
+    fields.Raw: field_converter,
+
+    # fields.Nested: nested_converted
+    fields.Nested: field_converter
 
 }
 
@@ -65,7 +74,6 @@ class MarshmallowForm(Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.__schema__ = self.__schema_cls__()
-
 
     @property
     def errors(self):
@@ -107,7 +115,7 @@ class MarshmallowForm(Form):
 
 
 def form_factory(model, create=True, **form_kwargs):
-    schema_cls = model.__schema_cls__
+    schema_cls = schema_class_factory(model)
     if isinstance(model, db.Model):
         form_kwargs['obj'] = model
     return MarshmallowForm.from_schema(schema_cls, create, **form_kwargs)
