@@ -17,6 +17,7 @@
     "lodash": "^3.10.1",
     "moment": "^2.10.6",
     "parse-link-header": "^0.4.1",
+    "typeahead.js": "^0.11.1",
     "vue": "^1.0.11"
   },
   "devDependencies": {

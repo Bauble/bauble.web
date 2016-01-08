@@ -28,16 +28,19 @@
           {{ counts['plants'] }}</a></div>
 
       <h4>Synonyms</h4>
-      <div ng-show="!family.synonyms || family.synonyms.length < 1" style="color: #aaa">
-        This family has no synonyms.
-      </div>
-      <ul>
-        {% for synonym in family.synonyms %}
-            <li loading-spinner="family.synonyms">
-                <a ng-href="#/search?q=family where id%3d'{{synonym.id}}'">{{synonym.str}}</a>
-            </li>
-        {% endfor %}
-      </ul>
+      {% if family.synonyms | length == 0  %}
+          <div style="color: #aaa">
+              This family has no synonyms.
+          </div>
+      {% else %}
+          <ul>
+              {% for synonym in family.synonyms %}
+                  <li loading-spinner="family.synonyms">
+                      <a href="/search?q=family where id%3d'{{synonym.id}}'">{{synonym.str}}</a>
+                  </li>
+              {% endfor %}
+          </ul>
+      {% endif %}
 
     </div>
 

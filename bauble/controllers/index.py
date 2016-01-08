@@ -10,5 +10,5 @@ blueprint = bp = Blueprint('index', __name__)
 
 @bp.route('/')
 @login_required
-def index(path):
+def index():
     return redirect(url_for('search.index'))

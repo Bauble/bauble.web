@@ -11,9 +11,7 @@
         {% set action = url_for('.create') %}
     {% endif %}
 
-    <form name="general" action="{{ action }}" method="POST" role="form"
-          class="form-horizontal">
-        <input type="hidden" name="_method" value="{{ method }}" />
+    <form action="{{ action }}" method="POST" class="form-horizontal" role="form">
 
         <div class="row">
             <div class="col-md-5 col-sm-6">
@@ -56,7 +54,7 @@
         <!-- </tabset> -->
 
         <div class="action-buttons">
-            <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+            <button class="btn btn-default" :click="cancel">Cancel</button>
             <input type="submit" class="btn btn-primary" value="Save">
             <!-- <button type="submit" class="btn btn-primary" ng-click="save()">Save</button> -->
             <!-- <button type="submit" class="btn btn-primary" ng-click="save(true)">Save and Add Genus</button> -->

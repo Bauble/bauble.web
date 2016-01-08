@@ -14,7 +14,6 @@ import bauble.utils as utils
 
 resource = Resource('search', __name__)
 
-
 # class SearchForm(Form):
 #     q = StringField('q', Length(min=1))
 
@@ -37,29 +36,30 @@ result_resource_map = {
     'contacts': '/source/{}'
 }
 
-
-@resource.route('/')
+@resource.route('')
+@resource.route('<re("(\..+)?$"):ext>')
 @login_required
 @use_args({
     'q': fields.String(validate=validate.Length(min=1))
 })
-def index(args):
+def index(args, ext=None):
     query = args.get('q', None)
     results = search(query, db.session) if query is not None else {}
 
     data = {}
 
     if request.prefers_json:
-        for key, values in results.items():
-            if len(values) > 0:
-                # data[key] = [obj.jsonify() for obj in values]
-                data[key] = [obj.jsonify() for obj in values]
-        return utils.json_response(jsonify(data))
+        value_factory = lambda k, v: [obj.jsonify() for obj in v]
+        response_factory = lambda d: utils.json_response(d)
+    else:
+        value_factory = lambda k, v: [{
+            'url': result_resource_map.get(key).format(obj.id),
+            'str': obj.str()
+        } for obj in v]
+        response_factory = lambda d: render_template('search/index.html', results=d)
 
     for key, values in results.items():
         if len(values) > 0:
-            data[key] = [{
-                'url': result_resource_map.get(key).format(obj.id),
-                'str': obj.str()
-            } for obj in values]
-    return render_template('search/index.html', results=data)
+            data[key] = value_factory(key, values)
+
+    return response_factory(data)

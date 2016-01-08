@@ -19,6 +19,7 @@ def index(families):
         return resource.render_json(families)
     return resource.render_html(families=families)
 
+
 @resource.show
 def show(id):
     family = Family.query \
@@ -36,10 +37,12 @@ def show(id):
 
     return resource.render_html(family=family, counts=counts)
 
+
 @resource.new
 def new():
     family = Family()
     return resource.render_html(family=family, form=form_factory(family))
+
 
 @resource.create
 @login_required

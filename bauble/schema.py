@@ -46,7 +46,7 @@ def schema_class_factory(model_cls):
             model_converter = ModelConverter
 
     many_to_one_filter = lambda prop: prop.direction.name == "MANYTOONE"
-    for cls, prop in filter(many_to_one_filter, mapper.relationships):
+    for prop in filter(many_to_one_filter, mapper.relationships):
         ModelSchema._declared_fields[prop.key] \
             = fields.Nested(schema_class_factory(prop.mapper.class_), dump_only=True)
 
@@ -55,5 +55,5 @@ def schema_class_factory(model_cls):
 
     return ModelSchema
 
-def schema_factory(cls):
-    return schema_class_factory(cls)()
+def schema_factory(cls, *args, **kwargs):
+    return schema_class_factory(cls)(*args, **kwargs)
