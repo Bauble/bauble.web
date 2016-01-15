@@ -13,17 +13,18 @@ class Resource(Blueprint):
         kwargs.setdefault('url_prefix', '/{}'.format(name))
         super().__init__(name, import_name, **kwargs)
 
-    def render_html(self, template_name=None, **context):
+    def render_html(self, template_name=None, status=200, **context):
         if template_name is None:
             template_name = '{}.html.jinja'.format(self.current_action)
-        return render_template('{}/{}'.format(self.name, template_name), **context)
+        return render_template('{}/{}'.format(self.name, template_name), **context), status
 
-    def render_json(self, model):
+    def render_json(self, model, status=200):
         if hasattr(model, '__iter__'):
             data = type(model).jsonify(model, many=True)
         else:
             data = model.jsonify()
-        return utils.json_response(data)
+
+        return utils.json_response(data, status=status)
 
     def index(self, f):
         @wraps(f)
@@ -33,6 +34,7 @@ class Resource(Blueprint):
             self.current_action = 'index'
             return f(*args, **kwargs)
         self.add_url_rule('', view_func=view_func, methods=['GET'])
+        self.add_url_rule('.json', view_func=view_func, methods=['GET'])
 
     def new(self, f):
         @wraps(f)
@@ -54,6 +56,7 @@ class Resource(Blueprint):
             self.current_action = 'create'
             return f(*args, **kwargs)
         self.add_url_rule('', view_func=view_func, methods=['POST'])
+        self.add_url_rule('.json', view_func=view_func, methods=['POST'])
         # self.add_url_rule('/<int:id>', view_func=view_func, methods=['POST'])
 
     def update(self, f):
@@ -62,6 +65,7 @@ class Resource(Blueprint):
             self.current_action = 'update'
             return f(*args, **kwargs)
         self.add_url_rule('/<int:id>', view_func=view_func, methods=['PATCH', 'POST'])
+        self.add_url_rule('/<int:id>.json', view_func=view_func, methods=['PATCH', 'POST'])
 
     def show(self, f):
         @wraps(f)
@@ -69,6 +73,7 @@ class Resource(Blueprint):
             self.current_action = 'show'
             return f(*args, **kwargs)
         self.add_url_rule('/<int:id>', view_func=view_func, methods=['GET'])
+        self.add_url_rule('/<int:id>.json', view_func=view_func, methods=['GET'])
 
     def destroy(self, f):
         @wraps(f)
@@ -76,6 +81,7 @@ class Resource(Blueprint):
             self.current_action = 'destroy'
             return f(*args, **kwargs)
         self.add_url_rule('/<int:id>', view_func=view_func, methods=['DELETE'])
+        self.add_url_rule('/<int:id>.json', view_func=view_func, methods=['DELETE'])
 
 
     # def action(self, rule, **kwargs):

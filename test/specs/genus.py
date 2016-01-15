@@ -14,6 +14,14 @@ def test_serializer(session, genus):
     assert genus_json['family']['id'] == genus.family_id
 
 
+def test_form(session, genus):
+    from bauble.forms import MarshmallowForm, form_factory
+    session.add(genus)
+    session.commit()
+    form = form_factory(genus)
+    assert form is not None
+
+
 def test_index_genus(client, session, genus):
     session.add(genus)
     session.commit()

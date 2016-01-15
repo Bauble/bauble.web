@@ -1,10 +1,17 @@
 from flask import request
 
-import bauble.db as db
+
 import sqlalchemy as sa
 import functools
 # from webargs.core import Parser
-from webargs.flaskparser import FlaskParser as Parser
+from webargs.flaskparser import FlaskParser
+from marshmallow import ValidationError
+
+import bauble.db as db
+from bauble.schema import schema_factory
+
+class Parser(FlaskParser):
+    pass
 
 parser = Parser()
 
@@ -37,8 +44,14 @@ def use_model(model_cls):
             # when an instance is provided
             if instance is None:
                 instance = model_cls()
-            schema = model_cls.__schema_cls__(instance=instance)
-            parser.parse(schema, request)
+            schema = schema_factory(model_cls, instance=instance)
+
+            data = request.json() if request.is_json else request.values
+            try:
+                schema.load(data, session=db.session)
+            except ValidationError as err:
+                instance._errors = err.messages
+
             return next(instance, *args, **kwargs)
         return wrapper
     return decorator

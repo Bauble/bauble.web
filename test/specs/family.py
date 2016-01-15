@@ -12,6 +12,17 @@ def test_serializer(session, family):
     assert 'str' in family_json
 
 
+def test_form(session, family):
+    from bauble.forms import MarshmallowForm, form_factory
+
+    session.add(family)
+    session.commit()
+    form = family.__form_cls__(obj=family)
+    # f = form_factory(family)
+    print('f.qualifier: ', form.qualifier)
+    print('f: ', form)
+
+
 def test_index_family(client, session, family):
     session.add(family)
     session.commit()
@@ -26,6 +37,7 @@ def test_post_family(client, session, family):
     assert resp.status_code == 201
     assert resp.json['id'] is not None
     assert resp.json['family'] == family.family
+
 
 def test_patch_family(client, session, family):
     session.add(family)

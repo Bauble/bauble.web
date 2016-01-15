@@ -32,16 +32,18 @@ class DefaultSchema(_ModelSchema):
 
 @lru_cache()
 def schema_class_factory(model_cls):
+    import bauble.db as db
 
     mapper = inspect(model_cls)
     if not isinstance(mapper, Mapper):
         return schema_class_factory(type(model_cls))
 
     class ModelSchema(DefaultSchema):
+
         class Meta:
             model = model_cls
             dump_only = ['str']
-            # sqla_session = self.session
+            sqla_session = db.session
             strict = True
             model_converter = ModelConverter
 

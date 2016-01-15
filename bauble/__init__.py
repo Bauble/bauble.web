@@ -45,6 +45,10 @@ class Request(flask.Request):
         # The flask docs say this is added in 0.11
         return self.mimetype == 'application/json'
 
+    @property
+    def params(self):
+        return self.get_json() if self.is_json else self.values
+
 
 def create_app(config_filename=None):
     app = Flask(__name__)
@@ -97,7 +101,7 @@ def create_app(config_filename=None):
         app.register_blueprint(module.blueprint)
 
     from bauble.resource import Resource
-    for controller in ['search', 'family', 'genus']:
+    for controller in ['search', 'family', 'genus', 'taxon']:
         module = import_module('bauble.controllers.{}'.format(controller))
         for attr_name in dir(module):
             attr = getattr(module, attr_name)
