@@ -1,6 +1,8 @@
 from flask import redirect, request, url_for
 from flask.ext.login import login_required
 import sqlalchemy.orm as orm
+from webargs import fields
+from webargs.flaskparser import use_args
 
 import bauble.db as db
 from bauble.forms import form_factory
@@ -13,11 +15,9 @@ import bauble.utils as utils
 resource = Resource('genus', __name__)
 
 @resource.index
-def index(genera):
+def index():
     genera = Genus.query.all()
-    if request.accept_mimetypes.best == 'application/json':
-        return resource.render_json(genera)
-    return resource.render_html(genera=genera)
+    return resource.render_json(genera)
 
 @resource.show
 def show(id):
@@ -35,27 +35,28 @@ def show(id):
 
     return resource.render_html(genus=genus, counts=counts)
 
+
 @resource.new
 @use_model(Genus)
 def new(genus):
-    # genus = Genus()
     return resource.render_html(genus=genus, form=form_factory(genus))
 
 
 @resource.create
 @login_required
 def create():
-    genus, errors = schema_factory(Genus).load(request.get_json())
+    genus, errors = schema_factory(Genus).load(request.params)
     if errors:
         if request.prefers_json:
-            return resource.render_json(errors)
+            return resource.render_json(errors, status=422)
         return resource.render_html('new.html.jinja', form=form_factory(genus))
 
     db.session.add(genus)
     db.session.commit()
     if request.prefers_json:
-        return resource.render_json(genus)
-    return resource.render_html('edit.html.jinja', form=form_factory(genus))
+        return resource.render_json(genus, status=201)
+    return resource.render_html('edit.html.jinja', genus=genus, form=form_factory(genus),
+                                status=201)
 
 
 @resource.update
@@ -68,13 +69,13 @@ def update(genus, id):
     # return resource.render_html(genus=genus, form=form_factory(genus))
     return redirect(url_for('.edit', id=id))
 
+
 @resource.edit
 @login_required
 def edit(id):
     genus = Genus.query.get_or_404(id)
-    if request.prefers_json:
-        return resource.render_json(genus)
     return resource.render_html(genus=genus, form=form_factory(genus))
+
 
 @resource.destroy
 @login_required
@@ -84,6 +85,16 @@ def destroy(genus, id):
     db.session.commit()
     return '', 204
 
-# @route()
-def count(id):
-    pass
+
+@resource.route("/<int:id>/count")
+@login_required
+@use_args({
+    'relation': fields.DelimitedList(fields.String(), required=True)
+})
+def genus_count(args, id):
+    data = {}
+    genus = Genus.query.get_or_404(id)
+    for relation in args['relation']:
+        _, base = relation.rsplit('/', 1)
+        data[base] = utils.count_relation(genus, relation)
+    return utils.json_response(data)

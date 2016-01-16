@@ -33,16 +33,16 @@ def test_form(session, taxon):
     assert form is not None
 
 
-def test_index_taxon(client, session, taxon):
+def test_index_taxon_json(client, session, taxon):
     session.add(taxon)
     session.commit()
-    resp = client.get('/api/taxon')
+    resp = client.get('/taxon')
     assert resp.status_code == 200
     assert len(resp.json) == 1
     assert resp.json[0]['id'] == taxon.id
 
 
-def test_post_taxon_accept_json(client, session, genus):
+def test_post_taxon_json(client, session, genus):
     session.add(genus)
     session.commit()
     sp = faker.first_name()
@@ -53,23 +53,51 @@ def test_post_taxon_accept_json(client, session, genus):
     assert resp.json['sp'] == sp
 
 
-def test_post_taxon_accept_html(client, session, genus):
+def test_post_taxon(client, session, genus):
     session.add(genus)
     session.commit()
     sp = faker.first_name()
     data = {'sp': sp, 'genus_id': genus.id}
-    headers = {'accept': 'text/html'}
-    resp = client.post('/taxon', data=data, headers=headers)
+    resp = client.post('/taxon', data=data)
+    assert resp.status_code == 201
+    assert resp.mimetype == 'text/html'
+
+
+def test_post_taxon_json(client, session, genus):
+    session.add(genus)
+    session.commit()
+    sp = faker.first_name()
+    data = {'sp': sp, 'genus_id': genus.id}
+    resp = client.post('/taxon', data=json.dumps(data), content_type='application/json',
+                       headers={'accept': 'application/json'})
+    assert resp.mimetype == 'application/json'
     assert resp.status_code == 201
 
 
+# TODO: test both PATCH and POST
 def test_patch_taxon(client, session, taxon):
     session.add(taxon)
     session.commit()
     taxon.sp = faker.first_name()
     data = json.dumps(taxon.jsonify())
-    resp = client.patch('/api/taxon/{}'.format(taxon.id), data=data)
+    resp = client.patch('/taxon/{}'.format(taxon.id), data=data,
+                        follow_redirects=True)
     assert resp.status_code == 200
+    assert resp.mimetype == 'text/html'
+    # TODO: test html response is what we expect
+
+
+# TODO: test both PATCH and POST
+def test_patch_taxon_json(client, session, taxon):
+    session.add(taxon)
+    session.commit()
+    taxon.sp = faker.first_name()
+    data = json.dumps(taxon.jsonify())
+    resp = client.patch('/taxon/{}'.format(taxon.id), data=data,
+                        content_type='application/json',
+                        headers={'accept': 'application/json'})
+    assert resp.status_code == 200
+    assert resp.mimetype == 'application/json'
     assert resp.json['id'] == taxon.id
     assert resp.json['sp'] == taxon.sp
 
@@ -77,9 +105,9 @@ def test_patch_taxon(client, session, taxon):
 def test_count(client, session, taxon, accession, plant):
     session.add_all([taxon, accession, plant])
     session.commit()
-    resp = client.get('/api/taxon/{}/count'.format(taxon.id), query_string={
+    resp = client.get('/taxon/{}/count'.format(taxon.id), query_string={
         'relation': ['/accessions', '/accessions/plants']
     })
-    assert resp.status_code == 200, resp.data
+    assert resp.status_code == 200
     data = resp.json
     assert data['accessions'] == 1

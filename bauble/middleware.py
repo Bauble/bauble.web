@@ -46,9 +46,8 @@ def use_model(model_cls):
                 instance = model_cls()
             schema = schema_factory(model_cls, instance=instance)
 
-            data = request.json() if request.is_json else request.values
             try:
-                schema.load(data, session=db.session)
+                schema.load(request.params, session=db.session)
             except ValidationError as err:
                 instance._errors = err.messages
 

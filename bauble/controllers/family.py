@@ -52,7 +52,8 @@ def create(family):
     db.session.commit()
     if request.prefers_json:
         return resource.render_json(family)
-    return resource.render_html(family=family, form=form_factory(family))
+    return redirect(url_for('.edit', id=id))
+    # return resource.render_html(family=family, form=form_factory(family))
 
 
 @resource.update
@@ -65,13 +66,13 @@ def update(family, id):
     # return resource.render_html(family=family, form=form_factory(family))
     return redirect(url_for('.edit', id=id))
 
+
 @resource.edit
 @login_required
 def edit(id):
     family = Family.query.get_or_404(id)
-    if request.prefers_json:
-        return resource.render_json(family)
     return resource.render_html(family=family, form=form_factory(family))
+
 
 @resource.destroy
 @login_required

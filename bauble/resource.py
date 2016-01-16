@@ -20,7 +20,7 @@ class Resource(Blueprint):
 
     def render_json(self, model, status=200):
         if hasattr(model, '__iter__'):
-            data = type(model).jsonify(model, many=True)
+            data = type(model[0]).jsonify(model, many=True)
         else:
             data = model.jsonify()
 

@@ -53,7 +53,7 @@ def schema_class_factory(model_cls):
             = fields.Nested(schema_class_factory(prop.mapper.class_), dump_only=True)
 
     if hasattr(model_cls, '_additional_schema_fields'):
-        ModelSchema._declared_fields.update(cls._additional_schema_fields)
+        ModelSchema._declared_fields.update(model_cls._additional_schema_fields)
 
     return ModelSchema
 
