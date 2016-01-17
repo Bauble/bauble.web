@@ -89,7 +89,7 @@ def taxon(genus):
 @pytest.fixture()
 def accession(taxon):
     from bauble.models import Accession
-    return Accession(code=faker.pyint(), taxon=taxon)
+    return Accession(code=faker.pyint(), taxon=taxon, date_recvd='2001-01-30')
 
 @pytest.fixture()
 def location():
