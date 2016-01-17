@@ -68,8 +68,6 @@ def batch():
             "headers": [{'name': k, 'value': v} for k, v in response.headers.items()]
         })
 
-        print('response: ', response)
-
         # if error response
         if (response.status_code % 400 < 100) or (response.status_code % 400 < 100):
             status_code = response.status_code

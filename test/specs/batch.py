@@ -19,7 +19,6 @@ def test_batch_get(client, session, family, genus):
     assert resp.status_code == 207
     resp0 = json.loads(resp.json[0]['body'])
     assert resp0['id'] == family.id
-    print('resp.json: ', resp.json)
 
 
 def test_batch_error(client, session, family, genus):
@@ -62,7 +61,6 @@ def test_batch_rollback(client, session, family, genus):
     }]
     resp = client.post('/batch', data=json.dumps(req), content_type='application/json')
     assert resp.status_code == 404
-    print('resp.json: ', resp.json)
     assert len(resp.json) == 2
 
     session.add(family)

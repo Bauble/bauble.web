@@ -49,7 +49,6 @@ def test_post_genus_json(client, session, family):
     resp = client.post('/genus', data=json.dumps(data), content_type='application/json',
                        headers={'accept': 'application/json'})
     assert resp.status_code == 201, resp.data.decode('utf-8')
-    assert resp.mimetype == 'application/json'
     assert resp.json['id'] is not None
     assert resp.json['genus'] == genus
 

@@ -7,7 +7,7 @@ from sqlalchemy.orm import *
 
 import bauble
 import bauble.i18n
-from bauble.error import check, CheckConditionError, BaubleError
+from bauble.error import check, BaubleError
 import bauble.db as db
 
 #from bauble.utils.log import debug

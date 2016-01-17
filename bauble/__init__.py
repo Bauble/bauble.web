@@ -101,7 +101,7 @@ def create_app(config_filename=None):
         app.register_blueprint(module.blueprint)
 
     from bauble.resource import Resource
-    for controller in ['search', 'family', 'genus', 'taxon']:
+    for controller in ['search', 'family', 'genus', 'taxon', 'accession']:
         module = import_module('bauble.controllers.{}'.format(controller))
         for attr_name in dir(module):
             attr = getattr(module, attr_name)
