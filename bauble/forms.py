@@ -1,4 +1,4 @@
-from functools import partialmethod
+from functools import lru_cache, partialmethod
 
 from marshmallow import Schema
 import marshmallow.fields as fields
@@ -109,16 +109,19 @@ class MarshmallowForm(Form):
 
             # form_cls.__dict__.update(validator_methods)
 
-        if create is True:
-            return form_cls(**form_kwargs)
         return form_cls
 
 
-def form_factory(model, create=True, **form_kwargs):
+@lru_cache()
+def form_class_factory(model, **form_kwargs):
     schema_cls = schema_class_factory(model)
     if isinstance(model, db.Model):
         form_kwargs['obj'] = model
-    return MarshmallowForm.from_schema(schema_cls, create, **form_kwargs)
+    return MarshmallowForm.from_schema(schema_cls, **form_kwargs)
+
+
+def form_factory(model, **form_kwargs):
+    return form_class_factory(model, **form_kwargs)()
 
 
 # rails-like helper

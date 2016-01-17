@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from marshmallow import fields
+from marshmallow import fields, post_load, ValidationError
 from marshmallow_sqlalchemy import (ModelSchema as _ModelSchema,
                                     ModelConverter as _ModelConverter)
 from sqlalchemy import func, inspect, Column, DateTime, Integer, MetaData
@@ -29,6 +29,21 @@ class ModelConverter(_ModelConverter):
 class DefaultSchema(_ModelSchema):
     str = fields.String(dump_only=True)
 
+    def load(self, data, *args, **kwargs):
+        try:
+            instance, errors = super().load(data, *args, **kwargs)
+            if errors:
+                # when there are errors marhsmallow return the original data
+                # instead of an instance of the model but we always want an
+                # instance of the model
+                instance = self.opts.model(**data)
+        except ValidationError as e:
+            # catch errors so this works whether strict is True or False
+            instance = self.opts.model(**data)
+            errors = e
+
+        return instance, errors
+
 
 @lru_cache()
 def schema_class_factory(model_cls):
@@ -44,7 +59,7 @@ def schema_class_factory(model_cls):
             model = model_cls
             dump_only = ['str']
             sqla_session = db.session
-            strict = True
+            # strict = True
             model_converter = ModelConverter
 
     many_to_one_filter = lambda prop: prop.direction.name == "MANYTOONE"

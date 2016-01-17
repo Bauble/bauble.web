@@ -4,7 +4,7 @@ import inspect
 from flask import abort, render_template, Blueprint
 
 import bauble.utils as utils
-
+import bauble.db as db
 
 class Resource(Blueprint):
 
@@ -19,10 +19,12 @@ class Resource(Blueprint):
         return render_template('{}/{}'.format(self.name, template_name), **context), status
 
     def render_json(self, model, status=200):
-        if hasattr(model, '__iter__'):
+        if isinstance(model, (list, tuple))and len(model) > 0:
             data = type(model[0]).jsonify(model, many=True)
-        else:
+        elif isinstance(model, db.Model):
             data = model.jsonify()
+        else:
+            data = model
 
         return utils.json_response(data, status=status)
 
