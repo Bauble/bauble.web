@@ -5,7 +5,6 @@ from sqlalchemy import (func, Boolean, Column, Date, Enum, ForeignKey, Integer, 
                         Text, UniqueConstraint)
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.ext.hybrid import hybrid_property
 
 import bauble.db as db
 import bauble.search as search

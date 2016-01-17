@@ -7,7 +7,6 @@ from flask.ext.migrate import Migrate
 from flask_marshmallow import Marshmallow
 from sqlalchemy import func, Column, DateTime, Integer, MetaData
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
-from sqlalchemy.ext.hybrid import hybrid_property
 
 from bauble.schema import schema_factory
 from bauble.utils import combomethod
@@ -50,7 +49,6 @@ class _Model(ExtModel):
         return data
 
 
-    @hybrid_property
     def str(self):
         return str(self)
 
