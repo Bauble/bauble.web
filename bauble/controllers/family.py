@@ -1,6 +1,8 @@
 from flask import redirect, request, url_for
 from flask.ext.login import login_required
 import sqlalchemy.orm as orm
+from webargs import fields
+from webargs.flaskparser import use_args
 
 import bauble.db as db
 from bauble.forms import form_factory
@@ -82,6 +84,16 @@ def destroy(family, id):
     db.session.commit()
     return '', 204
 
-# @route()
-def count(id):
-    pass
+
+@resource.route("/<int:family_id>/count")
+@login_required
+@use_args({
+    'relation': fields.DelimitedList(fields.String(), required=True)
+})
+def family_count(args, family_id):
+    data = {}
+    family = Family.query.get_or_404(family_id)
+    for relation in args['relation']:
+        _, base = relation.rsplit('/', 1)
+        data[base] = utils.count_relation(family, relation)
+    return utils.json_response(data)
