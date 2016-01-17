@@ -6,6 +6,7 @@ import Vue from 'vue'
 import './search'
 import './genus'
 import './taxon'
+import './accession'
 
 $(document).ready(function () {
     Vue.config.debug = true

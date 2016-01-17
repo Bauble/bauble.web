@@ -19,7 +19,7 @@ $('#genus-form').ready(function () {
                 queryTokenizer: Bloodhound.tokenizers.whitespace,
 
                 remote: {
-                    url: '/search.json?q=family=%QUERY%',
+                    url: '/search.json?q=family%3D%QUERY%25',
                     wildcard: '%QUERY',
                     transform: (response) => {
                         return response['families']

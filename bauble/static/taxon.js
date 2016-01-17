@@ -19,7 +19,7 @@ $('#taxon-form').ready(function () {
                 queryTokenizer: Bloodhound.tokenizers.whitespace,
 
                 remote: {
-                    url: '/search.json?q=genus=%QUERY%',
+                    url: '/search.json?q=genus%3D%QUERY%25',
                     wildcard: '%QUERY',
                     transform: (response) => {
                         return response['genera']
