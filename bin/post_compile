@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -eo pipefail
+
+echo "-----> Build assets"
+export NODE_VERSION=4.2.6
+export NODE_BASENAME=node-v${NODE_VERSION}-linux-x64
+export PATH=$NODE_BASENAME/bin:./node_modules/.bin:$PATH
+PATH=$NODE_BASENAME/bin:./node_modules/.bin:$PATH ./manage.py assets build

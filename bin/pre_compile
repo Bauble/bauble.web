@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -eo pipefail
+
+NODE_VERSION=4.2.6
+NODE_BASENAME=node-v${NODE_VERSION}-linux-x64
+NODE_ARCHIVE="http://nodejs.org/dist/v${NODE_VERSION}/${NODE_BASENAME}.tar.gz"
+
+curl -s -L -o tmp-nodejs.tar.gz $NODE_ARCHIVE
+tar -zxvf tmp-nodejs.tar.gz > /dev/null
+rm tmp-nodejs.tar.gz
+export PATH=$NODE_BASENAME/bin:$PATH
+echo "path" $PATH
+echo "which node" `which node`
+
+function indent() {
+  c='s/^/       /'
+  case $(uname) in
+    Darwin) sed -l "$c";;
+    *)      sed -u "$c";;
+  esac
+}
+
+echo "-----> Installing dependencies with npm"
+npm install -g browserify babel-cli | indent
+npm install -d | indent
+echo "Dependencies installed" | indent
