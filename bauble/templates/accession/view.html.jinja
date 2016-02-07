@@ -1,0 +1,29 @@
+<div ng-controller="AccessionViewController">
+
+  <div class="row">
+    <div class="col-md-10">
+
+      <h3>{{accession.str}}</h3>
+      <h4><a ng-href="{{'#/search?q=taxon where id%3d' + accession.taxon_id}}">{{accession.taxon_str}}</a></h4>
+
+      <div># of Plants:
+        <a ng-href="{{'#/search?q=plant where accession.code%3d' + accession.code}}"
+           loading-spinner="counts.plants">
+          {{counts.plants}}</a>
+      </div>
+
+    </div>
+
+    <div class="col-md-2">
+      <div id="summary-buttons">
+        <a class="btn btn-default" ng-href="/accession/{{accession.id}}/edit">
+          <i class="fa fa-pencil"></i>Edit</a>
+        <a class="btn btn-default" ng-href="/plant/add?accession={{accession.id}}">
+          <i class="fa fa-plus"></i>Add Plant</a>
+        <a class="btn btn-default" ng-click="delete(accession.id)">
+          <i class="fa fa-trash-o"></i>Delete</a>
+      </div>
+    </div>
+
+  </div> <!-- .row -->
+</div>

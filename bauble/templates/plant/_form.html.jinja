@@ -1,0 +1,132 @@
+<script type="text/ng-template" id="accession-typeahead.html">
+  <div class="accession-typehead-match">
+    <span class="accession-str" bind-html-unsafe="match.model.str | typeaheadHighlight:query"></span>
+    <span class="taxon-str" bind-html-unsafe="match.model.taxon_str  | typeaheadHighlight:query"></span>
+  </div>
+</script>
+
+<div id="plant-form" class="bauble-editor">
+
+    <h3>{{ plant.str() if plant.str() != '' else 'New plant' }}</h3>
+
+    {% if plant.id %}
+        {% set action = url_for('.update', id=plant.id) %}
+    {% else %}
+        {% set action = url_for('.create') %}
+    {% endif %}
+
+    <form action="{{ action }}" method="POST" class="form-horizontal" role="form">
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active">
+                <a href="#general" aria-controls="general" role="tab"
+                   data-toggle="tab">General</a></li>
+            <li role="presentation">
+                <a href="#profile" aria-controls="profile" role="tab"
+                   data-toggle="tab">Additional info</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="general">
+
+                <div class="form-group">
+                    {{ form.accession_id.label("Accession", class_="col-sm-2 control-label") }}
+                    <div class="col-md-3">
+                        <input class="form-control typeahead" id="accession"
+                               value="{{ plant.accession.str() if plant.accession else '' }}">
+                        {{ form.accession_id(type="hidden") }}
+                        <!-- <input type="text" ng-model="model.accession"
+                             placeholder="required" typeahead-editable="false"
+                             uib-typeahead="accession as accession.str for accession in getAccessions($viewValue)"
+                             typeahead-input-formatter="model.accession.str"
+                             typeahead-template-url="accession-typeahead.html"
+                             typeahead-loading="loadingAccessions" class="form-control" required> -->
+                    </div>
+
+                </div> <!-- .form-group -->
+
+                <div class="form-group">
+                    <!-- <label class="control-label col-md-2" for="plant-code-input">Plant code</label> -->
+                    {{ form.code.label("Code", class_="col-sm-2 control-label") }}
+                    <div class="col-md-2">
+                        {{ form.code(class_="form-control", required=True, placeholder="required") }}
+                    </div>
+                </div> <!-- .form-group -->
+
+                <div class="form-group">
+                    <label class="control-label col-md-2" for="accession-type-input">Accession type</label>
+                    {{ form.acc_type.label("Code", class_="col-sm-2 control-label") }}
+                    <div class="col-md-3">
+                        <select ng-model="plant.acc_type" class="form-control" id="accession-type-input"
+                                ng-options="value as text for (value, text) in acc_type_values">
+                        </select>
+                    </div>
+                </div> <!-- .form-group -->
+
+
+                <div class="form-group">
+                    {{ form.memorial.label("Memorial", class_="col-sm-2 control-label") }}
+                    <div class="col-md-3">
+                        {{ form.memorial(class_="form-control", ) }}
+                    </div>
+                </div> <!-- .form-group -->
+
+                <div class="form-group">
+                    {{ form.quantity.label("Code", class_="col-sm-2 control-label") }}
+                    <div class="col-md-2">
+                        {{ form.quantity(class_="form-control", required=True, placeholder="required") }}
+                    </div>
+                </div> <!-- .form-group -->
+
+                <div class="form-group">
+                    {{ form.location_id.label("Location", class_="col-sm-2 control-label") }}
+                    <div class="col-md-4">
+                        <input class="form-control typeahead" id="location"
+                               value="{{ plant.location.str() if plant.location else '' }}">
+                        {{ form.location_id(type="hidden") }}
+                    </div>
+                </div> <!-- .form-group -->
+
+                <div ng-if="'false'" class="editor-section">
+                    <!-- TODO: disabled until we add full support for recording plant changes -->
+                    <h4>Current change</h4>
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="chain-reason-input">Reason</label>
+                        <div class="col-md-6">
+                            <input type="text" ng-model="plant.change.reason" class="form-control"
+                                   placeholder="required" id="change-reason-input" required/>
+                        </div>
+                    </div> <!-- .form-group -->
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="change-date-input">Date</label>
+                        <div class="col-md-2">
+                            <input bs-datepicker type="text" ng-model="plant.change.date"
+                                   placeholder="required" id="change-date-input" required/>
+                        </div>
+                    </div> <!-- .form-group -->
+
+                </div> <!-- .editor-section -->
+
+
+
+
+    <!-- <tab heading="Propagation">
+         <button class="btn btn-default"><i class="fa fa-plus"></i>Add</button>
+         <div ng-include="'/static/partials/propagation-edit.html'"></div>
+         </tab> -->
+
+    <!-- <tab heading="Notes">
+         <div ng-include="'/static/partials/notes_editor.html'"></div>
+         </tab> -->
+
+            </div>
+        </div>
+
+
+        <div class="action-buttons">
+            <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+            <input type="submit" class="btn btn-primary" value="Save">
+        </div>
+
+    </form>
+</div> <!-- .plant-editor -->

@@ -18,30 +18,17 @@
             <ul class="nav navbar-nav">
                 <li><a href="/search">Search</a></li>
 
-                <li uib-dropdown>
-                    <a href="#" class="dropdown-toggle" role="button"
-                       uib-dropdown-toggle
-                       aria-haspopup="true" aria-expanded="false">New
-                        <span class="caret"></span></a>
-                    <ul class="dropdown-menu pull-right" uib-dropdown-menu>
-                        <li>
-                            <a class="pull-right" href="/family/add">Family</a>
-                        </li>
-                        <li>
-                            <a class="pull-right" href="/genus/add">Genus</a>
-                        </li>
-                        <li>
-                            <a class="pull-right" href="/taxon/add">Taxon</a>
-                        </li>
-                        <li>
-                            <a class="pull-right" href="/accession/add">Accession</a>
-                        </li>
-                        <li>
-                            <a class="pull-right" href="/plant/add">Plant</a>
-                        </li>
-                        <li>
-                            <a class="pull-right" href="/location/add">Location</a>
-                        </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"
+                       role="button" aria-haspopup="true" aria-expanded="false">
+                        New<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/family/new">Family</a></li>
+                        <li><a href="/genus/new">Genus</a></li>
+                        <li><a href="/taxon/new">Taxon</a></li>
+                        <li><a href="/accession/new">Accession</a></li>
+                        <li><a href="/plant/new">Plant</a></li>
+                        <li><a href="/location/new">Location</a></li>
                     </ul>
                 </li>
             </ul>

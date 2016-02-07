@@ -5,7 +5,6 @@ from sqlalchemy import (func, Boolean, Column, Date, Enum, ForeignKey, Integer, 
                         Text, UniqueConstraint)
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.ext.hybrid import hybrid_property
 
 import bauble.db as db
 import bauble.search as search
@@ -224,7 +223,6 @@ class Taxon(db.Model):
     # in PlantPlugins.init() we set this to 'x' for win32
     hybrid_char = '\u2a09'  # U+2A09
 
-    @hybrid_property
     def str(taxon, authors=False, markup=False):
         '''
         returns a string for taxon
@@ -273,8 +271,7 @@ class Taxon(db.Model):
             if rank == 'cv.' and epithet:
                 if taxon.cv_group and not group_added:
                     group_added = True
-                    infrasp_parts.append(_("(%(group)s Group)") % \
-                                         dict(group=taxon.cv_group))
+                    infrasp_parts.append("({} Group)".format(taxon.cv_group))
 
                 infrasp_parts.append("'%s'" % escape(epithet))
             else:
@@ -288,8 +285,9 @@ class Taxon(db.Model):
             if authors and iauthor:
                 infrasp_parts.append(escape(iauthor))
         if taxon.cv_group and not group_added:
-            infrasp_parts.append(_("%(group)s Group") % \
-                                 dict(group=taxon.cv_group))
+            # infrasp_parts.append(_("%(group)s Group") % \
+            #                      dict(group=taxon.cv_group))
+            infrasp_parts.append("({} Group)".format(taxon.cv_group))
 
         # create the binomial part
         binomial = []
@@ -307,8 +305,7 @@ class Taxon(db.Model):
             tail = [taxon.sp_qual]
 
         parts = chain(binomial, infrasp_parts, tail)
-        s = ' '.join(filter(lambda x: x not in ('', None), parts))
-        return s
+        return ' '.join(filter(lambda x: x not in ('', None), parts))
 
 
     infrasp_attr = {1: {'rank': 'infrasp1_rank',

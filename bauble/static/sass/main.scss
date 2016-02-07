@@ -45,6 +45,7 @@ $footer-border: $default-border;
 $icon-color: $orange;
 
 @import "bootstrap";
+@import "typeahead";
 /* @import "animation"; */
 
 html {
@@ -153,7 +154,8 @@ h1, h2, h3, h4, h5, legend {
         border-bottom: $default-border;
 
         a, li > a {
-            color: $navbar-default-bg
+          color: $navbar-default-bg;
+          /* float: right !important; */
         }
 
         a:hover, li > a:hover {
@@ -162,7 +164,6 @@ h1, h2, h3, h4, h5, legend {
             background-image: none; // undo bootstrap background gradient on hover
         }
     }
-
 }
 
 
@@ -324,7 +325,7 @@ h1, h2, h3, h4, h5, legend {
 
 
 #search-spinner {
-
+  margin-top: 1em;
     text-align: center;
 
     i {
@@ -345,8 +346,7 @@ h1, h2, h3, h4, h5, legend {
 
 .result-item {
     list-style: none;
-    //margin: .5em 0;
-    padding: 1em .5em;
+    padding: 1em;
     border-bottom: solid 1px $light-grey;
 
     &:hover {

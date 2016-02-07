@@ -1,0 +1,2 @@
+$('#location-form').ready(function () {
+})

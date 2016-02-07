@@ -11,13 +11,6 @@ from bauble.models.geography import Geography
 #from bauble.utils.log import debug
 import bauble.search as search
 
-def coll_markup_func(coll):
-    acc = coll.source.accession
-    safe = utils.xml_safe_utf8
-    return '%s - <small>%s</small>' %  \
-        (safe(acc), safe(acc.taxon_str())), safe(coll)
-
-
 class Source(db.Model):
     """
     """
@@ -46,16 +39,6 @@ class Source(db.Model):
     plant_propagation_id = Column(Integer, ForeignKey('plant_propagation.id'))
     plant_propagation = relationship("PlantPropagation", foreign_keys=plant_propagation_id,
                                      uselist=False)
-
-
-    def json(self, *args, **kwargs):
-        data = self.source_detail.json() if self.source_detail is not None else {}
-        data['sources_code'] = self.sources_code
-        data['collection'] = self.collection.json() if self.collection is not None else {}
-        data['propagation'] = self.propagation.json() if self.propagation is not None else {}
-        data['plant_propagation_id'] = self.plant_propagation.id if self.plant_propagation is not None else None
-        return data
-
 
 
 source_type_values = {

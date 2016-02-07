@@ -17,16 +17,9 @@ def req_mock():
         yield m
 
 
-@pytest.yield_fixture(scope='session', autouse=True)
+@pytest.yield_fixture(scope='module', autouse=True)
 def app():
-    # this fixture is needed by the pytext-fixtures "client" fixture
-    if flask.has_app_context():
-        # tests probably started from ./manage.py
-        _app = flask.current_app
-    else:
-        # tests probably started from py.test
-        _app = bauble.create_app('../env/test.py')
-
+    _app = bauble.create_app('../env/test.py')
     with _app.app_context():
         _app.testing = True
         yield _app
@@ -96,7 +89,7 @@ def taxon(genus):
 @pytest.fixture()
 def accession(taxon):
     from bauble.models import Accession
-    return Accession(code=faker.pyint(), taxon=taxon)
+    return Accession(code=faker.pyint(), taxon=taxon, date_recvd='2001-01-30')
 
 @pytest.fixture()
 def location():

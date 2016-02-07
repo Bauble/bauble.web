@@ -32,4 +32,3 @@ webassets
 webassets-babel
 webassets-browserify
 webassets-libsass
-webassets-ng-annotate

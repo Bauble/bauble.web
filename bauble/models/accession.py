@@ -257,7 +257,7 @@ class Accession(db.Model):
     @declared_attr
     def _additional_schema_fields(self):
         return {
-            'taxon_str': fields.Function(lambda obj: obj.taxon_str())
+            'taxon_str': fields.Function(lambda obj: obj.taxon_str(), dump_only=True)
         }
 
     # columns
@@ -410,15 +410,6 @@ class Accession(db.Model):
 
     def markup(self):
         return '%s (%s)' % (self.code, self.taxon.markup())
-
-
-    def json(self, *args, **kwargs):
-        # always embed the source in the accession
-        data = super().json(*args, **kwargs)
-        data['source'] = self.source.json() if self.source is not None else {}
-        data['taxon_str'] = self.taxon_str()
-        return data
-
 
 
 @event.listens_for(Accession, 'after_update')

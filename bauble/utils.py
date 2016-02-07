@@ -65,3 +65,17 @@ def count_relation(mapped_instance, relation):
         join(*path)
 
     return query.count()
+
+
+def ilike(col, val, engine=None):
+    """
+    Return a cross platform ilike function.
+    """
+    import bauble.db as db
+    from sqlalchemy import func
+    if not engine:
+        engine = db.engine
+    if engine.name == 'postgresql':
+        return col.op('ILIKE')(val)
+    else:
+        return func.lower(col).like(func.lower(val))

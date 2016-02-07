@@ -1,0 +1,40 @@
+<div>
+  <div class="modal-header">
+    <h4>Source</h4>
+  </div>
+  <div class="modal-body">
+    <form class="form-horizontal" role="form">
+      <div class="form-group">
+        <label class="control-label col-lg-2" for="nameInput">Name</label>
+        <div class="col-lg-10">
+          <input type="text" ng-model="sourceDetail.name" class="form-control"
+                 id="nameInput" required>
+        </div> <!-- .col-lg-10 -->
+      </div>
+
+      <div class="form-group">
+        <label class="control-label col-lg-2" for="sourceTypeInput">Type</label>
+        <div class="col-lg-10">
+          <select ng-model="sourceDetail.source_type"
+                  id="sourceTypeInput" class="form-control"
+                  ng-options="value as text for (value, text) in source_type_values">
+          </select>
+        </div>
+      </div> <!-- .form-group -->
+
+      <div class="form-group">
+        <label class="control-label col-lg-2" for="descriptionInput">Description</label>
+        <div class="col-lg-10">
+          <textarea ng-model="sourceDetail.description" rows="3" class="form-control"
+                    id="descriptionInput">
+          </textarea>
+        </div> <!-- .col-lg-10 -->
+      </div>   <!-- .form-group -->
+    </form>
+  </div> <!-- .modal-body -->
+  <div class="modal-footer">
+    <button class="btn cancel" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-primary" ng-click="save()">Save</button>
+  </div> <!-- .modal-footer -->
+
+</div>

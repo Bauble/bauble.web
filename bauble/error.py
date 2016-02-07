@@ -27,40 +27,6 @@ class CommitException(Exception):
         return str(self.exc)
 
 
-class PermissionError(BaubleError):
-    pass
-
-class AuthenticationError(BaubleError):
-    pass
-
-class LoginError(BaubleError):
-    pass
-
-class DatabaseError(BaubleError):
-    pass
-
-class EmptyDatabaseError(DatabaseError):
-    pass
-
-class MetaTableError(DatabaseError):
-    pass
-
-class TimestampError(DatabaseError):
-    pass
-
-class RegistryError(DatabaseError):
-    pass
-
-class VersionError(DatabaseError):
-
-    def __init__(self, version):
-        super(VersionError, self).__init__()
-        self.version = version
-
-
-class SQLAlchemyVersionError(BaubleError):
-    pass
-
 class CheckConditionError(BaubleError):
     pass
 
