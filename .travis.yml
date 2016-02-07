@@ -1,11 +1,26 @@
 language: python
+cache:
+  - pip
+  - npm
 python:
-  - "3.3"
+  # - "3.3"
   - "3.4"
-  - "3.5"
-  - "3.5-dev" # 3.5 development branch
-  - "nightly" # currently points to 3.6-dev
+  # - "3.5"
+  # - "3.5-dev" # 3.5 development branch
+  # - "nightly" # currently points to 3.6-dev
+addons:
+  postgresql: "9.3"
+services:
+  - postgresql
 # command to install dependencies
+before_install:
+  - curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.30.2/install.sh | bash
+  - nvm install v4.2.6
 install: "pip install -r requirements-dev.txt"
 # command to run tests
+before_script:
+  - npm set progress=false
+  - npm install --dev --python=python2
+  - psql -c 'create database test;' -U postgres
+  - ./manage.py db upgrade
 script: py.test

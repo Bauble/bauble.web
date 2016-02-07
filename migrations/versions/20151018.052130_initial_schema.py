@@ -145,7 +145,7 @@ def upgrade():
                  sa.Column('leaves_reduced_pct', sa.Integer(), autoincrement=False),
                  sa.Column('length', sa.Integer(), autoincrement=False),
                  sa.Column('length_unit', sa.Enum('mm', 'in', 'cm',
-                                                  name='prop_cutting_length_unit_type'))
+                                                  name='prop_cutting_length_unit_type')),
                  sa.Column('wound', sa.Enum('No', 'Double', 'Single', 'Slice',
                                             name='prop_cutting_would_type')),
                  sa.Column('flower_buds', sa.Enum('Removed', 'None',
