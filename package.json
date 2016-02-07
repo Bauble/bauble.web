@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "progress": false,
+  "loglevel": "error"
   "directories": {
     "test": "test"
   },
