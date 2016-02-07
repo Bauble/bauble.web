@@ -19,6 +19,9 @@ flask-sslify
 flask-wtf
 flask>=0.10.1,<0.11.0a0
 gunicorn
+# Use earlier version of libsass until this commit makes it into a release:
+# https://github.com/miracle2k/webassets/commit/f17787f15ea2f736d725b3fd1931df694717639
+libsass<0.10
 marshmallow-sqlalchemy
 marshmallow>=2.1.0
 oauthlib==0.7.2
