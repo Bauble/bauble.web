@@ -7,6 +7,8 @@ import './search'
 import './genus'
 import './taxon'
 import './accession'
+import './plant'
+import './location'
 
 $(document).ready(function () {
     Vue.config.debug = true

@@ -77,6 +77,7 @@ def test_post_accession_json(client, session, taxon):
     assert resp.json['id'] is not None
     assert resp.json['code'] == code
 
+
 def test_post_accession_json_with_errors(client, session, taxon):
     session.add(taxon)
     session.commit()
@@ -87,7 +88,6 @@ def test_post_accession_json_with_errors(client, session, taxon):
                        headers={'accept': 'application/json'})
     assert resp.status_code == 422, resp.data.decode('utf-8')
     # TODO: check for errors
-
 
 
 def test_patch_accession(client, session, accession):

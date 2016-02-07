@@ -16,7 +16,9 @@ register_filter(Browserify)
 register_filter(LibSass)
 
 # not sure why but the debug false is required here
-sass_app = Bundle("sass/main.scss", filters="libsass", debug=False, output='dist/main.css')
+sass_app = Bundle("sass/main.scss", filters="libsass", debug=False,
+                  depends='sass/_*.scss',
+                  output='dist/main.css')
 # css_vendor = Bundle("vendor/node_modules/toastr/build/toastr.css")
 css_all = Bundle(sass_app,
                  # css_vendor,
@@ -33,11 +35,11 @@ js_bundle = Bundle("app.js",
                        "babel",
                        "browserify",
                    ],
-                   output='bundle.js')
+                   output='dist/bundle.js')
 
 # ** not sure why minifying and the bundling in the same step
 # ** doesn't cause the code to be minified
-js_all = Bundle(js_bundle, filters="rjsmin", output="bundle.min.js")
+js_all = Bundle(js_bundle, filters="rjsmin", output="dist/bundle.min.js")
 
 webassets = Environment()
 
