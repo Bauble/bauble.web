@@ -1,10 +1,10 @@
 # pin oauthlib to 0.7.2 until flask-oauthlib works with 1.0
 SQLAlchemy==1.0.9
-attrdict
+# attrdict
 bcrypt
 celery
 cssmin
-cytoolz
+# cytoolz
 flask-appconfig
 flask-assets
 flask-babel
@@ -12,7 +12,7 @@ flask-login
 flask-mail
 flask-marshmallow
 flask-migrate
-flask-oauthlib
+# flask-oauthlib
 flask-script
 flask-sqlalchemy
 flask-sslify
@@ -24,12 +24,12 @@ gunicorn
 libsass<0.10
 marshmallow-sqlalchemy
 marshmallow>=2.1.0
-oauthlib==0.7.2
+# oauthlib==0.7.2
 psycopg2
-pycontracts
-redis
+# pycontracts
+# redis
 requests
-requests-oauthlib
+# requests-oauthlib
 webargs
 webassets
 webassets-babel
