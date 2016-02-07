@@ -3,6 +3,7 @@
 
 from datetime import datetime, timedelta
 from importlib import import_module
+import os
 import pathlib
 import sys
 import subprocess
@@ -18,6 +19,9 @@ from bauble.assets import webassets
 
 if len(sys.argv) > 1 and sys.argv[1] == 'test':
     config_filename = '../env/test.py'
+elif 'DYNO' in os.environ:
+    # heroku
+    config_filename = None
 else:
     config_filename = '../env/local.py'
 
