@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "progress": false,
-  "loglevel": "error"
+  "loglevel": "error",
   "directories": {
     "test": "test"
   },
