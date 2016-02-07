@@ -16,6 +16,7 @@ services:
 install: "pip install -r requirements-dev.txt"
 # command to run tests
 before_script:
+  - npm set progress=false
   - npm install --dev --python=python2
   - psql -c 'create database test;' -U postgres
   - ./manage.py db upgrade
