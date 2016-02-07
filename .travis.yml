@@ -1,7 +1,7 @@
 language: python
 cache:
-  $HOME/.cache/pip
-  node_modules/
+  - pip
+  - npm
 python:
   # - "3.3"
   - "3.4"
