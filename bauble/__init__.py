@@ -113,9 +113,6 @@ def create_app(config_filename=None):
             # if isclass(attr) and issubclass(attr, Blueprint) and attr != Resource:
             #     app.register_blueprint(attr())
 
-    from bauble.controllers.api import api
-    app.register_blueprint(api)
-
     from bauble.error import init_errorhandlers
     init_errorhandlers(app)
 
