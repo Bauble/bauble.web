@@ -53,4 +53,3 @@ def init_app(app):
     webassets.config['BROWSERIFY_EXTRA_ARGS'] = ['--extension=.es6']
     webassets.config['BROWSERIFY_TRANSFORMS'] = ['babelify', 'resolvify']
     webassets.config['LIBSASS_INCLUDES'] = [os.path.join(path, 'static/vendor/node_modules/bootstrap-sass/assets/stylesheets')]
-    print('webassets.config["LIBSASS_INCLUDES"]: ', webassets.config["LIBSASS_INCLUDES"])
