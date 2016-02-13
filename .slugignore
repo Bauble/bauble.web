@@ -1,3 +1,4 @@
 env/
 test/
 Readme.md
+bauble/static/vendor/node_modules
