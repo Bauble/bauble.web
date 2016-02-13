@@ -7,13 +7,11 @@ from webassets.filter import register_filter
 
 from webassets_babel import BabelFilter
 from webassets_browserify import Browserify
-from webassets_libsass import LibSass
 
 path, _ = os.path.split(__file__)
 
 register_filter(BabelFilter)
 register_filter(Browserify)
-register_filter(LibSass)
 
 # not sure why but the debug false is required here
 sass_app = Bundle("sass/main.scss", filters="libsass", debug=False,
