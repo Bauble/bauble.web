@@ -17,7 +17,7 @@ register_filter(LibSass)
 
 # not sure why but the debug false is required here
 sass_app = Bundle("sass/main.scss", filters="libsass", debug=False,
-                  depends='sass/_*.scss',
+                  depends='sass/*.scss',
                   output='dist/main.css')
 # css_vendor = Bundle("vendor/node_modules/toastr/build/toastr.css")
 css_all = Bundle(sass_app,
@@ -55,3 +55,4 @@ def init_app(app):
     webassets.config['BROWSERIFY_EXTRA_ARGS'] = ['--extension=.es6']
     webassets.config['BROWSERIFY_TRANSFORMS'] = ['babelify', 'resolvify']
     webassets.config['LIBSASS_INCLUDES'] = [os.path.join(path, 'static/vendor/node_modules/bootstrap-sass/assets/stylesheets')]
+    print('webassets.config["LIBSASS_INCLUDES"]: ', webassets.config["LIBSASS_INCLUDES"])
