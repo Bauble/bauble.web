@@ -121,7 +121,7 @@ def form_class_factory(model, **form_kwargs):
 
 
 def form_factory(model, **form_kwargs):
-    return form_class_factory(model, **form_kwargs)()
+    return form_class_factory(model, **form_kwargs)(obj=model)
 
 
 # rails-like helper
