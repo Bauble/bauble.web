@@ -81,7 +81,7 @@ class MarshmallowForm(Form):
         errors.update(self.__schema__)
 
     @classmethod
-    def from_schema(cls, schema, create=True, **form_kwargs):
+    def from_schema(cls, schema):
         # TODO: what about just creating a schema dynamically...this would allow
         # us to extend an existing form instead of creating a new one from scratch
         schema_cls = type(schema) if isinstance(schema, Schema) else schema
@@ -113,15 +113,14 @@ class MarshmallowForm(Form):
 
 
 @lru_cache()
-def form_class_factory(model, **form_kwargs):
+def form_class_factory(model):
     schema_cls = schema_class_factory(model)
-    if isinstance(model, db.Model):
-        form_kwargs['obj'] = model
-    return MarshmallowForm.from_schema(schema_cls, **form_kwargs)
+    return MarshmallowForm.from_schema(schema_cls)
 
 
 def form_factory(model, **form_kwargs):
-    return form_class_factory(model, **form_kwargs)(obj=model)
+    form_kwargs['obj'] = model
+    return form_class_factory(model)(**form_kwargs)
 
 
 # rails-like helper
