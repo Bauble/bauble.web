@@ -1,56 +1,58 @@
-<div ng-controller="TaxonViewController">
-
+<div>
   <div class="row">
     <div class="col-md-10">
 
-      <h3>{{taxon.str}}</h3>
+      <h3>{{taxon.str()}}</h3>
 
-      <h4><a ng-href="#/search?q=family where id%3d'{{taxon['genus.family'].id}}'">
-        {{taxon["genus.family"].str}}</a></h4>
+      <h4><a href="#/search?q=family where id%3d'{{taxon.genus.family.id}}'">
+        {{taxon.genus.family.str()}}</a></h4>
 
       <div># of Accessions:
-        <a ng-href="#/search?q=accession where taxon.id%3d'{{taxon.id}}'"
-           loading-spinner="counts.accessions">
+        <a href="#/search?q=accession where taxon.id%3d'{{taxon.id}}'">
           {{counts.accessions}}</a>
       </div>
 
       <div># of Plants:
-        <a ng-href="#/search?q=plant where accession.taxon.id%3d'{{taxon.id}}'"
-           loading-spinner="counts.plants">
-          {{counts.plants}}</a>
+        <a href="#/search?q=plant where accession.taxon.id%3d'{{taxon.id}}'">
+            {{counts.plants}}</a>
       </div>
 
       <h4>Vernacular Names</h4>
-      <div ng-show="!taxon.vernacular_names || taxon.vernacular_names.length < 1"
-           style="color: #aaa">
-        This taxon has no vernacular names.
-      </div>
-      <ul>
-        <li ng-repeat="vn in taxon.vernacular_names" loading-spinner="taxon.vernacular_names">
-          {{vn.name}} ({{vn.language}})</li>
-      </ul>
-
+      {% if taxon.vernacular_names|length > 0 %}
+          <ul>
+              {% for vn in taxon.vernacular_names %}
+                  <li>{{ vn.name }} ({{ vn.language }})</li>
+              {% endfor %}
+          </ul>
+      {% else %}
+          <div style="color: #aaa">
+              This taxon has no vernacular names.
+          </div>
+      {% endif %}
 
       <h4>Synonyms</h4>
-      <div ng-show="!taxon.synonyms || taxon.synonyms.length < 1" style="color: #aaa">
-        This taxon has no synonyms.
-      </div>
-      <ul>
-        <li ng-repeat="synonym in taxon.synonyms" loading-spinner="taxon.synonyms">
-          <a ng-href="#/search?q=taxon where id%3d'{{synonym.id}}'">{{synonym.str}}</a>
-        </li>
-      </ul>
+      {% if taxon.synonyms|length > 0 %}
+          <ul>
+              <li>
+                  <a href="#/search?q=taxon where id%3d'{{synonym.id}}'">{{synonym.str}}</a>
+              </li>
+          </ul>
+      {% else %}
+          <div style="color: #aaa">
+              This taxon has no synonyms.
+          </div>
+      {% endif %}
     </div>
 
     <div class="col-md-2">
       <div id="summary-buttons">
-        <a class="btn btn-default" ng-href="/taxon/{{taxon.id}}/edit">
+        <a class="btn btn-default" href="/taxon/{{taxon.id}}/edit">
           <i class="fa fa-pencil"></i>Edit</a>
 
-        <a class="btn btn-default" ng-href="/accession/add?taxon={{taxon.id}}">
+        <a class="btn btn-default" href="/accession/add?taxon={{taxon.id}}">
           <i class="fa fa-plus"></i>Add Accession</a>
 
-        <a class="btn btn-default" ng-click="delete(taxon.id)">
+        <a class="btn btn-default" click="delete(taxon.id)">
           <i class="fa fa-trash-o"></i>Delete</a>
       </div>
     </div>
