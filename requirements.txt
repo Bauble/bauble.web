@@ -34,5 +34,4 @@ webargs
 # Use master of webassets until this commit makes it into a release:
 # https://github.com/miracle2k/webassets/commit/f17787f15ea2f736d725b3fd1931df694717639
 -e git+https://github.com/miracle2k/webassets.git#egg=webassets
-webassets-babel
 webassets-browserify
