@@ -21,6 +21,6 @@ function indent() {
 }
 
 echo "-----> Installing dependencies with npm"
-npm install -g browserify | indent
+# npm install -g browserify | indent
 npm install -d --loglevel error | indent
 echo "Dependencies installed" | indent

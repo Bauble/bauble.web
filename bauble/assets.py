@@ -47,6 +47,7 @@ def init_app(app):
     webassets.manifest = 'cache' if not app.debug else False
     webassets.cache = not app.debug
     webassets.debug = app.debug
+    webassets.config['BROWSERIFY_BIN'] = 'node_modules/.bin/browserify'
     webassets.config['BROWSERIFY_EXTRA_ARGS'] = ['--extension=.es6']
     webassets.config['BROWSERIFY_TRANSFORMS'] = ['vueify', 'babelify', 'resolvify']
     webassets.config['LIBSASS_INCLUDES'] = [os.path.join(path, 'static/vendor/node_modules/bootstrap-sass/assets/stylesheets')]
