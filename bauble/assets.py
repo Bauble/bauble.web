@@ -5,12 +5,10 @@ import os
 from flask.ext.assets import Bundle, Environment
 from webassets.filter import register_filter
 
-from webassets_babel import BabelFilter
 from webassets_browserify import Browserify
 
 path, _ = os.path.split(__file__)
 
-register_filter(BabelFilter)
 register_filter(Browserify)
 
 # not sure why but the debug false is required here
@@ -25,12 +23,11 @@ css_all = Bundle(sass_app,
 find_files = lambda p, g: (str(p.relative_to('bauble/static')) for p in Path(p).glob(g))
 
 js_bundle = Bundle("app.js",
-                   depends='*.js',
+                   depends=['*.js', 'components/*.js', 'components/*.vue'],
                    # depends=find_files('bauble/static', '**/*.js'),
                    # depends=chain(find_files('bauble/static/components', '**/*.js'),
                    #               find_files('bauble/static/shared', '**/*.js')),
                    filters=[
-                       "babel",
                        "browserify",
                    ],
                    output='dist/bundle.js')
@@ -51,5 +48,5 @@ def init_app(app):
     webassets.cache = not app.debug
     webassets.debug = app.debug
     webassets.config['BROWSERIFY_EXTRA_ARGS'] = ['--extension=.es6']
-    webassets.config['BROWSERIFY_TRANSFORMS'] = ['babelify', 'resolvify']
+    webassets.config['BROWSERIFY_TRANSFORMS'] = ['vueify', 'babelify', 'resolvify']
     webassets.config['LIBSASS_INCLUDES'] = [os.path.join(path, 'static/vendor/node_modules/bootstrap-sass/assets/stylesheets')]
