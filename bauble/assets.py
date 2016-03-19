@@ -49,5 +49,5 @@ def init_app(app):
     webassets.debug = app.debug
     webassets.config['BROWSERIFY_BIN'] = 'node_modules/.bin/browserify'
     webassets.config['BROWSERIFY_EXTRA_ARGS'] = ['--extension=.es6']
-    webassets.config['BROWSERIFY_TRANSFORMS'] = ['vueify', 'babelify', 'resolvify']
+    webassets.config['BROWSERIFY_TRANSFORMS'] = ['vueify', 'babelify']
     webassets.config['LIBSASS_INCLUDES'] = [os.path.join(path, 'static/vendor/node_modules/bootstrap-sass/assets/stylesheets')]
