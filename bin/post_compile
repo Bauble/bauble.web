@@ -2,7 +2,7 @@
 set -eo pipefail
 
 echo "-----> Build assets"
-export NODE_VERSION=4.2.6
+export NODE_VERSION=4.4.0
 export NODE_BASENAME=node-v${NODE_VERSION}-linux-x64
 export PATH=$NODE_BASENAME/bin:./node_modules/.bin:$PATH
 export DYNO=1  # make manage.py use environment for config
