@@ -84,7 +84,7 @@ def herokucfg(environment, verbose=False):
 def test():
     """Run tests locally"""
     import pytest
-    pytest.main(['-s'])
+    return pytest.main(['-s'])
 
 
 @manager.command
