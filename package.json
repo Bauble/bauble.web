@@ -1,6 +1,9 @@
 {
   "name": "bauble",
   "version": "1.0.0",
+  "engines": {
+    "node": "~4.2.6"
+  },
   "description": "",
   "main": "index.js",
   "progress": false,
