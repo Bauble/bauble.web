@@ -13,11 +13,11 @@ def test_serializer(session, family):
 
 
 def test_form(session, family):
-    from bauble.forms import MarshmallowForm, form_factory
+    from bauble.forms import form_factory, BaseModelForm
     session.add(family)
     session.commit()
     form = form_factory(family)
-    assert form is not None
+    assert isinstance(form, BaseModelForm)
 
 
 def test_index_family(client, session, family):
