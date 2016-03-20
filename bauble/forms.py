@@ -43,7 +43,8 @@ def form_class_factory(model_cls):
     Meta = type('Meta', (object, ), {
         'form_generator': FormGenerator,
         'model': model_cls,
-        'exclude': ['created_at', 'updated_at']
+        'exclude': ['created_at', 'updated_at'],
+        'include_foreign_keys': True
     })
     ModelForm = type('{}Form'.format(model_cls.__name__), (BaseModelForm, ), {
         'Meta': Meta
