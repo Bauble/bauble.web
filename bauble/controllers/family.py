@@ -1,4 +1,4 @@
-from flask import redirect, request, url_for
+from flask import current_app, redirect, request, url_for
 from flask.ext.login import login_required
 import sqlalchemy.orm as orm
 from webargs import fields

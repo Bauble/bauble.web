@@ -10,6 +10,18 @@ BaseModelForm = model_form_factory(Form)
 
 
 class FormGenerator(_FormGenerator):
+
+    def type_agnostic_parameters(self, key, column):
+        kwargs = super().type_agnostic_parameters(key, column)
+        # if the label wasn't explicitly defined in the column.info then make it
+        # the capitalized version of the key with any special characters remove
+        if 'label' not in column.info:
+            trans_table = str.maketrans({'_': ' '})
+            kwargs['label'] = column.name.translate(trans_table).capitalize()
+
+        return kwargs
+
+
     def select_field_kwargs(self, column):
         kwargs = super().select_field_kwargs(column)
         if column.nullable and ('', '') not in kwargs.get('choices', []):
