@@ -10,6 +10,7 @@
     {% endif %}
 
     <form action="{{ action }}" method="POST" class="form-horizontal" role="form">
+        {{ form.csrf_token }}
 
         <tabset>
             <tab :header="'General'">

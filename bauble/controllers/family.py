@@ -11,13 +11,12 @@ from bauble.middleware import use_model
 from bauble.resource import Resource
 import bauble.utils as utils
 
-
 resource = Resource('family', __name__)
 
 @resource.index
-def index(families):
+def index():
     families = Family.query.all()
-    if request.accept_mimetypes.best == 'application/json':
+    if request.prefers_json:
         return resource.render_json(families)
     return resource.render_html(families=families)
 
@@ -48,25 +47,30 @@ def new():
 
 @resource.create
 @login_required
-@use_model(Family)
-def create(family):
-    db.session.add(family)
-    db.session.commit()
+def create():
+    family = Family()
+    form = resource.save_form(family)
+
     if request.prefers_json:
-        return resource.render_json(family)
-    return redirect(url_for('.edit', id=id))
-    # return resource.render_html(family=family, form=form_factory(family))
+        return (resource.render_json(family, status=201)
+                if not form.errors
+                else resource.render_json_errors(form.errors))
+
+    return resource.render_html('new', status=201, family=family, form=form)
+
 
 
 @resource.update
 @login_required
-@use_model(Family)
-def update(family, id):
-    db.session.commit()
+def update(id):
+    family = Family.query.get_or_404(id)
+    form = resource.save_form(family)
     if request.prefers_json:
-        return resource.render_json(family)
-    # return resource.render_html(family=family, form=form_factory(family))
-    return redirect(url_for('.edit', id=id))
+        return (resource.render_json(family)
+                if not form.errors
+                else resource.render_json_errors(form.errors))
+
+    return resource.render_html('edit', family=family, form=form)
 
 
 @resource.edit
