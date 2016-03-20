@@ -5,6 +5,7 @@ from flask import abort, render_template, Blueprint
 
 import bauble.utils as utils
 import bauble.db as db
+from bauble.forms import form_factory
 
 class Resource(Blueprint):
 
@@ -16,6 +17,9 @@ class Resource(Blueprint):
     def render_html(self, template_name=None, status=200, **context):
         if template_name is None:
             template_name = '{}.html.jinja'.format(self.current_action)
+        elif '.' not in template_name:
+            # template name can be just the base string
+            template_name = '{}.html.jinja'.format(template_name)
         return render_template('{}/{}'.format(self.name, template_name), **context), status
 
     def render_json(self, model, status=200):
@@ -65,6 +69,7 @@ class Resource(Blueprint):
         @wraps(f)
         def view_func(*args, **kwargs):
             self.current_action = 'update'
+            # TODO: verify CSRF
             return f(*args, **kwargs)
         self.add_url_rule('/<int:id>', view_func=view_func, methods=['PATCH', 'POST'])
         self.add_url_rule('/<int:id>.json', view_func=view_func, methods=['PATCH', 'POST'])
@@ -85,6 +90,27 @@ class Resource(Blueprint):
         self.add_url_rule('/<int:id>', view_func=view_func, methods=['DELETE'])
         self.add_url_rule('/<int:id>.json', view_func=view_func, methods=['DELETE'])
 
+
+    def save_request_params(self, model, form=None):
+        if form is None:
+            form = form_factory(model)
+
+        if form.validate_on_submit():
+            form.populate_obj(model)
+            # TODO: what happens if an exception is raised...could we have a
+            # resource error handler....or a save_resource() that handles the commit
+            # and transaction...we could probably go one step further and do the
+            # validate on submit, populate and commit and handle error in one
+            # function
+
+            try:
+                db.session.add(model)
+                db.session.commit()
+            except Exception as exc:
+                form.errors['default'] = 'Could not save {}'.format(model.__class__.__name__.lower)
+                self.app.logger.error(exc)
+
+        return form
 
     # def action(self, rule, **kwargs):
     #     def decorator(f):
