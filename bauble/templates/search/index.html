@@ -1,28 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div id="search-page" @hashchange="hashChanged">
-    <div class="search-box">
-        <form autocapitalize="off" autocorrect="off" action="/search" method="GET">
-            <div class="input-group">
-                <!-- <span class="input-group-btn">
-                     <button class="btn btn-default" type="button"><i class="fa fa-cog"></i></button>
-                     </span> -->
-                <input id="search-field" name="q" type="text" autocorrect="off"
-                       autocapitalize="off" spellcheck="false"
-                       placeholder="Enter a search query" class="form-control">
-                <span class="input-group-btn">
-                    <button class="btn btn-default" type="submit">Search</button>
-                </span>
-            </div>
-        </form>
-    </div>
+<search-page inline-template>
+    <div id="search-page" @hashchange="hashChanged" inline-template>
+        <div class="search-box">
+            <form autocapitalize="off" autocorrect="off" action="/search" method="GET">
+                <div class="input-group">
+                    <!-- <span class="input-group-btn">
+                         <button class="btn btn-default" type="button"><i class="fa fa-cog"></i></button>
+                         </span> -->
+                    <input id="search-field" name="q" type="text" autocorrect="off"
+                           autocapitalize="off" spellcheck="false"
+                           placeholder="Enter a search query" class="form-control">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="submit">Search</button>
+                    </span>
+                </div>
+            </form>
+        </div>
 
-    <div class="row">
-        <div class="col-md-4">
-            <div class="panel-group" id="accordion" role="tablist"
-                 aria-multiselectable="true">
-                {% for group, values in results.items() %}
+        <div class="row">
+            <div class="col-md-4">
+                <div class="panel-group" id="accordion" role="tablist"
+                     aria-multiselectable="true">
+                    {% for group, values in results.items() %}
                     {% set heading_id = 'heading-' + group %}
                     {% set collapse_id = 'collapse-' + group %}
                     <div class="panel panel-default result-group">
@@ -41,27 +42,28 @@
                             <div class="list-group">
                                 <ul>
                                     {% for result in values %}
-                                        <li class="result-item" data-resource="{{ result.url }}"
-                                            ng-class="{'selected': $parent.selected.id===result.id}"
-                                            @click="selectItem">
-                                            {{ result.str }}
-                                        </li>
+                                    <li class="result-item" data-resource="{{ result.url }}"
+                                        ng-class="{'selected': $parent.selected.id===result.id}"
+                                        @click="selectItem">
+                                        {{ result.str }}
+                                    </li>
                                     {% endfor %}
                                 </ul>
                             </div>
                         </div>
                     </div>
-                {% endfor %}
+                    {% endfor %}
+                </div>
             </div>
-        </div>
 
-        <div class="col-md-8">
-            <div id="search-spinner" v-if="loading">
-                <i class="fa fa-spinner fa-spin fa-3x"></i>
+            <div class="col-md-8">
+                <div id="search-spinner" v-if="loading">
+                    <i class="fa fa-spinner fa-spin fa-3x"></i>
+                </div>
+                <div id="resource-view" class="resource-view" v-show="!loading"></div>
             </div>
-            <div id="resource-view" class="resource-view" v-show="!loading"></div>
         </div>
     </div>
-</div>
+</search-page>
 
 {% endblock %}

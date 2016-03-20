@@ -1,40 +1,42 @@
-<div id="location-form" class="bauble-editor">
+<location-form>
+    <div id="location-form" class="bauble-editor">
 
-  <h3>{{ location.str() if location.id else 'New location' }}</h3>
+        <h3>{{ location.str() if location.id else 'New location' }}</h3>
 
-  {% if location.id %}
-      {% set action = url_for('.update', id=location.id) %}
-  {% else %}
-      {% set action = url_for('.create') %}
-  {% endif %}
+        {% if location.id %}
+            {% set action = url_for('.update', id=location.id) %}
+        {% else %}
+            {% set action = url_for('.create') %}
+        {% endif %}
 
-  <form action="{{ action }}" method="POST" class="form-horizontal" role="form">
+        <form action="{{ action }}" method="POST" class="form-horizontal" role="form">
 
-      <div class="form-group">
-          {{ form.code.label("Code", class_="col-sm-2 control-label") }}
-          <!-- <label class="control-label col-md-2" for="code-input">Code</label> -->
-          <div class="col-md-2">
-              {{ form.code(class_="form-control", required=True, placeholder="required") }}
-          </div>
-      </div> <!-- .form-group -->
+            <div class="form-group">
+                {{ form.code.label("Code", class_="col-sm-2 control-label") }}
+                <!-- <label class="control-label col-md-2" for="code-input">Code</label> -->
+                <div class="col-md-2">
+                    {{ form.code(class_="form-control", required=True, placeholder="required") }}
+                </div>
+            </div> <!-- .form-group -->
 
-      <div class="form-group">
-          {{ form.name.label("Name", class_="col-md-2 control-label") }}
-          <div class="col-md-6">
-              {{ form.name(class_="form-control", required=True, placeholder="required") }}
-          </div>
-      </div> <!-- .form-group -->
+            <div class="form-group">
+                {{ form.name.label("Name", class_="col-md-2 control-label") }}
+                <div class="col-md-6">
+                    {{ form.name(class_="form-control", required=True, placeholder="required") }}
+                </div>
+            </div> <!-- .form-group -->
 
-      <div class="form-group">
-          {{ form.description.label("Description", class_="control-label col-md-2") }}
-          <div class="col-md-6">
-              {{ form.description(class_="form-control", rows=3) }}
-          </div>
-      </div> <!-- .form-group -->
+            <div class="form-group">
+                {{ form.description.label("Description", class_="control-label col-md-2") }}
+                <div class="col-md-6">
+                    {{ form.description(class_="form-control", rows=3) }}
+                </div>
+            </div> <!-- .form-group -->
 
-      <div class="action-buttons">
-          <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-          <button type="submit" class="btn btn-primary" ng-click="save()">Save</button>
-      </div>
-  </form>
-</div>
+            <div class="action-buttons">
+                <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+                <button type="submit" class="btn btn-primary" ng-click="save()">Save</button>
+            </div>
+        </form>
+    </div>
+</location-form>
