@@ -49,7 +49,7 @@ def new():
 @login_required
 def create():
     family = Family()
-    form = resource.save_form(family)
+    form = resource.save_request_params(family)
 
     if request.prefers_json:
         return (resource.render_json(family, status=201)
@@ -64,7 +64,7 @@ def create():
 @login_required
 def update(id):
     family = Family.query.get_or_404(id)
-    form = resource.save_form(family)
+    form = resource.save_request_params(family)
     if request.prefers_json:
         return (resource.render_json(family)
                 if not form.errors
@@ -82,8 +82,8 @@ def edit(id):
 
 @resource.destroy
 @login_required
-@use_model(Family)
-def destroy(family, id):
+def destroy(id):
+    family = Family.query.get_or_404(id)
     db.session.delete(family)
     db.session.commit()
     return '', 204

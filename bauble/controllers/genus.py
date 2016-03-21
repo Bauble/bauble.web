@@ -17,7 +17,10 @@ resource = Resource('genus', __name__)
 @resource.index
 def index():
     genera = Genus.query.all()
-    return resource.render_json(genera)
+    if request.prefers_json:
+        return resource.render_json(genera)
+
+    return resource.render_html(genera=genera)
 
 @resource.show
 def show(id):
@@ -37,37 +40,37 @@ def show(id):
 
 
 @resource.new
-@use_model(Genus)
-def new(genus):
+@login_required
+def new():
+    genus = Genus()
     return resource.render_html(genus=genus, form=form_factory(genus))
 
 
 @resource.create
 @login_required
 def create():
-    genus, errors = schema_factory(Genus).load(request.params)
-    if errors:
-        if request.prefers_json:
-            return resource.render_json(errors, status=422)
-        return resource.render_html('new.html.jinja', form=form_factory(genus))
+    genus = Genus()
+    form = resource.save_request_params(genus)
 
-    db.session.add(genus)
-    db.session.commit()
     if request.prefers_json:
-        return resource.render_json(genus, status=201)
-    return resource.render_html('edit.html.jinja', genus=genus, form=form_factory(genus),
-                                status=201)
+        return (resource.render_json(genus, status=201)
+                if not form.errors
+                else resource.render_json_errors(form.errors))
+
+    return resource.render_html('new', status=201, genus=genus, form=form)
 
 
 @resource.update
 @login_required
-@use_model(Genus)
-def update(genus, id):
-    db.session.commit()
+def update(id):
+    genus = Genus.query.get_or_404(id)
+    form = resource.save_request_params(genus)
     if request.prefers_json:
-        return resource.render_json(genus)
-    # return resource.render_html(genus=genus, form=form_factory(genus))
-    return redirect(url_for('.edit', id=id))
+        return (resource.render_json(genus)
+                if not form.errors
+                else resource.render_json_errors(form.errors))
+
+    return resource.render_html('edit', genus=genus, form=form)
 
 
 @resource.edit
@@ -79,8 +82,8 @@ def edit(id):
 
 @resource.destroy
 @login_required
-@use_model(Genus)
-def destroy(genus, id):
+def destroy(id):
+    genus = Genus.query.get_or_404(id)
     db.session.delete(genus)
     db.session.commit()
     return '', 204

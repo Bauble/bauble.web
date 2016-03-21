@@ -1,7 +1,7 @@
 from functools import partial, wraps
 import inspect
 
-from flask import abort, render_template, Blueprint
+from flask import abort, current_app, render_template, Blueprint
 
 import bauble.utils as utils
 import bauble.db as db
@@ -91,6 +91,9 @@ class Resource(Blueprint):
         self.add_url_rule('/<int:id>.json', view_func=view_func, methods=['DELETE'])
 
 
+    def render_json_errors(self, errors):
+        return utils.json_response(errors)
+
     def save_request_params(self, model, form=None):
         if form is None:
             form = form_factory(model)
@@ -108,7 +111,7 @@ class Resource(Blueprint):
                 db.session.commit()
             except Exception as exc:
                 form.errors['default'] = 'Could not save {}'.format(model.__class__.__name__.lower)
-                self.app.logger.error(exc)
+                current_app.logger.error(exc)
 
         return form
 

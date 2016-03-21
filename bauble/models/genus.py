@@ -76,7 +76,7 @@ class Genus(db.Model):
 
     # use '' instead of None so that the constraints will work propertly
     author = Column(String(255), default='')
-    qualifier = Column(Enum('s. lat.', 's. str', ''))
+    qualifier = Column(Enum('s. lat.', 's. str'))
 
     family_id = Column(Integer, ForeignKey('family.id'), nullable=False)
     family = relationship('Family', backref=backref('genera', cascade='all,delete-orphan'))
