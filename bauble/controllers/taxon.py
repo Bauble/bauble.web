@@ -15,12 +15,14 @@ import bauble.utils as utils
 resource = Resource('taxon', __name__)
 
 @resource.index
+@login_required
 def index():
     taxa = Taxon.query.all()
     return resource.render_json(taxa)
 
 
 @resource.show
+@login_required
 def show(id):
     taxon = Taxon.query \
                  .options(orm.joinedload(*Taxon.synonyms.attr)) \
@@ -38,6 +40,7 @@ def show(id):
 
 
 @resource.new
+@login_required
 @use_model(Taxon)
 def new(taxon):
     return resource.render_html(taxon=taxon, form=form_factory(taxon))

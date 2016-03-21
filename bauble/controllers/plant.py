@@ -15,11 +15,13 @@ import bauble.utils as utils
 resource = Resource('plant', __name__)
 
 @resource.index
+@login_required
 def index():
     taxa = Plant.query.all()
     return resource.render_json(taxa)
 
 @resource.show
+@login_required
 @use_model(Plant)
 def show(plant, id):
     if request.prefers_json:
@@ -34,6 +36,7 @@ def show(plant, id):
     return resource.render_html(plant=plant, counts=counts)
 
 @resource.new
+@login_required
 @use_model(Plant)
 def new(plant):
     return resource.render_html(plant=plant, form=form_factory(plant))

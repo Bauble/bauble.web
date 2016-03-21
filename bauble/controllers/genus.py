@@ -15,6 +15,7 @@ import bauble.utils as utils
 resource = Resource('genus', __name__)
 
 @resource.index
+@login_required
 def index():
     genera = Genus.query.all()
     if request.prefers_json:
@@ -23,6 +24,7 @@ def index():
     return resource.render_html(genera=genera)
 
 @resource.show
+@login_required
 def show(id):
     genus = Genus.query \
                  .options(orm.joinedload(*Genus.synonyms.attr)) \

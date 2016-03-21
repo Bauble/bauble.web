@@ -15,11 +15,13 @@ import bauble.utils as utils
 resource = Resource('accession', __name__)
 
 @resource.index
+@login_required
 def index():
     taxa = Accession.query.all()
     return resource.render_json(taxa)
 
 @resource.show
+@login_required
 def show(id):
     accession = Accession.query \
                  .options(orm.joinedload(*Accession.synonyms.attr)) \
@@ -36,6 +38,7 @@ def show(id):
     return resource.render_html(accession=accession, counts=counts)
 
 @resource.new
+@login_required
 @use_model(Accession)
 def new(accession):
     return resource.render_html(accession=accession, form=form_factory(accession))

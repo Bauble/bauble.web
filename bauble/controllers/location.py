@@ -15,11 +15,13 @@ import bauble.utils as utils
 resource = Resource('location', __name__)
 
 @resource.index
+@login_required
 def index():
     taxa = Location.query.all()
     return resource.render_json(taxa)
 
 @resource.show
+@login_required
 @use_model(Location)
 def show(location, id):
     if request.prefers_json:
@@ -34,12 +36,14 @@ def show(location, id):
     return resource.render_html(location=location, counts=counts)
 
 @resource.new
+@login_required
 @use_model(Location)
 def new(location):
     return resource.render_html(location=location, form=form_factory(location))
 
 
 @resource.create
+@login_required
 @login_required
 def create():
     location, errors = schema_factory(Location).load(request.params)
