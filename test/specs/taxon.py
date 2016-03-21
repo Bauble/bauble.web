@@ -26,17 +26,25 @@ def test_deserialize(session, taxon):
 
 
 def test_form(session, taxon):
-    from bauble.forms import MarshmallowForm, form_factory
+    from bauble.forms import form_factory, BaseModelForm
     session.add(taxon)
     session.commit()
     form = form_factory(taxon)
-    assert form is not None
+    assert isinstance(form, BaseModelForm)
+
+
+def test_index_taxon(client, session, taxon):
+    session.add(taxon)
+    session.commit()
+    resp = client.get('/taxon')
+    assert resp.status_code == 200
+    # TODO: assert response
 
 
 def test_index_taxon_json(client, session, taxon):
     session.add(taxon)
     session.commit()
-    resp = client.get('/taxon')
+    resp = client.get('/taxon.json')
     assert resp.status_code == 200
     assert len(resp.json) == 1
     assert resp.json[0]['id'] == taxon.id
@@ -68,8 +76,8 @@ def test_post_taxon_json(client, session, genus):
     session.commit()
     sp = faker.first_name()
     data = {'sp': sp, 'genus_id': genus.id}
-    resp = client.post('/taxon', data=json.dumps(data), content_type='application/json',
-                       headers={'accept': 'application/json'})
+    resp = client.post('/taxon.json', data=json.dumps(data),
+                       content_type='application/json')
     assert resp.mimetype == 'application/json'
     assert resp.status_code == 201
 
@@ -93,9 +101,8 @@ def test_patch_taxon_json(client, session, taxon):
     session.commit()
     taxon.sp = faker.first_name()
     data = json.dumps(taxon.jsonify())
-    resp = client.patch('/taxon/{}'.format(taxon.id), data=data,
-                        content_type='application/json',
-                        headers={'accept': 'application/json'})
+    resp = client.patch('/taxon/{}.json'.format(taxon.id), data=data,
+                        content_type='application/json')
     assert resp.status_code == 200
     assert resp.mimetype == 'application/json'
     assert resp.json['id'] == taxon.id

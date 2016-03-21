@@ -29,6 +29,7 @@ def test_index_genus(client, session, genus):
     assert resp.status_code == 200
     # TODO: assert response
 
+
 def test_index_genus_json(client, session, genus):
     session.add(genus)
     session.commit()

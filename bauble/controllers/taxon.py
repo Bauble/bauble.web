@@ -18,7 +18,10 @@ resource = Resource('taxon', __name__)
 @login_required
 def index():
     taxa = Taxon.query.all()
-    return resource.render_json(taxa)
+    if request.prefers_json:
+        return resource.render_json(taxa)
+
+    return resource.render_html(taxa=taxa)
 
 
 @resource.show
@@ -41,37 +44,36 @@ def show(id):
 
 @resource.new
 @login_required
-@use_model(Taxon)
-def new(taxon):
+def new():
+    taxon = Taxon()
     return resource.render_html(taxon=taxon, form=form_factory(taxon))
 
 
 @resource.create
 @login_required
 def create():
-    taxon, errors = schema_factory(Taxon).load(request.params)
-    if errors:
-        if request.prefers_json:
-            return resource.render_json(errors, status=422)
-        return resource.render_html('new.html.jinja', form=form_factory(taxon))
+    taxon = Taxon()
+    form = resource.save_request_params(taxon)
 
-    db.session.add(taxon)
-    db.session.commit()
     if request.prefers_json:
-        return resource.render_json(taxon, status=201)
-    return resource.render_html('edit.html.jinja', taxon=taxon,
-                                form=form_factory(taxon), status=201)
+        return (resource.render_json(taxon, status=201)
+                if not form.errors
+                else resource.render_json_errors(form.errors))
+
+    return resource.render_html('new', status=201, taxon=taxon, form=form)
 
 
 @resource.update
 @login_required
-@use_model(Taxon)
-def update(taxon, id):
-    db.session.commit()
+def update(id):
+    taxon = Taxon.query.get_or_404(id)
+    form = resource.save_request_params(taxon)
     if request.prefers_json:
-        return resource.render_json(taxon)
-    # return resource.render_html(taxon=taxon, form=form_factory(taxon))
-    return redirect(url_for('.edit', id=id))
+        return (resource.render_json(taxon)
+                if not form.errors
+                else resource.render_json_errors(form.errors))
+
+    return resource.render_html('edit', taxon=taxon, form=form)
 
 
 @resource.edit
@@ -83,8 +85,8 @@ def edit(id):
 
 @resource.destroy
 @login_required
-@use_model(Taxon)
-def destroy(taxon, id):
+def destroy(id):
+    taxon = Taxon.query.get_or_404(id)
     db.session.delete(taxon)
     db.session.commit()
     return '', 204
