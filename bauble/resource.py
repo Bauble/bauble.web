@@ -92,7 +92,7 @@ class Resource(Blueprint):
 
 
     def render_json_errors(self, errors):
-        return utils.json_response(errors)
+        return utils.json_response(errors, status=422)
 
     def save_request_params(self, model, form=None):
         if form is None:
@@ -110,6 +110,7 @@ class Resource(Blueprint):
                 db.session.add(model)
                 db.session.commit()
             except Exception as exc:
+                db.session.rollback()
                 form.errors['default'] = 'Could not save {}'.format(model.__class__.__name__.lower)
                 current_app.logger.error(exc)
 
