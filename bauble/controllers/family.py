@@ -1,4 +1,4 @@
-from flask import current_app, redirect, request, url_for
+from flask import abort, request
 from flask.ext.login import login_required
 import sqlalchemy.orm as orm
 from webargs import fields
@@ -7,7 +7,6 @@ from webargs.flaskparser import use_args
 import bauble.db as db
 from bauble.forms import form_factory
 from bauble.models import Family
-from bauble.middleware import use_model
 from bauble.resource import Resource
 import bauble.utils as utils
 
@@ -17,10 +16,10 @@ resource = Resource('family', __name__)
 @login_required
 def index():
     families = Family.query.all()
-    if request.prefers_json:
-        return resource.render_json(families)
+    if not request.accept_json:
+        abort(406)
 
-    return resource.render_html(families=families)
+    return resource.render_json(families)
 
 
 @resource.show

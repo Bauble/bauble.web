@@ -1,4 +1,4 @@
-from flask import redirect, request, url_for
+from flask import abort, redirect, request, url_for
 from flask.ext.login import login_required
 import sqlalchemy.orm as orm
 from webargs import fields
@@ -17,8 +17,12 @@ resource = Resource('accession', __name__)
 @resource.index
 @login_required
 def index():
-    taxa = Accession.query.all()
-    return resource.render_json(taxa)
+    accessions = Accession.query.all()
+    if not request.accept_json:
+        abort(406)
+
+    return resource.render_json(accessions)
+
 
 @resource.show
 @login_required

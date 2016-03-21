@@ -22,18 +22,10 @@ def test_form(session, genus):
     assert isinstance(form, BaseModelForm)
 
 
-def test_index_genus(client, session, genus):
-    session.add(genus)
-    session.commit()
-    resp = client.get('/genus')
-    assert resp.status_code == 200
-    # TODO: assert response
-
-
 def test_index_genus_json(client, session, genus):
     session.add(genus)
     session.commit()
-    resp = client.get('/genus.json')
+    resp = client.get('/genus')
     assert resp.status_code == 200
     assert len(resp.json) == 1
     assert resp.json[0]['id'] == genus.id

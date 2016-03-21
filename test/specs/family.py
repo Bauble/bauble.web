@@ -22,18 +22,10 @@ def test_form(session, family):
     assert isinstance(form, BaseModelForm)
 
 
-def test_index_family(client, session, family):
-    session.add(family)
-    session.commit()
-    resp = client.get('/family')
-    assert resp.status_code == 200
-    # TODO: assert response
-
-
 def test_index_family_json(client, session, family):
     session.add(family)
     session.commit()
-    resp = client.get('/family.json')
+    resp = client.get('/family')
     assert resp.status_code == 200
     assert len(resp.json) == 1
     assert resp.json[0]['id'] == family.id

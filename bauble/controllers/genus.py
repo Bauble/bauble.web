@@ -1,4 +1,4 @@
-from flask import redirect, request, url_for
+from flask import abort, request
 from flask.ext.login import login_required
 import sqlalchemy.orm as orm
 from webargs import fields
@@ -7,9 +7,7 @@ from webargs.flaskparser import use_args
 import bauble.db as db
 from bauble.forms import form_factory
 from bauble.models import Genus
-from bauble.middleware import use_model
 from bauble.resource import Resource
-from bauble.schema import schema_factory
 import bauble.utils as utils
 
 resource = Resource('genus', __name__)
@@ -18,10 +16,11 @@ resource = Resource('genus', __name__)
 @login_required
 def index():
     genera = Genus.query.all()
-    if request.prefers_json:
-        return resource.render_json(genera)
+    if not request.accept_json:
+        abort(406)
 
-    return resource.render_html(genera=genera)
+    return resource.render_json(genera)
+
 
 @resource.show
 @login_required
