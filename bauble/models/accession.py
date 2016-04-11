@@ -1,9 +1,8 @@
 from marshmallow import fields
-from sqlalchemy import (event, func, Boolean, Column, Date, Enum, ForeignKey, Integer,
-                        String, Text, UniqueConstraint)
+from sqlalchemy import (event, func, Boolean, Column, Date, Enum, ForeignKey,
+                        Integer, String, Text)
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import (backref, object_mapper, reconstructor, relationship,
-                            MapperExtension, EXT_CONTINUE)
+from sqlalchemy.orm import backref, object_mapper, reconstructor, relationship
 from sqlalchemy.orm.session import object_session
 
 import bauble.db as db

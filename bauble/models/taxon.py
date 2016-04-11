@@ -384,77 +384,6 @@ class TaxonSynonym(db.Model):
 
 
 
-class VernacularName(db.Model):
-    """
-    :Table name: vernacular_name
-
-    :Columns:
-        *name*:
-            the vernacular name
-
-        *language*:
-            language is free text and could include something like UK
-            or US to identify the origin of the name
-
-        *taxon_id*:
-            key to the taxon this vernacular name refers to
-
-    :Properties:
-
-    :Constraints:
-    """
-    name = Column(String(128), nullable=False)
-    language = Column(String(128))
-    taxon_id = Column(Integer, ForeignKey('taxon.id'), nullable=False)
-    __table_args__ = (UniqueConstraint('name', 'language',
-                                       'taxon_id', name='vn_index'), {})
-
-    def __str__(self):
-        if self.name:
-            return self.name
-        else:
-            return ''
-
-
-
-class DefaultVernacularName(db.Model):
-    """
-    :Table name: default_vernacular_name
-
-    DefaultVernacularName is not meant to be instantiated directly.
-    Usually the default vernacular name is set on a taxon by setting
-    the default_vernacular_name property on Taxon to a
-    VernacularName instance
-
-    :Columns:
-        *id*:
-            Integer, primary_key
-
-        *taxon_id*:
-            foreign key to taxon.id, nullable=False
-
-        *vernacular_name_id*:
-
-    :Properties:
-
-    :Constraints:
-    """
-    __table_args__ = (UniqueConstraint('taxon_id', 'vernacular_name_id',
-                                       name='default_vn_index'), {})
-
-    # columns
-    taxon_id = Column(Integer, ForeignKey('taxon.id'), nullable=False)
-    vernacular_name_id = Column(Integer, ForeignKey('vernacular_name.id'),
-                                nullable=False)
-
-    # relations
-    vernacular_name = relationship(VernacularName, uselist=False)
-
-    def __str__(self):
-        return str(self.vernacular_name)
-
-
-
 class TaxonDistribution(db.Model):
     """
     :Table name: taxon_distribution
@@ -514,5 +443,3 @@ mapper_search = search.get_strategy('MapperSearch')
 mapper_search.add_meta(('taxa', 'taxon', 'sp'), Taxon,
                        ['sp', 'sp2', 'infrasp1', 'infrasp2',
                         'infrasp3', 'infrasp4'])
-mapper_search.add_meta(('vernacular', 'vern', 'common'),
-                       VernacularName, ['name'])

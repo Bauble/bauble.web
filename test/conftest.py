@@ -106,3 +106,8 @@ def plant(accession, location):
 def source_detail():
     from bauble.models import SourceDetail
     return SourceDetail(name=faker.company())
+
+@pytest.fixture()
+def vernacular_name(taxon):
+    from bauble.models import VernacularName
+    return VernacularName(name=faker.pystr(), language=faker.pystr(), taxon=taxon)
