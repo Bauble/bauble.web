@@ -1,16 +1,19 @@
-from bauble.models.geography import Geography
-from bauble.models.family import Family, FamilyNote, FamilySynonym
-from bauble.models.genus import Genus, GenusNote, GenusSynonym
-from bauble.models.taxon import (Taxon, TaxonDistribution, TaxonNote, TaxonSynonym,
-                                 VernacularName)
-from bauble.models.accession import Accession, AccessionNote
-from bauble.models.plant import Plant, PlantChange
-from bauble.models.location import Location
-from bauble.models.source import Source, SourceDetail, Collection
-from bauble.models.propagation import (Propagation, PlantPropagation, PropRooted,
-                                       PropCutting, PropSeed)
-from bauble.models.report import Report
+from os.path import dirname, basename, isfile
+import glob
+from importlib import import_module
+from inspect import isclass
+import sys
 
-from bauble.models.user import User
-from bauble.models.organization import Organization
-from bauble.models.invitation import Invitation
+import bauble.db as db
+
+# import all model subclasses in this package
+modules = glob.glob(dirname(__file__) + "/*.py")
+for filename in modules:
+    if not isfile(filename) or filename == __file__:
+        continue
+    module_name = basename(filename)[:-3]
+    mod = import_module('.{}'.format(module_name), __package__)
+    for attr_name in dir(mod):
+        attr = getattr(mod, attr_name)
+        if isclass(attr) and issubclass(attr, db.Model):
+            setattr(sys.modules[__name__], attr_name, attr)
