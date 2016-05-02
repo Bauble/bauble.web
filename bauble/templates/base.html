@@ -6,17 +6,19 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
         <meta name="apple-mobile-web-app-capable" content="yes">
         {% include '_css.html' %}
-        {% assets "js_all" %}
-            <script type="text/javascript" src="{{ ASSET_URL }}"></script>
-        {% endassets %}
         <title>Bauble</title>
     </head>
-    <body ng-app="bauble-app" >
+    <body>
+        <app>
         {% include '_nav.html' %}
         <div id="content" class="container-fluid">
             <div ui-view autoscroll="false">
                 {% block content %}{% endblock %}
             </div>
         </div>
+        </app>
+        {% assets "js_all" %}
+            <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+        {% endassets %}
     </body>
 </html>

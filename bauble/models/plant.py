@@ -7,7 +7,7 @@ from sqlalchemy.exc import DBAPIError
 import bauble.db as db
 #from bauble.error import check, CheckConditionError
 
-from bauble.models import Accession
+# from bauble.models import Accession
 from bauble.models.location import Location
 from bauble.models.propagation import PlantPropagation
 import bauble.utils as utils
@@ -40,50 +40,50 @@ def plant_markup_func(plant):
         return utils.xml_safe_utf8(plant), sp_str
 
 
-def get_next_code(acc):
-    """
-    Return the next available plant code for an accession.
+# def get_next_code(acc):
+#     """
+#     Return the next available plant code for an accession.
 
-    This function should be specific to the institution.
+#     This function should be specific to the institution.
 
-    If there is an error getting the next code the None is returned.
-    """
-    # auto generate/increment the accession code
-    session = db.Session()
-    codes = session.query(Plant.code).join(Accession).\
-        filter(Accession.id == acc.id).all()
-    next = 1
-    if codes:
-        try:
-            next = max([int(code[0]) for code in codes]) + 1
-        except Exception as e:
-            return None
-    return utils.utf8(next)
+#     If there is an error getting the next code the None is returned.
+#     """
+#     # auto generate/increment the accession code
+#     session = db.Session()
+#     codes = session.query(Plant.code).join(Accession).\
+#         filter(Accession.id == acc.id).all()
+#     next = 1
+#     if codes:
+#         try:
+#             next = max([int(code[0]) for code in codes]) + 1
+#         except Exception as e:
+#             return None
+#     return utils.utf8(next)
 
 
-def is_code_unique(plant, code):
-    """
-    Return True/False if the code is a unique Plant code for accession.
+# def is_code_unique(plant, code):
+#     """
+#     Return True/False if the code is a unique Plant code for accession.
 
-    This method will also take range values for code that can be passed
-    to utils.range_builder()
-    """
-    # if the range builder only creates one number then we assume the
-    # code is not a range and so we test against the string version of
-    # code
-    codes = map(utils.utf8, utils.range_builder(code))  # test if a range
-    if len(codes) == 1:
-        codes = [utils.utf8(code)]
+#     This method will also take range values for code that can be passed
+#     to utils.range_builder()
+#     """
+#     # if the range builder only creates one number then we assume the
+#     # code is not a range and so we test against the string version of
+#     # code
+#     codes = map(utils.utf8, utils.range_builder(code))  # test if a range
+#     if len(codes) == 1:
+#         codes = [utils.utf8(code)]
 
-    # reference accesssion.id instead of accession_id since
-    # setting the accession on the model doesn't set the
-    # accession_id until the session is flushed
-    session = db.Session()
-    count = session.query(Plant).join('accession').\
-        filter(and_(Accession.id == plant.accession.id,
-                    Plant.code.in_(codes))).count()
-    session.close()
-    return count == 0
+#     # reference accesssion.id instead of accession_id since
+#     # setting the accession on the model doesn't set the
+#     # accession_id until the session is flushed
+#     session = db.Session()
+#     count = session.query(Plant).join('accession').\
+#         filter(and_(Accession.id == plant.accession.id,
+#                     Plant.code.in_(codes))).count()
+#     session.close()
+#     return count == 0
 
 
 # TODO: what would happend if the PlantRemove.plant_id and

@@ -6,7 +6,7 @@ from webargs.flaskparser import use_args
 
 import bauble.db as db
 from bauble.forms import form_factory
-from bauble.models import Taxon
+from bauble.models import Geography, Taxon
 from bauble.resource import Resource
 import bauble.utils as utils
 
@@ -44,7 +44,9 @@ def show(id):
 @login_required
 def new():
     taxon = Taxon()
-    return resource.render_html(taxon=taxon, form=form_factory(taxon))
+    geographies = Geography.query.all()
+    return resource.render_html(taxon=taxon, geographies=geographies,
+                                form=form_factory(taxon))
 
 
 @resource.create
@@ -52,6 +54,8 @@ def new():
 def create():
     taxon = Taxon()
     form = resource.save_request_params(taxon)
+
+    # TODO: accept vernacular names for create only
 
     if request.prefers_json:
         return (resource.render_json(taxon, status=201)
@@ -78,7 +82,9 @@ def update(id):
 @login_required
 def edit(id):
     taxon = Taxon.query.get_or_404(id)
-    return resource.render_html(taxon=taxon, form=form_factory(taxon))
+    geographies = Geography.query.all()
+    return resource.render_html(taxon=taxon, geographies=geographies,
+                                form=form_factory(taxon))
 
 
 @resource.destroy

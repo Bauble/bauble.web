@@ -3,7 +3,8 @@ from functools import lru_cache
 from flask_wtf import Form
 from sqlalchemy import inspect
 from sqlalchemy.orm import Mapper
-from wtforms_alchemy import model_form_factory, null_or_unicode, FormGenerator as _FormGenerator
+from wtforms_alchemy import (model_form_factory, model_form_meta_factory, null_or_unicode,
+                             FormGenerator as _FormGenerator, ModelFormMeta)
 
 
 BaseModelForm = model_form_factory(Form)

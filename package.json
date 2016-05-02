@@ -1,6 +1,7 @@
 {
   "name": "bauble",
   "version": "1.0.0",
+  "private": true,
   "engines": {
     "node": "~4.4.0"
   },
@@ -23,7 +24,7 @@
     "moment": "^2.10.6",
     "parse-link-header": "^0.4.1",
     "typeahead.js": "^0.11.1",
-    "vue": "^1.0.17"
+    "vue": "^1.0.20"
   },
   "devDependencies": {
     "babel-core": "^6.7.2",

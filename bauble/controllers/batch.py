@@ -6,7 +6,7 @@ from webargs.flaskparser import use_args
 blueprint = bp = Blueprint('batch', __name__)
 
 class RequestSchema(Schema):
-    relative_url = fields.Str(required=True)
+    url = fields.Str(required=True)
     method = fields.Str(validate=validate.OneOf(['GET', 'POST', 'PATCH', 'DELETE']),
                         missing='GET')
     body = fields.Str()
@@ -24,12 +24,15 @@ def batch():
 
     :statuscode 207: Multi status
     """
+
+    # TODO: we could probably turn off csrf protection for each requests
+    # and only use the CSRF in the header of the parent request
     requests, err = RequestSchema().load(request.get_json(), many=True)
     responses = []
     status_code = 207
     for req in requests:
         method = req['method']
-        url = req['relative_url']
+        url = req['url']
         body = req.get('body', None)
         headers = req.get('headers', {})
 

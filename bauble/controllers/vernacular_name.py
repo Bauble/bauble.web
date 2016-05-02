@@ -45,6 +45,9 @@ def create(taxon_id):
     taxon.vernacular_names.append(vernacular_name)
     form = resource.save_request_params(vernacular_name)
 
+    # TODO this should always return json and if the Accept
+    # header doesn't allow for json then we should return an error
+
     if request.prefers_json:
         return (resource.render_json(vernacular_name, status=201)
                 if not form.errors

@@ -14,6 +14,7 @@ from flask.ext.migrate import Migrate
 from flask.ext.login import LoginManager
 from flask.ext.sslify import SSLify
 from werkzeug.routing import BaseConverter
+from werkzeug.wrappers import AcceptMixin
 
 class JSONEncoder(flask.json.JSONEncoder):
     def default(self, obj):
@@ -37,8 +38,13 @@ class RegexConverter(BaseConverter):
 class Request(flask.Request):
 
     @property
+    def accept_json(self):
+        return len(self.accept_mimetypes) == 0 or self.accept_mimetypes.accept_json
+
+    @property
     def prefers_json(self):
-        return self.path.endswith('.json') or self.accept_mimetypes.best == 'application/json'
+        return (self.path.endswith('.json') or
+                self.accept_mimetypes.best == 'application/json')
 
     @property
     def is_json(self):
@@ -102,7 +108,7 @@ def create_app(config_filename=None):
 
     from bauble.resource import Resource
     controllers = ['search', 'family', 'genus', 'taxon', 'accession',
-                   'plant', 'location']
+                   'plant', 'location', 'vernacular_name']
     for controller in controllers:
         module = import_module('bauble.controllers.{}'.format(controller))
         for attr_name in dir(module):

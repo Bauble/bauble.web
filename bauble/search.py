@@ -1,5 +1,3 @@
-import weakref
-
 from flask.ext.babel import gettext as _, ngettext as _n
 from pyparsing import *
 from sqlalchemy import *
@@ -8,7 +6,6 @@ from sqlalchemy.orm import *
 import bauble
 import bauble.i18n
 from bauble.error import check, BaubleError
-import bauble.db as db
 
 #from bauble.utils.log import debug
 import bauble.utils as utils

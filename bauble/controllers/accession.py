@@ -43,8 +43,8 @@ def show(id):
 
 @resource.new
 @login_required
-@use_model(Accession)
-def new(accession):
+def new():
+    accession = Accession()
     return resource.render_html(accession=accession, form=form_factory(accession))
 
 

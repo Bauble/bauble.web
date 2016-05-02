@@ -22,8 +22,8 @@ css_all = Bundle(sass_app,
 
 find_files = lambda p, g: (str(p.relative_to('bauble/static')) for p in Path(p).glob(g))
 
-js_bundle = Bundle("app.js",
-                   depends=['*.js', 'components/*.js', 'components/*.vue'],
+js_bundle = Bundle("main.js",
+                   depends=['*.js', '*.vue', 'components/*.js', 'components/*.vue'],
                    # depends=find_files('bauble/static', '**/*.js'),
                    # depends=chain(find_files('bauble/static/components', '**/*.js'),
                    #               find_files('bauble/static/shared', '**/*.js')),
