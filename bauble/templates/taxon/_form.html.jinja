@@ -200,14 +200,12 @@
                         </div> <!-- .row -->
 
                         <div id="vernacular-names">
-                            {% for vn in taxon.vernacular_names %}
-                                <vernacular-name
-                                    taxon-id="{{ vn.taxon_id }}"
-                                    id="{{ vn.id }}"
-                                    name="{{ vn.name }}" language="{{ vn.language }}"
-                                    default="{{ vn.default }}"
-                                    v-on:remove="removeVernacularName({{ vn.id }})">
-                                </vernacular-name>
+                            {% for vn in form.vernacular_names %}
+                                {{ vn['id'](type='hidden') }}
+                                {{ vn['name'] }}
+                                {{ vn.language }}
+                                {{ vn.destroy_ }}
+                                {#{ vn.method_(type='hidden') }#}
                             {% endfor %}
                         </div>
                         <button class="vn-add-btn btn" type="button"

@@ -1,13 +1,15 @@
 from itertools import chain
 
 from flask.ext.babel import gettext as _, ngettext as _n
-from sqlalchemy import (func, Boolean, Column, Date, Enum, ForeignKey, Integer, String,
-                        Text, UniqueConstraint)
+from sqlalchemy import (func, Boolean, Column, Date, Enum, ForeignKey, Integer,
+                        String, Text)
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.associationproxy import association_proxy
 
 import bauble.db as db
+from bauble.models.default_vernacular_name import DefaultVernacularName
 import bauble.search as search
+import bauble.utils as utils
 
 class VNList(list):
     """

@@ -1,7 +1,7 @@
 from functools import partial, wraps
 import inspect
 
-from flask import abort, current_app, render_template, Blueprint
+from flask import abort, current_app, render_template, request, Blueprint
 
 import bauble.utils as utils
 import bauble.db as db
@@ -94,9 +94,11 @@ class Resource(Blueprint):
     def render_json_errors(self, errors):
         return utils.json_response(errors, status=422)
 
+
     def save_request_params(self, model, form=None):
-        if form is None:
-            form = form_factory(model)
+        # a flask_wtf.form will get populated from request.form by default
+        # or request.json if the content type is json
+        form = form_factory(model) if form is None else form
 
         if form.validate_on_submit():
             form.populate_obj(model)

@@ -1,16 +1,43 @@
 from flask import abort, request
 from flask.ext.login import login_required
+from wtforms_alchemy import ModelFieldList, ModelForm, ModelFormField, model_form_factory
+from wtforms.fields import FormField, BooleanField, StringField
+import wtforms.widgets as widgets
 import sqlalchemy.orm as orm
 from webargs import fields
 from webargs.flaskparser import use_args
 
 import bauble.db as db
-from bauble.forms import form_factory
-from bauble.models import Geography, Taxon
+# from bauble.controllers.vernacular_name import Resource as VernacularNameResource
+from bauble.forms import form_factory, form_class_factory, BaseModelForm
+from bauble.models import Geography, Taxon, VernacularName, DefaultVernacularName
 from bauble.resource import Resource
 import bauble.utils as utils
 
 resource = Resource('taxon', __name__)
+
+class HiddenBooleanField(BooleanField):
+    widget = widgets.HiddenInput()
+
+class RelationshipFormMixin(BaseModelForm):
+    destroy_ = HiddenBooleanField()
+
+class OneToManyField(ModelFieldList):
+    def __init__(self, model, *args, **kwargs):
+        model_form = model_form_factory(RelationshipFormMixin)
+        form_cls = form_class_factory(model, model_form, include_primary_keys=True)
+        super().__init__(ModelFormField(form_cls), *args, **kwargs)
+
+
+class OneToOneField(ModelFormField):
+    def __init__(self, model, *args, **kwargs):
+        model_form = model_form_factory(RelationshipFormMixin)
+        form_cls = form_class_factory(model, model_form, include_primary_keys=True)
+        super().__init__(form_cls, *args, **kwargs)
+
+
+class TaxonForm(form_class_factory(Taxon)):
+    vernacular_names = OneToManyField(VernacularName)
 
 @resource.index
 @login_required
@@ -46,14 +73,49 @@ def new():
     taxon = Taxon()
     geographies = Geography.query.all()
     return resource.render_html(taxon=taxon, geographies=geographies,
-                                form=form_factory(taxon))
+                                form=TaxonForm)
+                                # form=form_factory(taxon))
+
+def accept_nested(attribute, model):
+    # TODO: maybe instead of having a accept nested we can just subclass
+    # the form and use a wtfoms field enclosure: http://wtforms.readthedocs.io/en/latest/fields.html#field-enclosures
+    def decorator(f):
+        def wrapper(*args, **kwargs):
+            return f(*args, **kwargs)
+        return wrapper
+    return decorator
+
+# def accept_nested_resources(model_or_form_cls, *kwargs):
+#     form_cls = forms.form_class_factory(model_or_form_cls) \
+#         if isinstance(db.Model) else model_or_form_Cls
+
+#     class ExtendedForm(form_cls):
+
+def process_nested_resource(param_name, resource_name):
+    values = request.params.get(param_name, None)
+    if values is None:
+        return
+
+    def forward_request(data):
+        print('data: ', data)
+        # TODO:
+
+    if not isinstance(values, (list, tuple)):
+        forward_request(values)
+        return
+
+    for val in values:
+        forward_request(val)
 
 
 @resource.create
 @login_required
+@accept_nested('vernacular_names', model=VernacularName)
 def create():
     taxon = Taxon()
-    form = resource.save_request_params(taxon)
+    form = resource.save_request_params(taxon, form=TaxonForm())
+
+    process_nested_resource('vernacular_names',  'vernacular_name')
 
     # TODO: accept vernacular names for create only
 
@@ -81,10 +143,12 @@ def update(id):
 @resource.edit
 @login_required
 def edit(id):
-    taxon = Taxon.query.get_or_404(id)
+    taxon = Taxon.query \
+                 .options(orm.joinedload('vernacular_names')) \
+                 .get_or_404(id)
     geographies = Geography.query.all()
     return resource.render_html(taxon=taxon, geographies=geographies,
-                                form=form_factory(taxon))
+                                form=TaxonForm(obj=taxon))
 
 
 @resource.destroy

@@ -1,6 +1,7 @@
 from faker import Faker
 from flask import json
 
+import bauble.db as db
 from bauble.models import Taxon
 
 faker = Faker()
@@ -25,12 +26,35 @@ def test_deserialize(session, taxon):
     assert taxon_json['sp'] == taxon.sp
 
 
-def test_form(session, taxon):
-    from bauble.forms import form_factory, BaseModelForm
+def test_form(session, genus, taxon):
+    # from bauble.forms import form_factory, BaseModelForm
+    from bauble.controllers.taxon import TaxonForm
     session.add(taxon)
     session.commit()
-    form = form_factory(taxon)
-    assert isinstance(form, BaseModelForm)
+    data = {
+        'sp': faker.first_name(),
+        'genus_id': genus.id,
+        'vernacular_names': [{
+            'name': faker.first_name(),
+            'language': 'Macedamian',
+            '_destroy': True
+        }]
+    }
+    form = TaxonForm(data=data)
+    taxon = Taxon()
+    form.populate_obj(taxon)
+    for key, value in form.data.items():
+        print('{} - {}'.format(key, value))
+    db.session.add(taxon)
+    db.session.commit()
+    print('taxon.vernacular_names: ', taxon.vernacular_names)
+    assert len(data['vernacular_names']) == len(taxon.vernacular_names)
+    for vn in taxon.vernacular_names:
+        assert vn.id is not None
+    db.session.refresh(taxon)
+    assert taxon.id is not None
+    # form = form_factory(taxon)
+    # assert isinstance(form, BaseModelForm)
 
 
 def test_index_taxon_json(client, session, taxon):
@@ -46,18 +70,36 @@ def test_post_taxon_json(client, session, genus):
     session.add(genus)
     session.commit()
     sp = faker.first_name()
-    data = {'sp': sp, 'genus_id': genus.id}
-    resp = client.post('/taxon.json', data=data)
-    assert resp.status_code == 201
+    data = {
+        'sp': sp,
+        'genus_id': genus.id,
+        'vernacular_names': [{
+            'name': faker.first_name(),
+            'language': 'Macedamian'
+        }]
+    }
+    resp = client.post('/taxon.json', data=json.dumps(data),
+                       content_type='application/json')
+    assert resp.status_code == 201, resp.data.decode('utf-8')
     assert resp.json['id'] is not None
     assert resp.json['sp'] == sp
+
+    taxon = Taxon.query.get_or_404(resp.json['id'])
+    assert len(data['vernacular_names']) == len(taxon.vernacular_names)
 
 
 def test_post_taxon(client, session, genus):
     session.add(genus)
     session.commit()
     sp = faker.first_name()
-    data = {'sp': sp, 'genus_id': genus.id}
+    data = {
+        'sp': sp,
+        'genus_id': genus.id,
+        'vernacular_names': [{
+            'name': faker.first_name(),
+            'language': 'Macedamian'
+        }]
+    }
     resp = client.post('/taxon', data=data)
     assert resp.status_code == 201
     assert resp.mimetype == 'text/html'

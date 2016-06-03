@@ -3,8 +3,8 @@ from functools import lru_cache
 from flask_wtf import Form
 from sqlalchemy import inspect
 from sqlalchemy.orm import Mapper
-from wtforms_alchemy import (model_form_factory, model_form_meta_factory, null_or_unicode,
-                             FormGenerator as _FormGenerator, ModelFormMeta)
+from wtforms_alchemy import (model_form_factory, null_or_unicode,
+                             FormGenerator as _FormGenerator)
 
 
 BaseModelForm = model_form_factory(Form)
@@ -36,18 +36,24 @@ class FormGenerator(_FormGenerator):
 
 
 @lru_cache()
-def form_class_factory(model_cls):
+def form_class_factory(model_cls, base_form_cls=BaseModelForm, **kwargs):
     # equivalent to following but gives a nicer class name:
     # class UserForm(BaseModelForm):
     #     class Meta:
     #         model = User
-    Meta = type('Meta', (object, ), {
+    options = {
         'form_generator': FormGenerator,
         'model': model_cls,
         'exclude': ['created_at', 'updated_at'],
         'include_foreign_keys': True
-    })
-    ModelForm = type('{}Form'.format(model_cls.__name__), (BaseModelForm, ), {
+    }
+    options.update(kwargs)
+
+    Meta = type('Meta', (object, ), options)
+
+    # dynamically define our form type that extends base
+    # print('model_cls: ', model_cls)
+    ModelForm = type('{}Form'.format(model_cls.__name__), (base_form_cls, ), {
         'Meta': Meta
     })
     return ModelForm
